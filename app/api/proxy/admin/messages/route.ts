@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
 
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+
 async function forward(req: Request) {
   try {
     const url = new URL(req.url);
 
     // remove the prefix /api/proxy/admin/messages
-    const prefix = '/proxy/admin/messages';
+    const prefix = '/api/proxy/admin/messages';
     let forwardPath = url.pathname.startsWith(prefix) ? url.pathname.slice(prefix.length) : '';
     if (forwardPath.startsWith('/')) forwardPath = forwardPath.slice(1);
 
-    const targetBase = 'http://127.0.0.1:8000/admin/messages';
+    const targetBase = `${BACKEND_URL}/api/admin/messages`;
     const targetUrl = forwardPath ? `${targetBase}/${forwardPath}${url.search}` : `${targetBase}${url.search}`;
 
     const headers: Record<string, string> = {};
@@ -26,6 +28,7 @@ async function forward(req: Request) {
     const init: RequestInit = {
       method: req.method,
       headers,
+      cache: 'no-store',
       body: ['GET', 'HEAD', 'OPTIONS'].includes(req.method) ? undefined : await req.arrayBuffer(),
     };
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
-import { Upload, Search, ChevronDown, Trash2, FileText, Loader2, X } from "lucide-react";
+import { Upload, Search, ChevronDown, Trash2, FileText, Loader2, X, Copy, Check } from "lucide-react";
 import { getAdminAuthHeaders } from "@/lib/auth";
 
 // FilerNow admin — Media Library
@@ -53,6 +53,7 @@ export default function MediaLibrary() {
   const [dragActive, setDragActive] = useState(false);
   const [uploading, setUploading] = useState<{ name: string; progress: number }[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const filterRef = useRef<HTMLDivElement | null>(null);
 
@@ -194,6 +195,17 @@ export default function MediaLibrary() {
       setError("Failed to delete media");
     } finally {
       setDeletingId(null);
+    }
+  };
+
+  const copyLiveLink = async (item: MediaItem) => {
+    try {
+      await navigator.clipboard.writeText(item.url);
+      setCopiedId(item.id);
+      window.setTimeout(() => setCopiedId((current) => (current === item.id ? null : current)), 1500);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to copy live link");
     }
   };
 
@@ -373,18 +385,33 @@ export default function MediaLibrary() {
                     </div>
                   )}
 
-                  <button
-                    onClick={() => deleteMedia(item.id)}
-                    disabled={deletingId === item.id}
-                    aria-label={`Delete ${label}`}
-                    className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-neutral-500 opacity-0 shadow-sm transition hover:bg-rose-50 hover:text-rose-600 group-hover:opacity-100 disabled:opacity-100"
-                  >
-                    {deletingId === item.id ? (
-                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-3.5 w-3.5" strokeWidth={1.8} />
-                    )}
-                  </button>
+                  <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition group-hover:opacity-100">
+                    <button
+                      onClick={() => copyLiveLink(item)}
+                      aria-label={`Copy live link for ${label}`}
+                      title="Copy live link"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-neutral-500 shadow-sm transition hover:bg-neutral-50 hover:text-neutral-800"
+                    >
+                      {copiedId === item.id ? (
+                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5" strokeWidth={1.8} />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => deleteMedia(item.id)}
+                      disabled={deletingId === item.id}
+                      aria-label={`Delete ${label}`}
+                      title="Delete media"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/90 text-neutral-500 shadow-sm transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-100"
+                    >
+                      {deletingId === item.id ? (
+                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                      ) : (
+                        <Trash2 className="h-3.5 w-3.5" strokeWidth={1.8} />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="px-3 py-2.5">

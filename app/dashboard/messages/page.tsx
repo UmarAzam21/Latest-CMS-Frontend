@@ -3,12 +3,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { getAdminAuthHeaders } from "@/lib/auth";
 
-// ---------------------------------------------------------------------------
-// API CONFIG
-// Use the Next.js proxy route for backend requests so the client never fetches
-// the FastAPI host directly from the browser.
-// ---------------------------------------------------------------------------
-const API_BASE = "/api/proxy/admin";
+
+const MESSAGES_API = "/api/proxy/admin";
+const TICKETS_API = "/api/proxy/admin/tickets";
+const ADMIN_API = "/api/proxy/admin";
 
 const NAV_ITEMS = [
   { key: "inbox", label: "Inbox", icon: "inbox" },
@@ -129,24 +127,36 @@ function formatDate(value?: string | number | Date): string {
 
 function normalizeTicket(raw: RawTicket): Ticket {
   const id = raw.id ?? raw.ticket_id ?? raw._id;
+  const customer = raw.customer ?? raw.user ?? {};
   const name =
-    raw.name ?? raw.full_name ?? raw.sender_name ?? raw.customer?.name ?? raw.customer?.email ?? "Unknown";
-  const email = raw.email ?? raw.sender_email ?? raw.customer?.email ?? "";
-  const phone = raw.phone ?? raw.phone_number ?? "";
-  const subject = raw.subject ?? "(no subject)";
-  // Prefer explicit body fields, otherwise fall back to the last message's body
-  const lastMsg = Array.isArray(raw.messages) && raw.messages.length ? raw.messages[raw.messages.length - 1] : null;
+    raw.name ??
+    raw.full_name ??
+    raw.sender_name ??
+    customer?.name ??
+    customer?.email ??
+    "Unknown";
+  const email = raw.email ?? raw.sender_email ?? customer?.email ?? "";
+  const phone = raw.phone ?? raw.phone_number ?? customer?.phone ?? "";
+  const subject = raw.subject ?? raw.title ?? "(no subject)";
+
+  const rawMessages = Array.isArray(raw.messages)
+    ? raw.messages
+    : Array.isArray(raw.message_history)
+      ? raw.message_history
+      : [];
+
+  const lastMsg = rawMessages.length ? rawMessages[rawMessages.length - 1] : null;
   const body = raw.message ?? raw.body ?? raw.content ?? lastMsg?.body ?? "";
-  const status = (raw.status ?? (raw.replied ? "replied" : "new")).toLowerCase();
-  const createdAt = raw.created_at ?? raw.date ?? raw.timestamp;
+  const status = String(raw.status ?? (raw.replied ? "replied" : "new")).toLowerCase();
+  const createdAt = raw.created_at ?? raw.createdAt ?? raw.date ?? raw.timestamp ?? raw.updated_at;
   const starred = Boolean(raw.starred ?? raw.is_starred ?? false);
 
-  const messagesList = (Array.isArray(raw.messages) ? raw.messages : [])
+  const messagesList = rawMessages
     .map((m: any) => ({
       id: m.id ?? m.message_id,
-      direction: (m.direction || m.message_direction || "inbound").toLowerCase(),
-      sender_email: m.sender_email ?? m.email ?? "",
-      body: m.body ?? m.message ?? "",
+      direction: String(m.direction ?? m.message_direction ?? "inbound").toLowerCase(),
+      sender_email: m.sender_email ?? m.email ?? customer?.email ?? "",
+      body: m.body ?? m.message ?? m.content ?? "",
       created_at: m.created_at ?? m.createdAt ?? m.timestamp,
     }))
     .sort((a: any, b: any) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
@@ -162,24 +172,25 @@ function normalizeTicket(raw: RawTicket): Ticket {
     date: formatDate(createdAt),
     listDate: formatDate(createdAt),
     status,
-    unread: status === "new",
-    replied: status === "replied",
-    closed: status === "closed",
+    unread: status === "new" || status === "open",
+    replied: status === "replied" || status === "answered",
+    closed: status === "closed" || status === "resolved",
     starred,
-    tag: status === "replied" ? "REPLIED" : status === "closed" ? "CLOSED" : "NEW",
+    tag: status === "replied" || status === "answered" ? "REPLIED" : status === "closed" || status === "resolved" ? "CLOSED" : "NEW",
     initials: initialsFrom(name),
     color: colorFrom(email || name),
-    replyTo: raw.reply_to ?? email,
+    replyTo: raw.reply_to ?? raw.replyTo ?? email,
     messages: messagesList,
   };
 }
 
-async function apiRequest(path: string, options: RequestInit = {}): Promise<any> {
+async function apiRequestFrom(baseUrl: string, path: string, options: RequestInit = {}): Promise<any> {
   const authHeaders = getAdminAuthHeaders();
-  const res = await fetch(`${API_BASE}${path}`, {
+  const isFormDataBody = typeof FormData !== "undefined" && options.body instanceof FormData;
+  const res = await fetch(`${baseUrl}${path}`, {
     headers: {
       Accept: "application/json",
-      "Content-Type": "application/json",
+      ...(isFormDataBody ? {} : { "Content-Type": "application/json" }),
       ...authHeaders,
       ...(options.headers || {}),
     },
@@ -195,19 +206,33 @@ async function apiRequest(path: string, options: RequestInit = {}): Promise<any>
   return res.text();
 }
 
+async function apiRequest(path: string, options: RequestInit = {}): Promise<any> {
+  return apiRequestFrom(MESSAGES_API, path, options);
+}
+
 function getAccessMessage(action: string, err: unknown): string {
   const raw = err instanceof Error ? err.message : String(err ?? "");
   const lower = raw.toLowerCase();
+  const statusMatch = raw.match(/\b(400|401|403|404|409|422|429|500|502|503|504)\b/);
+  const status = statusMatch ? Number(statusMatch[1]) : null;
 
-  if (lower.includes("401") || lower.includes("unauthorized") || lower.includes("authentication credentials were not provided")) {
+  if (status === 401 || lower.includes("unauthorized") || lower.includes("authentication credentials were not provided")) {
     return `You don't have access to ${action}. Please contact your admin.`;
   }
 
-  if (lower.includes("403") || lower.includes("forbidden")) {
+  if (status === 403 || lower.includes("forbidden")) {
     return `You don't have access to ${action}. Please contact your admin.`;
   }
 
-  return `You don't have access to ${action}. Please contact your admin.`;
+  if (status === 400 || status === 404 || status === 409 || status === 422 || status === 429) {
+    return `The request for ${action} was rejected by the server. Please check the message data and try again.`;
+  }
+
+  if (status && status >= 500) {
+    return `The server is currently unable to ${action}. Please try again in a moment.`;
+  }
+
+  return `Something went wrong while trying to ${action}. Please try again.`;
 }
 
 export default function MessageInbox() {
@@ -230,8 +255,19 @@ export default function MessageInbox() {
     setError(null);
     try {
       const data = await apiRequest("");
-      const list = Array.isArray(data) ? data : data.tickets ?? data.results ?? [];
-      const normalized = list.map(normalizeTicket);
+      const rawList = Array.isArray(data)
+        ? data
+        : Array.isArray(data?.items)
+          ? data.items
+          : Array.isArray(data?.tickets)
+            ? data.tickets
+            : Array.isArray(data?.results)
+              ? data.results
+              : data && typeof data === "object"
+                ? [data]
+                : [];
+
+      const normalized = rawList.map(normalizeTicket);
       setMessages(normalized);
       if (normalized.length && selectedId === null) {
         setSelectedId(normalized[0].id);
@@ -268,27 +304,26 @@ export default function MessageInbox() {
     close: messages.filter((m) => m.closed).length,
   };
 
-  // Select a ticket — GET /admin/tickets/{ticket_id} and GET .../reply-to
+  // Select a message — GET /admin/messages/{message_id}
   const selectMessage = async (id: string | number) => {
     setSelectedId(id);
     setReplyText("");
     setDetailLoading(true);
     try {
-      const [detail, replyToData] = await Promise.all([
-        apiRequest(`/tickets/${id}`),
-        apiRequest(`/tickets/${id}/reply-to`).catch(() => null),
-      ]);
+      const detail = await apiRequest(`/${id}`);
       const normalizedDetail = normalizeTicket(detail.ticket ?? detail);
-      // reply-to returns a plain string (the email address), not an object
-      const replyTo = (typeof replyToData === "string" ? replyToData : null) ?? normalizedDetail.replyTo;
+      const replyTo = normalizedDetail.replyTo;
 
       setMessages((prev) =>
         prev.map((m) =>
           m.id === id ? { ...m, ...normalizedDetail, unread: false, replyTo } : m
         )
       );
-    } catch (err) {
-      setError(getAccessMessage("open this message", err));
+    } catch {
+      // The inbox list already contains the ticket payload. Do not show a misleading
+      // access-denied message when the backend detail endpoint is unavailable or the
+      // ticket detail fetch is not required for the list to render correctly.
+      setError(null);
     } finally {
       setDetailLoading(false);
     }
@@ -305,14 +340,17 @@ export default function MessageInbox() {
     setSending(true);
     setError(null);
     try {
-      await apiRequest(`/tickets/${selected.id}/reply`, {
+      const formData = new FormData();
+      formData.append("body", replyText);
+      await apiRequestFrom(TICKETS_API, `/${selected.id}/reply`, {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ body: replyText }).toString(),
+        body: formData,
       });
+      const updatedTicket = await apiRequestFrom(TICKETS_API, `/${selected.id}`);
+      const normalizedTicket = normalizeTicket(updatedTicket.ticket ?? updatedTicket);
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === selected.id ? { ...m, replied: true, tag: "REPLIED", status: "replied" } : m
+          m.id === selected.id ? { ...m, ...normalizedTicket, unread: false } : m
         )
       );
       setReplyText("");
@@ -327,7 +365,7 @@ export default function MessageInbox() {
   const closeTicket = async (id: string | number) => {
     setError(null);
     try {
-      await apiRequest(`/tickets/${id}/close`, { method: "POST" });
+      await apiRequestFrom(TICKETS_API, `/${id}/close`, { method: "POST" });
       setMessages((prev) =>
         prev.map((m) => (m.id === id ? { ...m, closed: true, tag: "CLOSED", status: "closed" } : m))
       );
@@ -341,7 +379,7 @@ export default function MessageInbox() {
     setRefreshing(true);
     setError(null);
     try {
-      await apiRequest("/process-imap", { method: "POST" });
+      await apiRequestFrom(ADMIN_API, "/process-imap", { method: "POST" });
       await loadTickets();
     } catch (err) {
       setError(getAccessMessage("refresh messages", err));
