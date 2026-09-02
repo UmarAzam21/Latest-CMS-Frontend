@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { Upload, Search, FileSpreadsheet, Loader2, X, ShieldCheck, ShieldAlert } from "lucide-react";
-import { canUpdateModule } from "@/lib/auth";
+import { canUpdateModule, getAdminAuthHeaders } from "@/lib/auth";
 
 type FBREntry = {
   id: string | number;
@@ -35,9 +35,13 @@ function formatBytes(bytes?: number) {
 }
 
 export default function FBRChecklist() {
-  // Default to localhost:8000 for local development if NEXT_PUBLIC_API_BASE isn't set
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000"; // e.g. http://localhost:8000
-  const apiUrl = (path: string) => `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+  // Use the Next.js proxy route for all API calls
+  const apiUrl = (path: string) => {
+    // Normalize path: remove leading /api/ if present, then prepend /api/proxy/
+    let normalized = path.startsWith("/api/") ? path.slice(4) : path;
+    if (!normalized.startsWith("/")) normalized = "/" + normalized;
+    return `/api/proxy${normalized}`;
+  };
   const [entries, setEntries] = useState<FBREntry[]>([]);
   const [defaultEntries, setDefaultEntries] = useState<FBREntry[]>([]);
   const [datasets, setDatasets] = useState<any[]>([]);
@@ -57,7 +61,7 @@ export default function FBRChecklist() {
     setError(null);
     try {
       // Use exact datasets endpoint to list available datasets
-      const res = await fetch(apiUrl(`/api/xlsx/datasets`), {
+      const res = await fetch(apiUrl(`/xlsx/datasets`), {
         method: "GET",
         cache: "no-store",
       });
@@ -89,7 +93,7 @@ export default function FBRChecklist() {
     setError(null);
     try {
       const params = new URLSearchParams({ q, limit: String(DEFAULT_PAGE_SIZE), offset: "0" });
-      const res = await fetch(apiUrl(`/api/xlsx/search?${params.toString()}`), {
+      const res = await fetch(apiUrl(`/xlsx/search?${params.toString()}`), {
         method: "GET",
         credentials: "include",
         cache: "no-store",

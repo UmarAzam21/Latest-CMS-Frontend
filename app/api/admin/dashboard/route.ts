@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const authHeader = req.headers.get('Authorization');
 
-    const response = await fetch(`${BACKEND_URL}/api/admin/dashboard`, {
+    const response = await fetch(`${BACKEND_URL}/api/admin`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

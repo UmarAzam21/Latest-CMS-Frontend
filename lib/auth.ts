@@ -106,7 +106,8 @@ export function hasRole(requiredRoles: string[]): boolean {
 export function isSuperAdmin(): boolean {
   const user = getCurrentAdminUser();
   if (!user) return false;
-  return Boolean(user.is_superadmin) || normalizeRoleValue(user.role) === "superadmin";
+  const role = normalizeRoleValue(user.role);
+  return Boolean(user.is_superadmin) || role === "superadmin";
 }
 
 /**
