@@ -22,6 +22,16 @@ function decodeJWT(token: string): Record<string, any> | null {
   }
 }
 
+function formatLoginError(value: unknown): string {
+    if (typeof value === "string") return value;
+    if (Array.isArray(value)) return value.map(formatLoginError).filter(Boolean).join(" ");
+    if (value && typeof value === "object") {
+        const item = value as { msg?: unknown; message?: unknown; detail?: unknown; error?: unknown };
+        return formatLoginError(item.msg ?? item.message ?? item.detail ?? item.error);
+    }
+    return "Login failed. Please try again.";
+}
+
 export default function LoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
@@ -83,10 +93,11 @@ export default function LoginPage() {
             
             // Store user info including role
             // Try multiple sources for role: JWT, response.user, response root level
-            let userInfo = {
+            const userInfo = {
               id: data.user?.id || data.user?.user_id || data.id || data.user_id || "",
               email: data.user?.email || data.email || email,
               name: data.user?.name || data.user?.full_name || data.name || data.full_name || "",
+                            slug: data.user?.slug || data.slug || "",
               role: roleFromJWT || data.user?.role || data.role || "superadmin", // Default to superadmin if not found
               modules: Array.isArray(data.permissions)
                 ? data.permissions
@@ -101,7 +112,7 @@ export default function LoginPage() {
             setStoredAdminUser(userInfo);
             
             console.log("Login success:", data);
-            router.push('/dashboard')
+            router.push(userInfo.slug.toLowerCase() === "user" ? "/user-dashboard" : "/dashboard")
         } catch (err: any) {
             const raw = err?.message || "Login failed";
 
@@ -110,7 +121,7 @@ export default function LoginPage() {
             try {
                 const parsed = JSON.parse(raw);
                 if (parsed && parsed.detail) {
-                    const detail = String(parsed.detail);
+                    const detail = formatLoginError(parsed.detail);
                     if (/invalid email|invalid password|invalid email or password/i.test(detail)) {
                         friendly = "Invalid email or password.";
                     } else {

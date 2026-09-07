@@ -19,17 +19,25 @@ import { getAdminAuthHeaders, setStoredAdminToken, setStoredAdminUser } from "@/
 
 type AdminProfile = {
   name?: string;
-  email: string;
-  role: string;
+  username?: string;
+  email?: string;
+  role?: string;
   profile_image?: string;
 };
 
-export default function Topbar() {
+type TopbarProps = {
+  variant?: "admin" | "user";
+};
+
+export default function Topbar({ variant = "admin" }: TopbarProps) {
+  const isUser = variant === "user";
   const [admin, setAdmin] = useState<AdminProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const displayName = admin?.name || admin?.email || "Umar";
-  const role = admin?.role || "Super Admin";
+  const displayName = isUser
+    ? admin?.username || "User"
+    : admin?.name || admin?.email || "Umar";
+  const role = admin?.role || (isUser ? "User" : "Super Admin");
 
   useEffect(() => {
     let mounted = true;
@@ -38,7 +46,7 @@ export default function Topbar() {
       try {
         setLoading(true);
 
-        const res = await fetch("/api/admin/me", {
+        const res = await fetch(isUser ? "/auth/me" : "/api/admin/me", {
           method: "GET",
           credentials: "include",
           cache: "no-store",
@@ -80,8 +88,9 @@ export default function Topbar() {
         if (data && mounted) {
           setAdmin({
             name: data.name || "",
+            username: data.username || "",
             email: data.email || "",
-            role: data.role || "Admin",
+            role: data.role || data.user_role || (isUser ? "User" : "Admin"),
             profile_image: data.profile_image || undefined,
           });
         }
@@ -103,7 +112,7 @@ export default function Topbar() {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [isUser]);
 
   async function handleLogout() {
     try {
@@ -147,7 +156,7 @@ export default function Topbar() {
 
         <input
           type="text"
-          placeholder="Search pages, messages, media..."
+          placeholder={isUser ? "Search your workspace..." : "Search pages, messages, media..."}
           className="h-[35px] w-[360px] rounded-lg border border-slate-200 bg-[#F9FAFB] py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0"
         />
       </div>
@@ -173,7 +182,7 @@ export default function Topbar() {
         {/* Notifications */}
         <NotificationModal userId={admin?.email} />
 
-        {/* Admin Dropdown */}
+        {/* Account Dropdown */}
         <Dropdown
           trigger={
             <div className="flex cursor-pointer items-center gap-3 rounded-lg py-1 pl-1 pr-2 transition-colors hover:bg-primary-light">
@@ -220,7 +229,7 @@ export default function Topbar() {
           <DropdownItem
             label="Edit Profile"
             icon={User}
-            href="/dashboard/settings?tab=profile"
+            href={isUser ? "/user-dashboard/settings" : "/dashboard/settings?tab=profile"}
           />
 
           <div className="my-1 h-px bg-slate-100" />

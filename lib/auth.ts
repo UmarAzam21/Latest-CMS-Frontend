@@ -8,6 +8,7 @@ export interface AdminUser {
   id: string;
   email: string;
   name: string;
+  slug?: string;
   role: string;
   /**
    * Real permission data from the backend (GET /api/admin/me).

@@ -54,7 +54,7 @@ export default function SiteVisitorsChart({ stats, loading }: SiteVisitorsChartP
   const yAxisTicks = Array.from({ length: 5 }, (_, i) => Math.round((yAxisMax / 4) * i));
 
   return (
-    <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div className="h-full rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>

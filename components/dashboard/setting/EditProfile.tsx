@@ -34,9 +34,14 @@ type AdminProfileApi = {
   profile_image?: string;
   avatar?: string;
   image_url?: string;
+  username?: string;
 };
 
-export default function EditProfilePage() {
+type EditProfileProps = {
+  isUser?: boolean;
+};
+
+export default function EditProfilePage({ isUser = false }: EditProfileProps) {
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(true);
@@ -66,7 +71,7 @@ export default function EditProfilePage() {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("/api/admin/me", {
+        const res = await fetch(isUser ? "/auth/me" : "/api/admin/me", {
           method: "GET",
           credentials: "include",
           cache: "no-store",
@@ -83,13 +88,13 @@ export default function EditProfilePage() {
         const data = (await res.json()) as AdminProfileApi;
 
         setProfile({
-          name: data.name || "",
+          name: isUser ? data.username || "" : data.name || "",
           email: data.email || "",
           phone: data.phone || data.phone_number || "",
-          designation: data.designation || data.role || "",
+          designation: isUser ? "" : data.designation || data.role || "",
           bio: data.bio || "",
           avatar: data.profile_image || data.avatar || data.image_url || "",
-          role: data.role || "",
+          role: data.role || (isUser ? "User" : ""),
         });
       } catch (err) {
         console.error(err);
@@ -100,7 +105,7 @@ export default function EditProfilePage() {
     };
 
     void loadProfile();
-  }, []);
+  }, [isUser]);
 
   const updateProfile = (field: keyof Omit<ProfileForm, "email" | "role">, value: string) => {
     setProfile((p) => ({ ...p, [field]: value }));
@@ -169,27 +174,32 @@ export default function EditProfilePage() {
     try {
       setSaving(true);
 
-      const payload: Record<string, unknown> = {
-        name: profile.name,
-        phone_number: profile.phone,
-        bio: profile.bio,
-      };
+      const payload: Record<string, unknown> = isUser
+        ? {
+            username: profile.name,
+            email: profile.email,
+            phone: profile.phone,
+          }
+        : {
+            name: profile.name,
+            phone_number: profile.phone,
+            bio: profile.bio,
+          };
 
-      if (profile.designation) {
+      if (!isUser && profile.designation) {
         payload.designation = profile.designation;
       }
 
-      if (profile.avatar) {
+      if (!isUser && profile.avatar) {
         payload.profile_image = profile.avatar;
       }
 
-      // Only add password fields if user is updating password
-      if (password.newPassword && password.currentPassword) {
+      if (!isUser && password.newPassword && password.currentPassword) {
         payload.current_password = password.currentPassword;
         payload.new_password = password.newPassword;
       }
 
-      const res = await fetch("/api/admin/profile", {
+      const res = await fetch(isUser ? "/auth/me" : "/api/admin/profile", {
         method: "PATCH",
         credentials: "include",
         headers: {
@@ -203,6 +213,26 @@ export default function EditProfilePage() {
 
       if (!res.ok) {
         throw new Error(data?.error || "Unable to update profile");
+      }
+
+      if (isUser && password.newPassword && password.currentPassword) {
+        const passwordRes = await fetch("/auth/change-password", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            ...getAdminAuthHeaders(),
+          },
+          body: JSON.stringify({
+            current_password: password.currentPassword,
+            new_password: password.newPassword,
+          }),
+        });
+
+        const passwordData = await passwordRes.json();
+        if (!passwordRes.ok) {
+          throw new Error(passwordData?.detail || passwordData?.error || "Unable to change password");
+        }
       }
 
       setPassword({ currentPassword: "", newPassword: "", confirmPassword: "" });
@@ -254,36 +284,44 @@ export default function EditProfilePage() {
               </div>
             )}
 
+            {!isUser && (
+              <button
+                type="button"
+                onClick={() => avatarInputRef.current?.click()}
+                className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#c8102e] text-white shadow-sm transition-transform duration-150 hover:scale-110 active:scale-95"
+                aria-label="Change photo"
+              >
+                <Camera className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
+
+          {!isUser && (
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleAvatarSelect}
+              className="hidden"
+            />
+          )}
+
+          {!isUser && (
             <button
               type="button"
               onClick={() => avatarInputRef.current?.click()}
-              className="absolute bottom-0 right-0 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-[#c8102e] text-white shadow-sm transition-transform duration-150 hover:scale-110 active:scale-95"
-              aria-label="Change photo"
+              className="text-[11px] font-semibold text-[#c8102e] transition-colors duration-150 hover:underline"
             >
-              <Camera className="h-3.5 w-3.5" />
+              Change Photo
             </button>
-          </div>
-
-          <input
-            ref={avatarInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handleAvatarSelect}
-            className="hidden"
-          />
-
-          <button
-            type="button"
-            onClick={() => avatarInputRef.current?.click()}
-            className="text-[11px] font-semibold text-[#c8102e] transition-colors duration-150 hover:underline"
-          >
-            Change Photo
-          </button>
+          )}
         </div>
 
         <div className="mt-5 space-y-4">
           <div>
-            <label className="text-[12px] font-semibold text-[#111111]">Full Name</label>
+            <label className="text-[12px] font-semibold text-[#111111]">
+              {isUser ? "Username" : "Full Name"}
+            </label>
             <input
               value={profile.name}
               onChange={(e) => updateProfile("name", e.target.value)}
@@ -392,7 +430,7 @@ export default function EditProfilePage() {
 
       <div className="flex items-center justify-end gap-2">
         <Link
-          href="/dashboard"
+          href={isUser ? "/user-dashboard" : "/dashboard"}
           className="rounded-lg border border-slate-200 px-6 py-2.5 text-[12px] font-semibold text-slate-600 transition-all duration-150 hover:border-slate-300 hover:bg-slate-50 active:scale-95"
         >
           Cancel

@@ -1,4 +1,4 @@
-import { LayoutDashboard, Clock, TrendingUp, Pencil, Plus, Upload, Landmark, Globe, FileText, Mail, Settings, LucideIcon, ImageIcon, Search, User, Users } from "lucide-react";
+import { BadgeCheck, BellRing, Building2, Calculator, Clock, Ellipsis, FileCheck2, FileClock, FileText, Globe, Globe2, ImageIcon, KeyRound, Landmark, LayoutDashboard, LifeBuoy, LucideIcon, Mail, Pencil, Plus, ReceiptText, Search, Settings, ShieldCheck, ShoppingCart, Stamp, TrendingUp, Upload, User, Users, UsersRound } from "lucide-react";
 
 export interface NavItem {
   label: string;
@@ -149,3 +149,49 @@ export function getNavData(): NavItem[] {
     // Backend protects users/roles with require_super_admin, not module grants.
   ];
 }
+
+export function getUserNavData(): NavItem[] {
+  return [
+    { label: "Dashboard", href: "/user-dashboard", icon: LayoutDashboard },
+    { label: "Enroll Service", href: "/user-dashboard/enroll-service", icon: FileText },
+    { label: "Order", href: "/user-dashboard/order", icon: ShoppingCart },
+    { label: "Support", href: "/user-dashboard/support", icon: LifeBuoy },
+    { label: "Setting", href: "/user-dashboard/settings", icon: Settings },
+  ];
+}
+
+export const SERVICE_CATEGORIES = [
+  {
+    label: "Registration",
+    values: ["business_ntn", "simple_ntn_registration", "business_registration", "company_registration", "filer_registration", "gst_registration"],
+  },
+  {
+    label: "Compliance",
+    values: ["tax_return_filing", "fbr_notices", "wealth_statement", "dts_registration"],
+  },
+  {
+    label: "Licenses",
+    values: ["imp_exp_license_psw", "trade_mark_registration", "pec_registration", "chamber_membership", "pseb", "dnfbp"],
+  },
+] as const;
+
+export const SERVICE_ICONS: Record<string, LucideIcon> = {
+  business_ntn: Building2,
+  simple_ntn_registration: FileCheck2,
+  business_registration: BadgeCheck,
+  company_registration: Building2,
+  filer_registration: User,
+  gst_registration: ReceiptText,
+  tax_return_filing: Calculator,
+  fbr_notices: BellRing,
+  wealth_statement: FileText,
+  dts_registration: FileClock,
+  imp_exp_license_psw: KeyRound,
+  trade_mark_registration: Stamp,
+  pec_registration: ShieldCheck,
+  chamber_membership: UsersRound,
+  pseB: Globe2,
+  pseb: Globe,
+  dnfbp: Landmark,
+  other: Ellipsis,
+};

@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { getAdminAuthHeaders } from "@/lib/auth";
 
 
-const MESSAGES_API = "/api/proxy/admin";
+const MESSAGES_API = "/api/proxy/admin/messages";
 const TICKETS_API = "/api/proxy/admin/tickets";
 const ADMIN_API = "/api/proxy/admin";
 
@@ -161,6 +161,9 @@ function normalizeTicket(raw: RawTicket): Ticket {
     }))
     .sort((a: any, b: any) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
 
+  const hasReadState = raw.is_read !== undefined || raw.read !== undefined;
+  const isRead = hasReadState ? Boolean(raw.is_read ?? raw.read) : null;
+
   return {
     id,
     name,
@@ -172,7 +175,7 @@ function normalizeTicket(raw: RawTicket): Ticket {
     date: formatDate(createdAt),
     listDate: formatDate(createdAt),
     status,
-    unread: status === "new" || status === "open",
+    unread: isRead === null ? status === "new" || status === "open" : !isRead,
     replied: status === "replied" || status === "answered",
     closed: status === "closed" || status === "resolved",
     starred,
@@ -188,6 +191,7 @@ async function apiRequestFrom(baseUrl: string, path: string, options: RequestIni
   const authHeaders = getAdminAuthHeaders();
   const isFormDataBody = typeof FormData !== "undefined" && options.body instanceof FormData;
   const res = await fetch(`${baseUrl}${path}`, {
+    credentials: "include",
     headers: {
       Accept: "application/json",
       ...(isFormDataBody ? {} : { "Content-Type": "application/json" }),
@@ -246,17 +250,32 @@ export default function MessageInbox() {
   const [detailLoading, setDetailLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [unreadCount, setUnreadCount] = useState<number | null>(null);
 
   const selected = messages.find((m) => m.id === selectedId) ?? null;
 
-  // Load ticket list — GET /admin
+  const loadUnreadCount = useCallback(async () => {
+    try {
+      const data = await apiRequest("/counts");
+      const count = data?.unread_count ?? data?.unread ?? data?.count;
+      if (typeof count === "number") setUnreadCount(count);
+    } catch {
+      // Keep the locally derived count when the optional badge endpoint is unavailable.
+    }
+  }, []);
+
+  // Load ticket list — GET /api/admin
   const loadTickets = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiRequest("");
+      const data = await apiRequestFrom(ADMIN_API, "");
       const rawList = Array.isArray(data)
         ? data
+        : Array.isArray(data?.messages)
+          ? data.messages
+          : Array.isArray(data?.data)
+            ? data.data
         : Array.isArray(data?.items)
           ? data.items
           : Array.isArray(data?.tickets)
@@ -273,7 +292,11 @@ export default function MessageInbox() {
         setSelectedId(normalized[0].id);
       }
     } catch (err) {
-      setError(getAccessMessage("view messages", err));
+      const message = getAccessMessage("view messages", err);
+      setError(message);
+      if (err instanceof Error && err.message.startsWith("401|")) {
+        setMessages([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -281,6 +304,7 @@ export default function MessageInbox() {
 
   useEffect(() => {
     loadTickets();
+    loadUnreadCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -297,19 +321,21 @@ export default function MessageInbox() {
 
   const navCounts: Record<string, number> = {
     inbox: messages.filter((m) => !m.closed).length,
-    unread: messages.filter((m) => m.unread).length,
+    unread: unreadCount ?? messages.filter((m) => m.unread).length,
     replied: messages.filter((m) => m.replied).length,
     starred: messages.filter((m) => m.starred).length,
     archived: 0,
     close: messages.filter((m) => m.closed).length,
   };
 
-  // Select a message — GET /admin/messages/{message_id}
+  // Select a message — PATCH and GET /api/admin/messages/{message_id}
   const selectMessage = async (id: string | number) => {
+    const wasUnread = messages.find((message) => message.id === id)?.unread ?? false;
     setSelectedId(id);
     setReplyText("");
     setDetailLoading(true);
     try {
+      await apiRequest(`/${id}`, { method: "PATCH" });
       const detail = await apiRequest(`/${id}`);
       const normalizedDetail = normalizeTicket(detail.ticket ?? detail);
       const replyTo = normalizedDetail.replyTo;
@@ -319,6 +345,10 @@ export default function MessageInbox() {
           m.id === id ? { ...m, ...normalizedDetail, unread: false, replyTo } : m
         )
       );
+      if (wasUnread) {
+        setUnreadCount((count) => (count === null ? null : Math.max(0, count - 1)));
+      }
+      await loadUnreadCount();
     } catch {
       // The inbox list already contains the ticket payload. Do not show a misleading
       // access-denied message when the backend detail endpoint is unavailable or the

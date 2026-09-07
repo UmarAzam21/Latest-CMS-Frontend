@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Pencil, Mail, Plus, LucideIcon } from "lucide-react";
+import { BellRing, FileEdit, Mail, Pencil, Plus, LucideIcon } from "lucide-react";
 
 interface QuickAction {
   title: string;
@@ -12,7 +12,7 @@ interface QuickAction {
   iconColor: string;
 }
 
-const actions: QuickAction[] = [
+const adminActions: QuickAction[] = [
   {
     title: "Edit Homepage",
     subtitle: "Update hero, sections, content",
@@ -39,7 +39,40 @@ const actions: QuickAction[] = [
   },
 ];
 
-export default function QuickActions() {
+const userActions: QuickAction[] = [
+  {
+    title: "Edit Order Documents",
+    subtitle: "Update your order documents",
+    href: "/user-dashboard/order",
+    icon: FileEdit,
+    iconBg: "#c8102e1a",
+    iconColor: "#c8102e",
+  },
+  {
+    title: "View Latest Updates",
+    subtitle: "See your latest updates",
+    href: "/user-dashboard",
+    icon: BellRing,
+    iconBg: "#EFF6FF",
+    iconColor: "#2563EB",
+  },
+  {
+    title: "Add New Service",
+    subtitle: "Choose another service",
+    href: "/user-dashboard/enroll-service",
+    icon: Plus,
+    iconBg: "#ECFDF5",
+    iconColor: "#16A34A",
+  },
+];
+
+interface QuickActionsProps {
+  variant?: "admin" | "user";
+}
+
+export default function QuickActions({ variant = "admin" }: QuickActionsProps) {
+  const actions = variant === "user" ? userActions : adminActions;
+
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
 
@@ -50,10 +83,10 @@ export default function QuickActions() {
           <Link
             key={index}
             href={action.href}
-            className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-colors hover:bg-slate-50"
+            className="group flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition-all hover:border-[#f3b6bf] hover:bg-[#fffafa] hover:shadow-[0_8px_20px_-10px_rgba(200,16,46,0.45)]"
           >
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg transition-colors group-hover:bg-[#fee2e2]"
               style={{ backgroundColor: action.iconBg }}
             >
               <Icon size={18} strokeWidth={2} style={{ color: action.iconColor }} />

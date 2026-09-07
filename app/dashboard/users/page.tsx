@@ -63,6 +63,7 @@ async function createLead(payload) {
     id: payload.id ?? Date.now(),
     username: payload.username,
     email: payload.email,
+    cnic: payload.cnic,
     phone: payload.phone,
     service_type: payload.service_type,
     city: payload.city,
@@ -95,6 +96,7 @@ async function updateLead(id, payload, original) {
     id,
     username: payload.username,
     email: payload.email,
+    cnic: payload.cnic,
     phone: payload.phone,
     service_type: payload.service_type,
     city: payload.city,
@@ -273,6 +275,7 @@ function UserFormModal({ mode = "add", initial, onClose, onSubmit }) {
   const [form, setForm] = useState({
     username: initial?.username ?? "",
     email: initial?.email ?? "",
+    cnic: initial?.cnic ?? "",
     phone: initial?.phone ?? "",
     service_type: initial?.service_type ?? "",
     city: initial?.city ?? "",
@@ -281,7 +284,7 @@ function UserFormModal({ mode = "add", initial, onClose, onSubmit }) {
 
   const set = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 
-  const canSubmit = form.username && form.email && form.phone && form.service_type && form.city;
+  const canSubmit = form.username && form.email && form.cnic && form.phone && form.service_type && form.city;
 
   const handleSubmit = async () => {
     if (!canSubmit || submitting) return;
@@ -333,6 +336,15 @@ function UserFormModal({ mode = "add", initial, onClose, onSubmit }) {
               value={form.phone}
               onChange={(e) => set("phone", e.target.value)}
               placeholder="e.g. +1 234 567 890"
+              className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] outline-none transition-all duration-150 focus:border-[#c8102e] focus:bg-white focus:ring-2 focus:ring-[#c8102e]/20 hover:border-slate-300"
+            />
+          </div>
+          <div>
+            <label className="text-[12px] font-semibold text-[#111111]">CNIC</label>
+            <input
+              value={form.cnic}
+              onChange={(e) => set("cnic", e.target.value)}
+              placeholder="e.g. 35202-1234567-1"
               className="mt-1 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] outline-none transition-all duration-150 focus:border-[#c8102e] focus:bg-white focus:ring-2 focus:ring-[#c8102e]/20 hover:border-slate-300"
             />
           </div>
@@ -868,6 +880,7 @@ export default function UsersLeadsPage() {
                   <th className="px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">Email</th>
                   <th className="px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">Date</th>
                   <th className="px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">Phone</th>
+                  <th className="px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">CNIC</th>
                   <th className="px-3 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">City</th>
                   <th className="px-5 py-3 text-left text-[11px] font-semibold uppercase tracking-wide text-[#6B7280]">Actions</th>
                 </tr>
@@ -929,6 +942,7 @@ export default function UsersLeadsPage() {
                       <td className="px-3 py-3.5 text-[12px] text-[#374151]">{lead.email}</td>
                       <td className="px-3 py-3.5 text-[12px] text-[#6B7280]">{formatDate(lead.created_at)}</td>
                       <td className="px-3 py-3.5 text-[12px] text-[#374151]">{lead.phone}</td>
+                      <td className="px-3 py-3.5 text-[12px] text-[#374151]">{lead.cnic}</td>
                       <td className="px-3 py-3.5 text-[12px] text-[#6B7280]">{lead.city}</td>
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-1.5">

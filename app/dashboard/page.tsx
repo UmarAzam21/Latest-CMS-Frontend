@@ -99,11 +99,13 @@ export default function DashboardOverviewPage() {
         })}
       </div>
 
-    <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-  <div className="lg:col-span-2">
+    <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
+  <div className="h-full lg:col-span-2">
     <SiteVisitorsChart stats={stats} loading={loading} />
   </div>
-  <RecentActivity stats={stats} loading={loading} />
+  <div className="h-full">
+    <RecentActivity stats={stats} loading={loading} />
+  </div>
 </div>
  
 <div className="mt-6">
