@@ -1,4 +1,5 @@
-import { BadgeCheck, BellRing, Building2, Calculator, Clock, Ellipsis, FileCheck2, FileClock, FileText, Globe, Globe2, ImageIcon, KeyRound, Landmark, LayoutDashboard, LifeBuoy, LucideIcon, Mail, Pencil, Plus, ReceiptText, Search, Settings, ShieldCheck, ShoppingCart, Stamp, TrendingUp, Upload, User, Users, UsersRound } from "lucide-react";
+import { ServicesSectionForm } from "@/components/dashboard/content/sections/ServicesSectionForm";
+import { BadgeCheck, BellRing, Building2, Calculator, Clock, CreditCard, Ellipsis, FileCheck2, FileClock, FileText, Globe, Globe2, ImageIcon, KeyRound, Landmark, LayoutDashboard, LifeBuoy, LucideIcon, Mail, Pencil, Plus, ReceiptText, Search, Settings, ShieldCheck, ShoppingCart, Stamp, TrendingUp, Upload, User, Users, UsersRound } from "lucide-react";
 
 export interface NavItem {
   label: string;
@@ -154,9 +155,11 @@ export function getUserNavData(): NavItem[] {
   return [
     { label: "Dashboard", href: "/user-dashboard", icon: LayoutDashboard },
     { label: "Enroll Service", href: "/user-dashboard/enroll-service", icon: FileText },
-    { label: "Order", href: "/user-dashboard/order", icon: ShoppingCart },
+    { label: "My Services", href: "/user-dashboard/my-services", icon: Users },
+    { label: "Expense Manager", href: "/user-dashboard/expense-manager", icon: CreditCard },
+    { label: "Legal Consultation", href: "/user-dashboard/legal-consultation", icon: Users },
     { label: "Support", href: "/user-dashboard/support", icon: LifeBuoy },
-    { label: "Setting", href: "/user-dashboard/settings", icon: Settings },
+    { label: "Settings", href: "/user-dashboard/settings", icon: Settings },
   ];
 }
 
