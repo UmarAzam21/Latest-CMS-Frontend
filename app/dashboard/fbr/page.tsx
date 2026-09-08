@@ -66,6 +66,11 @@ export default function FBRChecklist() {
         cache: "no-store",
       });
       if (!res.ok) throw new Error(`Failed to list datasets: ${res.status}`);
+      const contentType = res.headers.get("content-type") || "";
+      if (!contentType.includes("application/json")) {
+        const responseText = await res.text();
+        throw new Error(`Datasets returned a non-JSON response (${res.status}): ${responseText.slice(0, 120)}`);
+      }
       const data = await res.json();
       // Expecting an array of dataset objects (rows from dataset_versions)
       const list: any[] = Array.isArray(data) ? data : data.datasets ?? [];

@@ -10,9 +10,15 @@ async function forward(req: Request) {
     // remove leading slash if present
     if (forwardPath.startsWith('/')) forwardPath = forwardPath.slice(1);
 
-    const targetBase = 'http://127.0.0.1:8000/api';
+    const backendBase = process.env.BACKEND_URL;
+    if (!backendBase) {
+      throw new Error('BACKEND_URL is not configured');
+    }
+    const targetBase = `${backendBase}/api`;
     // build target URL: avoid duplicate slashes
-    const targetUrl = forwardPath ? `${targetBase}/${forwardPath}${url.search}` : `${targetBase}${url.search}`;
+    const upstreamUrl = new URL(forwardPath ? `${targetBase}/${forwardPath}` : targetBase);
+    url.searchParams.forEach((value, key) => upstreamUrl.searchParams.set(key, value));
+    upstreamUrl.searchParams.set('ngrok-skip-browser-warning', 'true');
 
     // build headers to forward
     const headers: Record<string, string> = {};
@@ -21,6 +27,9 @@ async function forward(req: Request) {
       if (k.toLowerCase() === 'host') return;
       headers[k] = v as string;
     });
+    headers['ngrok-skip-browser-warning'] = '1';
+    headers.accept = 'application/json';
+    headers['user-agent'] = 'filernow-api-proxy/1.0';
 
     if (!headers.authorization && !headers.Authorization) {
       const authHeader = req.headers.get('authorization');
@@ -36,7 +45,7 @@ async function forward(req: Request) {
       body: ['GET', 'HEAD', 'OPTIONS'].includes(req.method) ? undefined : await req.arrayBuffer(),
     };
 
-    const res = await fetch(targetUrl, init);
+    const res = await fetch(upstreamUrl, init);
     const resBuffer = await res.arrayBuffer();
 
     const resHeaders: Record<string, string> = {};

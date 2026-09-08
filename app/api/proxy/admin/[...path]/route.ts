@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000';
+const BACKEND_URL = process.env.BACKEND_URL;
+
+if (!BACKEND_URL) {
+  throw new Error('BACKEND_URL is not configured');
+}
 
 async function forward(req: Request) {
   try {
@@ -9,15 +13,16 @@ async function forward(req: Request) {
     const forwardPath = url.pathname.startsWith(prefix)
       ? url.pathname.slice(prefix.length).replace(/^\//, '')
       : '';
-    const targetBase = `${BACKEND_URL}/api/admin`;
-    const targetUrl = forwardPath
-      ? `${targetBase}/${forwardPath}${url.search}`
-      : `${targetBase}${url.search}`;
+    const targetUrl = new URL(
+      forwardPath ? `${BACKEND_URL}/api/admin/${forwardPath}` : `${BACKEND_URL}/api/admin`
+    );
+    url.searchParams.forEach((value, key) => targetUrl.searchParams.set(key, value));
 
     const headers: Record<string, string> = {};
     req.headers.forEach((value, key) => {
       if (key.toLowerCase() !== 'host') headers[key] = value;
     });
+    headers.accept = headers.accept || 'application/json';
 
     const init: RequestInit = {
       method: req.method,

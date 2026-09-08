@@ -33,8 +33,16 @@ const SERVICES = [
 const CITIES = ["Lahore", "Karachi", "Multan", "Islamabad", "Sialkot", "Narowal"];
 
 const PAGE_SIZE = 6;
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
-const apiUrl = (path) => `${API_BASE}${path.startsWith("/") ? path : `/${path}`}`;
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api/proxy";
+const apiUrl = (path: string) => {
+  const base = API_BASE.replace(/\/$/, "");
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const proxyPath = base.endsWith("/api/proxy") && normalizedPath.startsWith("/api/")
+    ? normalizedPath.slice(4)
+    : normalizedPath;
+
+  return `${base}${proxyPath}`;
+};
 
 /* ------------------------------------------------------------------ */
 /*  API                                                                 */

@@ -4,7 +4,11 @@ async function forward(req: Request) {
   try {
     const url = new URL(req.url);
 
-    const targetBase = 'http://127.0.0.1:8000/api/notifications';
+    const backendBase = process.env.BACKEND_URL;
+    if (!backendBase) {
+      throw new Error('BACKEND_URL is not configured');
+    }
+    const targetBase = `${backendBase}/api/notifications`;
     const targetUrl = `${targetBase}${url.search}`;
 
     const headers: Record<string, string> = {};
@@ -12,6 +16,7 @@ async function forward(req: Request) {
       if (k.toLowerCase() === 'host') return;
       headers[k] = v as string;
     });
+    headers['ngrok-skip-browser-warning'] = 'true';
 
     if (!headers.authorization && !headers.Authorization) {
       const authHeader = req.headers.get('authorization');

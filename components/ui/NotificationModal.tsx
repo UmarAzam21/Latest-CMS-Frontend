@@ -105,6 +105,12 @@ export default function NotificationModal({ userId }: NotificationModalProps) {
         throw new Error(`Failed to load notifications: ${listRes.status}`);
       }
 
+      const listContentType = listRes.headers.get("content-type") || "";
+      if (!listContentType.includes("application/json")) {
+        const responseText = await listRes.text();
+        throw new Error(`Notifications returned a non-JSON response (${listRes.status}): ${responseText.slice(0, 120)}`);
+      }
+
       const data = (await listRes.json()) as NotificationResponsePayload;
       const list = normalizeNotifications(data);
 
@@ -122,6 +128,12 @@ export default function NotificationModal({ userId }: NotificationModalProps) {
       }));
 
       if (unreadRes.ok) {
+        const unreadContentType = unreadRes.headers.get("content-type") || "";
+        if (!unreadContentType.includes("application/json")) {
+          setNotifications(nextNotifications);
+          return;
+        }
+
         const unreadPayload = (await unreadRes.json()) as Record<string, unknown> | null;
         const unreadTotal = Number(
           unreadPayload?.count ??
@@ -217,7 +229,13 @@ export default function NotificationModal({ userId }: NotificationModalProps) {
       return;
     }
 
-    const wsUrl = `ws://localhost:8000/api/notifications/ws/${encodeURIComponent(safeUserId)}`;
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE || process.env.BACKEND_URL;
+    if (!apiBase) {
+      console.warn("Notifications websocket unavailable: API base URL is not configured");
+      return;
+    }
+    const wsOrigin = apiBase.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
+    const wsUrl = `${wsOrigin}/api/notifications/ws/${encodeURIComponent(safeUserId)}`;
     const socket = new WebSocket(wsUrl);
     socketRef.current = socket;
 

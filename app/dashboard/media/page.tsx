@@ -102,6 +102,11 @@ export default function MediaLibrary() {
           },
         });
         if (!res.ok) throw new Error(`Failed to load media: ${res.status}`);
+        const contentType = res.headers.get("content-type") || "";
+        if (!contentType.includes("application/json")) {
+          const responseText = await res.text();
+          throw new Error(`Media returned a non-JSON response (${res.status}): ${responseText.slice(0, 120)}`);
+        }
         const data = await res.json();
         setItems(Array.isArray(data) ? data : data.items ?? []);
       } catch (err) {
