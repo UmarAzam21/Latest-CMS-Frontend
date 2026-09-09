@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ArrowRight, ChevronDown, LogOut, Lock, UserRoundPlus } from "lucide-react";
+import { ArrowRight, ChevronDown, FileText, LogOut, Lock, UserRoundPlus } from "lucide-react";
 import { getNavData, getUserNavData, SERVICE_CATEGORIES, SERVICE_ICONS } from "@/lib/data";
 import { ASSETS } from "@/lib/assets";
 import {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Settings2, Users } from "lucide-react";
 import SiteSettings from "@/components/dashboard/setting/SiteSetting";
@@ -15,7 +15,7 @@ const TABS: { key: TabKey; label: string; icon: React.ComponentType<{ className?
   { key: "profile", label: "Edit Profile", icon: Settings2 },
 ];
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<TabKey>("site");
 
@@ -69,5 +69,13 @@ export default function SettingsPage() {
         <EditProfilePage />
       </div>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-sm text-neutral-500">Loading settings...</div>}>
+      <SettingsPageContent />
+    </Suspense>
   );
 }

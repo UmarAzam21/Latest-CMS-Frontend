@@ -1,6 +1,5 @@
 "use client";
-
-import { useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import {
   Search,
   ChevronDown,
@@ -33,6 +32,20 @@ const SERVICES = [
 const CITIES = ["Lahore", "Karachi", "Multan", "Islamabad", "Sialkot", "Narowal"];
 
 const PAGE_SIZE = 6;
+
+type Lead = {
+  id: string | number;
+  username: string;
+  email: string;
+  cnic?: string;
+  phone?: string;
+  service_type?: string;
+  city?: string;
+  created_at?: string;
+};
+
+type LeadPayload = Omit<Lead, "id"> & { id?: string | number };
+
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "/api/proxy";
 const apiUrl = (path: string) => {
   const base = API_BASE.replace(/\/$/, "");
@@ -66,7 +79,7 @@ async function fetchLeads() {
   return res.json(); // LeadsResponse[]
 }
 
-async function createLead(payload) {
+async function createLead(payload: LeadPayload) {
   const body = {
     id: payload.id ?? Date.now(),
     username: payload.username,
@@ -99,7 +112,7 @@ async function createLead(payload) {
 // Matches @router.patch(...) which currently accepts a full
 // LeadsResponse-shaped body (includes id/created_at even though
 // the handler only reads username/email/phone/service_type/city).
-async function updateLead(id, payload, original) {
+async function updateLead(id: string | number, payload: LeadPayload, original?: Lead) {
   const body = {
     id,
     username: payload.username,
@@ -130,7 +143,7 @@ async function updateLead(id, payload, original) {
 
 // POST /api/admin/leads/download — reuses the same export endpoint,
 // scoped to a single lead id, for the per-row download button.
-async function downloadLead(id, username) {
+async function downloadLead(id: string | number, username: string) {
   const res = await fetch(apiUrl("/api/admin/leads/download"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -155,7 +168,7 @@ async function downloadLead(id, username) {
   window.URL.revokeObjectURL(url);
 }
 
-function formatDate(isoString) {
+function formatDate(isoString?: string) {
   if (!isoString) return "—";
   const d = new Date(isoString);
   if (Number.isNaN(d.getTime())) return isoString;
@@ -163,7 +176,7 @@ function formatDate(isoString) {
 }
 
 // Strips everything but digits so "+92 234 567 8902" becomes a valid wa.me path.
-function toWhatsAppLink(phone) {
+function toWhatsAppLink(phone?: string) {
   const digits = (phone || "").replace(/[^\d]/g, "");
   return `https://wa.me/${digits}`;
 }
@@ -191,7 +204,11 @@ const DATE_RANGES = ["All Time", "Today", "Last 7 Days", "Last 30 Days", "This Y
 /*  Small shared bits                                                  */
 /* ------------------------------------------------------------------ */
 
-function Checkbox({ checked, onChange, className = "" }) {
+function Checkbox({ checked, onChange, className = "" }: {
+  checked: boolean;
+  onChange: () => void;
+  className?: string;
+}) {
   return (
     <button
       type="button"
@@ -207,7 +224,7 @@ function Checkbox({ checked, onChange, className = "" }) {
   );
 }
 
-function ServiceBadge({ children }) {
+function ServiceBadge({ children }: { children: ReactNode }) {
   return (
     <span className="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-[11px] font-medium text-slate-600">
       {children}
@@ -217,7 +234,12 @@ function ServiceBadge({ children }) {
 
 // Functional single-select dropdown used for Services / City filters.
 // Same visual treatment as the original static FilterDropdown button.
-function FilterDropdown({ label, options, value, onChange }) {
+function FilterDropdown({ label, options, value, onChange }: {
+  label: string;
+  options: string[];
+  value: string | null;
+  onChange: (value: string | null) => void;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -279,7 +301,12 @@ function FilterDropdown({ label, options, value, onChange }) {
 /*  Add / Edit User modal — shared form, two entry points               */
 /* ------------------------------------------------------------------ */
 
-function UserFormModal({ mode = "add", initial, onClose, onSubmit }) {
+function UserFormModal({ mode = "add", initial, onClose, onSubmit }: {
+  mode?: "add" | "edit";
+  initial?: Lead;
+  onClose: () => void;
+  onSubmit: (payload: LeadPayload) => Promise<void>;
+}) {
   const [form, setForm] = useState({
     username: initial?.username ?? "",
     email: initial?.email ?? "",
@@ -290,7 +317,7 @@ function UserFormModal({ mode = "add", initial, onClose, onSubmit }) {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  const set = (key, value) => setForm((f) => ({ ...f, [key]: value }));
+  const set = (key: keyof typeof form, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   const canSubmit = form.username && form.email && form.cnic && form.phone && form.service_type && form.city;
 
@@ -408,24 +435,36 @@ function UserFormModal({ mode = "add", initial, onClose, onSubmit }) {
 /*  Export modal — config -> progress -> complete                      */
 /* ------------------------------------------------------------------ */
 
-function ExportModal({ selectedIds, allCount, onClose }) {
-  const [step, setStep] = useState("config"); // config | progress | complete
-  const [format, setFormat] = useState("csv");
+type ExportFormat = "csv" | "excel" | "pdf";
+type ExportFileInfo = { name: string; size: string; label: string };
+const FORMAT_OPTIONS: Array<{ key: ExportFormat; label: string }> = [
+  { key: "csv", label: "CSV" },
+  { key: "excel", label: "Excel" },
+  { key: "pdf", label: "PDF" },
+];
+
+function ExportModal({ selectedIds, allCount, onClose }: {
+  selectedIds: Array<string | number>;
+  allCount: number;
+  onClose: () => void;
+}) {
+  const [step, setStep] = useState<"config" | "progress" | "complete">("config");
+  const [format, setFormat] = useState<ExportFormat>("csv");
   const [columns, setColumns] = useState(EXPORT_COLUMNS.map((c) => c.key));
   const [dateRange, setDateRange] = useState("All Time");
   const [progress, setProgress] = useState(0);
-  const [fileInfo, setFileInfo] = useState(null);
-  const [downloadUrl, setDownloadUrl] = useState(null);
+  const [fileInfo, setFileInfo] = useState<ExportFileInfo | null>(null);
+  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
 
-  const toggleColumn = (key) => {
+  const toggleColumn = (key: string) => {
     setColumns((cur) =>
       cur.includes(key) ? cur.filter((c) => c !== key) : [...cur, key]
     );
   };
 
   const exportCount = selectedIds.length > 0 ? selectedIds.length : allCount;
-  const extFor = { csv: "csv", excel: "xlsx", pdf: "pdf" };
-  const labelFor = { csv: "CSV Document", excel: "Excel Document", pdf: "PDF Document" };
+  const extFor: Record<ExportFormat, string> = { csv: "csv", excel: "xlsx", pdf: "pdf" };
+  const labelFor: Record<ExportFormat, string> = { csv: "CSV Document", excel: "Excel Document", pdf: "PDF Document" };
 
   const startExport = async () => {
     setStep("progress");
@@ -521,11 +560,7 @@ function ExportModal({ selectedIds, allCount, onClose }) {
               <div>
                 <div className="mb-2 text-[12px] font-semibold text-[#111111]">File Format</div>
                 <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { key: "csv", label: "CSV" },
-                    { key: "excel", label: "Excel" },
-                    { key: "pdf", label: "PDF" },
-                  ].map((f) => (
+                  {FORMAT_OPTIONS.map((f) => (
                     <button
                       key={f.key}
                       type="button"
@@ -688,26 +723,26 @@ function ExportModal({ selectedIds, allCount, onClose }) {
 /* ------------------------------------------------------------------ */
 
 export default function UsersLeadsPage() {
-  const [leads, setLeads] = useState([]);
+  const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
-  const [serviceFilter, setServiceFilter] = useState(null);
-  const [cityFilter, setCityFilter] = useState(null);
+  const [serviceFilter, setServiceFilter] = useState<string | null>(null);
+  const [cityFilter, setCityFilter] = useState<string | null>(null);
   const [page, setPage] = useState(1);
-  const [selected, setSelected] = useState(new Set());
+  const [selected, setSelected] = useState<Set<string | number>>(new Set());
   const [showAddModal, setShowAddModal] = useState(false);
   const [showExportModal, setShowExportModal] = useState(false);
-  const [editingLead, setEditingLead] = useState(null);
-  const [downloadingId, setDownloadingId] = useState(null);
+  const [editingLead, setEditingLead] = useState<Lead | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | number | null>(null);
 
   const loadLeads = () => {
     setLoading(true);
     setError(null);
     fetchLeads()
-      .then((data) => setLeads(data))
-      .catch((err) => setError(err.message || "Something went wrong"))
+      .then((data: Lead[]) => setLeads(data))
+      .catch((err: unknown) => setError(err instanceof Error ? err.message : "Something went wrong"))
       .finally(() => setLoading(false));
   };
 
@@ -724,7 +759,7 @@ export default function UsersLeadsPage() {
         (l) =>
           l.username.toLowerCase().includes(q) ||
           l.email.toLowerCase().includes(q) ||
-          l.city.toLowerCase().includes(q)
+          (l.city ?? "").toLowerCase().includes(q)
       );
     }
 
@@ -744,7 +779,7 @@ export default function UsersLeadsPage() {
 
   const allOnPageSelected = pageRows.length > 0 && pageRows.every((r) => selected.has(r.id));
 
-  const toggleRow = (id) => {
+  const toggleRow = (id: string | number) => {
     setSelected((cur) => {
       const next = new Set(cur);
       next.has(id) ? next.delete(id) : next.add(id);
@@ -766,13 +801,13 @@ export default function UsersLeadsPage() {
 
   const deselectAll = () => setSelected(new Set());
 
-  const handleSingleDownload = async (lead) => {
+  const handleSingleDownload = async (lead: Lead) => {
     setDownloadingId(lead.id);
     try {
       await downloadLead(lead.id, lead.username);
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
-      setError(err.message || "Failed to download lead");
+      setError(err instanceof Error ? err.message : "Failed to download lead");
     } finally {
       setDownloadingId(null);
     }
@@ -826,7 +861,7 @@ export default function UsersLeadsPage() {
                 label="Services"
                 options={SERVICES}
                 value={serviceFilter}
-                onChange={(v) => {
+                onChange={(v: string | null) => {
                   setServiceFilter(v);
                   setPage(1);
                 }}
@@ -835,7 +870,7 @@ export default function UsersLeadsPage() {
                 label="City"
                 options={CITIES}
                 value={cityFilter}
-                onChange={(v) => {
+                onChange={(v: string | null) => {
                   setCityFilter(v);
                   setPage(1);
                 }}
@@ -1053,9 +1088,9 @@ export default function UsersLeadsPage() {
               await createLead(payload);
               setShowAddModal(false);
               loadLeads(); // refresh the table with the newly created lead
-            } catch (err) {
+            } catch (err: unknown) {
               console.error(err);
-              setError(err.message || "Failed to create lead");
+              setError(err instanceof Error ? err.message : "Failed to create lead");
             }
           }}
         />
@@ -1071,9 +1106,9 @@ export default function UsersLeadsPage() {
               await updateLead(editingLead.id, payload, editingLead);
               setEditingLead(null);
               loadLeads(); // refresh the table with the updated lead
-            } catch (err) {
+            } catch (err: unknown) {
               console.error(err);
-              setError(err.message || "Failed to update lead");
+              setError(err instanceof Error ? err.message : "Failed to update lead");
             }
           }}
         />

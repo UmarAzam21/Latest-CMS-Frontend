@@ -1,12 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Toast from "../../components/ui/Toast";
 import Link from "next/link";
 import { Check, Eye, EyeOff } from "lucide-react";
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
     const searchParams = useSearchParams();
     const token = searchParams?.get("token") ?? "";
     const [showPassword, setShowPassword] = useState(false);
@@ -257,5 +257,13 @@ export default function ResetPassword() {
                 </p>
             </form>
         </>
+    );
+}
+
+export default function ResetPassword() {
+    return (
+        <Suspense fallback={<div className="p-6 text-sm text-gray-500">Loading reset form...</div>}>
+            <ResetPasswordContent />
+        </Suspense>
     );
 }

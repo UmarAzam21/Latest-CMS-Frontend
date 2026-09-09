@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import PageSections from "@/components/dashboard/content/SecondarySidebar";
@@ -9,7 +9,7 @@ import { mockSectionsByPage } from "@/lib/mockContent";
 import { fetchPageSections, updateContentBlock, deleteContentBlock } from "@/lib/sectionsApi";
 import type { Section } from "@/types/content";
 
-export default function ContentEditPage() {
+function ContentEditPageContent() {
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug") ?? "home";
   const selectedSectionParam = searchParams.get("section") ?? "";
@@ -334,6 +334,14 @@ export default function ContentEditPage() {
 
 
     </div>
+  );
+}
+
+export default function ContentEditPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-sm text-slate-500">Loading editor...</div>}>
+      <ContentEditPageContent />
+    </Suspense>
   );
 }
 

@@ -12,7 +12,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             width={600}
             height={600}
             className="object-contain animate-float"
-            style={{ width: "auto", height: "auto" }}
+            // style={{ width: "auto", height: "auto" }}
             priority
           />
         </div>

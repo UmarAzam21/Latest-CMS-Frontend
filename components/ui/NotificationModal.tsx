@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useRef, useEffect, type MouseEvent } from "react";
+import { useCallback, useState, useRef, useEffect, type MouseEvent as ReactMouseEvent } from "react";
 import { Bell, X, Trash2, CheckCheck, FileText, ShieldCheck, Receipt, AlertTriangle, RefreshCw } from "lucide-react";
 
 
@@ -135,11 +135,17 @@ export default function NotificationModal({ userId }: NotificationModalProps) {
         }
 
         const unreadPayload = (await unreadRes.json()) as Record<string, unknown> | null;
+        const unreadRecord = unreadPayload && typeof unreadPayload === "object" ? unreadPayload : null;
+        const unreadData =
+          unreadRecord && unreadRecord.data && typeof unreadRecord.data === "object"
+            ? (unreadRecord.data as Record<string, unknown>)
+            : null;
+
         const unreadTotal = Number(
-          unreadPayload?.count ??
-            unreadPayload?.unread_count ??
-            unreadPayload?.data?.count ??
-            unreadPayload?.data?.unread_count ??
+          unreadRecord?.count ??
+            unreadRecord?.unread_count ??
+            unreadData?.count ??
+            unreadData?.unread_count ??
             0
         );
 
@@ -199,7 +205,7 @@ export default function NotificationModal({ userId }: NotificationModalProps) {
   }, [safeUserId, loadNotifications]);
 
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleClick(e: globalThis.MouseEvent) {
       const target = e.target as Node | null;
       if (
         panelRef.current &&
@@ -320,7 +326,7 @@ export default function NotificationModal({ userId }: NotificationModalProps) {
     }
   };
 
-  const deleteNotification = async (id: string, e: React.MouseEvent<HTMLButtonElement>) => {
+  const deleteNotification = async (id: string, e: ReactMouseEvent<HTMLButtonElement>) => {
     if (!safeUserId) {
       return;
     }
