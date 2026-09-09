@@ -15,39 +15,40 @@ export default function DashboardOverviewPage() {
 
     return [
       {
-        title: 'Active Services',
+        title: 'Total Budjet',
         value: stats.active_services || 0,
-        change: 'Currently enrolled',
+        change: 'Increase since last month',
         icon: Check,
         iconBg: '#FEF2F2',
         iconColor: '#c8102e',
       },
       {
-        title: 'Pending Queries',
+        title: 'Monthly Income',
         value: stats.pending_queries || 0,
-        change: 'Awaiting response',
+        change: 'Decrease since last month',
         icon: MessageSquare,
         iconBg: '#FFFBEB',
         iconColor: '#F59E0B',
       },
       {
-        title: 'Upcoming Deadlines',
+        title: 'Monthly Expenses',
         value: stats.upcoming_deadlines || 0,
-        change: 'Awaiting response',
+        change: 'Increase since last month',
         icon: Calendar,
         iconBg: '#FFFBEB',
         iconColor: '#c8102e',
       },
       {
-        title: 'Forms in Progress',
+        title: 'Total Debt',
         value: stats.forms_in_progress || 0,
-        change: 'Awaiting response',
+        change: 'Decrease since last month',
         icon: Zap,
         iconBg: '#FFFBEB',
         iconColor: '#F59E0B',
       },
     ];
   }, [stats]);
+
   return (
     <div>
       <div className="h-[55px] border-b border-slate-200">
@@ -63,7 +64,7 @@ export default function DashboardOverviewPage() {
         </div>
       )}
 
-      <div className="flex h-[129px] items-end gap-3">
+      <div className="bg-red-50 flex h-[129px] items-center justify-between gap-3 px-2">
         {statsCards.map((card, index) => {
           const Icon = card.icon;
 

@@ -1,4 +1,4 @@
-// types/dashboard.ts
+// types/user-dashboard.ts
 
 export type FormStatus = "not_started" | "draft" | "assigned" | "fulfilled";
 
