@@ -1,0 +1,108 @@
+@layer base {
+
+    *,
+    *::before,
+    *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    :root {
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+
+        /* layout */
+        --container-width: 1180px;
+        /* --container-x-padding: 130px; */
+        --container-x-padding: clamp(20px, 10.8vw - 25.5px, 130px);
+        --container-x-padding: clamp(20px, 7.8vw - 25.5px, 130px);
+        --container-y-padding: 60px;
+
+        /* brand colors */
+        --brand-primary: #C8102E;
+        --brand-primary-light: #FFB4C0;
+        /* --brand-primary-lighter: #C8102E/10; */
+        --brand-primary-lighter: #C8102E1A;
+        /* ~10% alpha */
+        /* --brand-primary-lightest: #C8102E/10; */
+        --brand-secondary: #34B08D;
+        --brand-secondary-light: #65c5aa;
+
+        /* text & neutral colors */
+        --text-dark: #111111;
+        --text-secondary: #4B5563;
+        --text-secondary-muted: #6B7280;
+        --text-secondary-muter: #9CA3AF;
+        --text-tertiary: #F9FAFB;
+        --text-muted: rgba(17, 17, 17, 0.5);
+        --text-link: #0059D9;
+
+        /* --page-bg-clr: #c6c6c6; */
+        --page-bg-clr: #fafafa;
+        --card-bg-clr: #F8F9FA;
+
+        /* borders */
+        --border-clr: #E5E7EB;
+        --border-clr-dark: rgba(172, 172, 172, 0.3);
+        --border-card-clr: #F3F4F6;
+
+        --stat-divider-clr: #EAE0E0;
+        --gradient-how-it-works-start: #FFFFFF;
+
+        /* status colors, trend deltas, form status pills (draft/assigned/fulfilled) */
+        --status-success: #16A34A;
+        --status-success-bg: #ECFDF3;
+        --status-danger: #DC2626;
+        --status-danger-bg: #FEF2F2;
+        --status-warning: #F59E0B;
+        --status-warning-bg: #FFFBEB;
+        --status-info: #2563EB;
+        --status-info-bg: #EFF6FF;
+
+        /* stat-card icon chips, the 4-variant pattern */
+        --chip-green-bg: #DCFCE7;
+        --chip-green: #16A34A;
+        --chip-blue-bg: #DBEAFE;
+        --chip-blue: #2563EB;
+        --chip-purple-bg: #EDE9FE;
+        --chip-purple: #7C3AED;
+        --chip-red-bg: #FEE2E2;
+        --chip-red: #DC2626;
+
+        /* z-index scale — a dashboard has more layering needs than a marketing
+       site (sidebar, sticky topbar, dropdowns, modals, toasts) */
+        --z-sidebar: 40;
+        --z-topbar: 50;
+        --z-dropdown: 60;
+        --z-modal: 100;
+        --z-toast: 110;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+        background-color: var(--page-bg-clr);
+        color: var(--text-dark);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-heading), ui-sans-serif, system-ui, sans-serif;
+    }
+
+    p,
+    span {
+        font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+        /* color: var(--text-secondary); */
+    }
+}

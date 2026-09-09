@@ -1,5 +1,5 @@
 // data/dashboardModules.ts
-import { DashboardModule } from "../types/user-dashboard";
+import { DashboardModule } from "../../types/user-dashboard";
 
 export const dashboardModules: DashboardModule[] = [
     {

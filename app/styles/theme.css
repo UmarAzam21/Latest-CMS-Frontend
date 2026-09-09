@@ -1,0 +1,86 @@
+@theme inline {
+    --font-sans: var(--font-inter);
+    --font-heading: var(--font-plus-jakarta);
+
+    --color-primary: var(--brand-primary);
+    --color-primary-light: var(--brand-primary-light);
+    --color-primary-lighter: var(--brand-primary-lighter);
+
+    --color-text-dark: var(--text-dark);
+    --color-text-secondary: var(--text-secondary);
+    --color-text-secondary-muted: var(--text-secondary-muted);
+    --color-text-secondary-muter: var(--text-secondary-muter);
+    --color-text-muted: var(--text-muted);
+
+    --color-page-bg: var(--page-bg-clr);
+    --color-card-bg-clr: var(--card-bg-clr);
+
+    --color-border-clr: var(--border-clr);
+    --color-border-clr-dark: var(--border-clr-dark);
+
+    --color-success: var(--status-success);
+    --color-success-bg: var(--status-success-bg);
+    --color-danger: var(--status-danger);
+    --color-danger-bg: var(--status-danger-bg);
+    --color-warning: var(--status-warning);
+    --color-warning-bg: var(--status-warning-bg);
+    --color-info: var(--status-info);
+    --color-info-bg: var(--status-info-bg);
+
+    --color-chip-green-bg: var(--chip-green-bg);
+    --color-chip-green: var(--chip-green);
+    --color-chip-blue-bg: var(--chip-blue-bg);
+    --color-chip-blue: var(--chip-blue);
+    --color-chip-purple-bg: var(--chip-purple-bg);
+    --color-chip-purple: var(--chip-purple);
+    --color-chip-red-bg: var(--chip-red-bg);
+    --color-chip-red: var(--chip-red);
+
+    --radius-brand-8: 8px;
+    --radius-brand-12: 12px;
+    --radius-brand-16: 16px;
+
+    --spacing-brand: 16px;
+
+    --shadow-card: 0 1px 2px 0 rgba(17, 17, 17, 0.04);
+    --shadow-card-hover: 0 4px 16px -4px rgba(17, 17, 17, 0.08);
+
+    --z-index-sidebar: var(--z-sidebar);
+    --z-index-topbar: var(--z-topbar);
+    --z-index-dropdown: var(--z-dropdown);
+    --z-index-modal: var(--z-modal);
+    --z-index-toast: var(--z-toast);
+
+    --animate-float: float 2s ease-in-out infinite;
+    --animate-sidebar-arrow: sidebar-arrow 1.2s ease-in-out infinite;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes sidebar-arrow {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(4px);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-sidebar-arrow {
+        animation: none;
+    }
+}

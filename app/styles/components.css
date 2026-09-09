@@ -1,0 +1,72 @@
+@layer components {
+    .sheen-sweep-hover::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -200%;
+        width: 200%;
+        height: 100%;
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.6) 50%, rgba(255, 255, 255, 0) 70%);
+        transition: left 0.8s ease;
+        pointer-events: none;
+        z-index: 1;
+        /* was implicit/auto — now guaranteed above the image, below the gradient/text at z-[1]... */
+    }
+
+    .sheen-sweep-hover:hover::before {
+        left: 100%;
+    }
+}
+
+/* utilities.css — new, additive to existing sheen-sweep-hover */
+@keyframes cta-shimmer-sweep {
+
+    0%,
+    82%,
+    100% {
+        left: -150%;
+    }
+
+    92% {
+        left: 100%;
+    }
+}
+
+@layer components {
+
+    /* for buttons on a colored (primary/gradient) background — white sweep */
+    .cta-shimmer::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 150%;
+        height: 100%;
+        background: linear-gradient(120deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.5) 50%, rgba(255, 255, 255, 0) 70%);
+        pointer-events: none;
+        animation: cta-shimmer-sweep 3.8s ease-in-out infinite;
+    }
+
+    /* for buttons on a white/light background — primary-tinted sweep, since a white
+       sweep on a white button would be invisible */
+    .cta-shimmer-dark::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -150%;
+        width: 150%;
+        height: 100%;
+        background: linear-gradient(120deg, rgba(200, 16, 46, 0) 30%, rgba(200, 16, 46, 0.15) 50%, rgba(200, 16, 46, 0) 70%);
+        pointer-events: none;
+        animation: cta-shimmer-sweep 3.8s ease-in-out infinite;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .cta-shimmer::after,
+    .cta-shimmer-dark::after {
+        animation: none;
+        display: none;
+    }
+}

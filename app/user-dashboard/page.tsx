@@ -1,57 +1,18 @@
 "use client";
 
-import { useMemo } from 'react';
-import { TrendingUp, MessageSquare, Zap, Users, Check, Calendar, FileText } from 'lucide-react';
 import DraftServices from '@/components/user-dashboard/DraftService';
 import { useDashboardStats } from '@/lib/useDashboardStats';
 import ExpenseManagerCard from '@/components/user-dashboard/ExpenseManager';
 import MajorServices from '@/components/user-dashboard/MajorServices';
+import ExpensesStatsCard from '@/components/user-dashboard/ExpensesStatsCard';
+import DashboardStatCard from '@/components/user-dashboard/DashboardStatCard';
 
 export default function DashboardOverviewPage() {
   const { stats, loading, error } = useDashboardStats();
 
-  const statsCards = useMemo(() => {
-    if (!stats) return [];
-
-    return [
-      {
-        title: 'Total Budjet',
-        value: stats.active_services || 0,
-        change: 'Increase since last month',
-        icon: Check,
-        iconBg: '#FEF2F2',
-        iconColor: '#c8102e',
-      },
-      {
-        title: 'Monthly Income',
-        value: stats.pending_queries || 0,
-        change: 'Decrease since last month',
-        icon: MessageSquare,
-        iconBg: '#FFFBEB',
-        iconColor: '#F59E0B',
-      },
-      {
-        title: 'Monthly Expenses',
-        value: stats.upcoming_deadlines || 0,
-        change: 'Increase since last month',
-        icon: Calendar,
-        iconBg: '#FFFBEB',
-        iconColor: '#c8102e',
-      },
-      {
-        title: 'Total Debt',
-        value: stats.forms_in_progress || 0,
-        change: 'Decrease since last month',
-        icon: Zap,
-        iconBg: '#FFFBEB',
-        iconColor: '#F59E0B',
-      },
-    ];
-  }, [stats]);
-
   return (
     <div>
-      <div className="h-[55px] border-b border-slate-200">
+      <div className="pb-2 mb-3 border-b border-slate-200">
         <span className="text-xs text-[#4B5563]">Hi,</span>
         <h1 className="text-md font-bold">
           Welcome Back, <span className="text-primary">User!</span>
@@ -64,39 +25,11 @@ export default function DashboardOverviewPage() {
         </div>
       )}
 
-      <div className="bg-red-50 flex h-[129px] items-center justify-between gap-3 px-2">
-        {statsCards.map((card, index) => {
-          const Icon = card.icon;
-
-          return (
-            <div
-              key={index}
-              className={`flex justify-between items-start rounded-lg p-4 h-[106px] w-[281px] border border-slate-300 bg-white text-slate-900`}
-            >
-              <div className="flex flex-col gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wide text-[#4B5563]">
-                  {card.title}
-                </span>
-
-                <span className="text-xl font-semibold">
-                  {loading ? '-' : card.value}
-                </span>
-
-                <span className="text-[11px] font-semibold text-[#4B5563]">
-                  {card.change}
-                </span>
-              </div>
-
-              <div
-                className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                style={{ backgroundColor: card.iconBg }}
-              >
-                <Icon size={20} strokeWidth={1.8} style={{ color: card.iconColor }} />
-              </div>
-            </div>
-          );
-        })}
+      <div className="py-2x">
+        <ExpensesStatsCard />
       </div>
+
+      {/* <DashboardStatCard /> */}
 
       <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
         <div className="h-full lg:col-span-2">
