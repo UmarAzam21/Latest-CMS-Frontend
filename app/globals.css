@@ -7,6 +7,17 @@
   --primary-color: #C8102E;
   --primary-light: #FFEDF0;
   --gray-color: #4B5563;
+
+  --color-primary: #C8102E;
+  --color-primary-light: #FFEDF0;
+  --color-text-dark: #111827;
+  --color-text-muted: #4B5563;
+  --color-border: #E2E8F0;
+  --color-card-bg: #FFFFFF;
+  --radius-brand-8: 8px;
+  --radius-brand-12: 12px;
+
+  --animate-float: float 2s ease-in-out infinite;
 }
 
 @layer utilities {
@@ -64,6 +75,7 @@
 }
 
 @keyframes sidebar-arrow {
+
   0%,
   100% {
     transform: translateX(0);
