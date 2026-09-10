@@ -1,105 +1,39 @@
-import React from "react";
-import {
-  ChevronRight,
-  Building2,
-  FileText,
-  BriefcaseBusiness,
-  Building,
-  UserCheck,
-  Receipt,
-  WalletCards,
-  Globe2,
-} from "lucide-react";
+import { servicesGridData } from "@/data/user-dashboard/serivcesGridData";
+import ServiceCard from "./ServiceCard";
+import { ChevronRight } from "lucide-react";
 
-const majorServices = [
-  {
-    name: "Business NTN",
-    icon: Building2,
-  },
-  {
-    name: "Tax Return Filing",
-    icon: FileText,
-  },
-  {
-    name: "Business Registration",
-    icon: BriefcaseBusiness,
-  },
-  {
-    name: "Company Registration",
-    icon: Building,
-  },
-  {
-    name: "Filer Registration",
-    icon: UserCheck,
-  },
-  {
-    name: "GST Registration",
-    icon: Receipt,
-  },
-  {
-    name: "Wealth Statement",
-    icon: WalletCards,
-  },
-  {
-    name: "Import & Export License",
-    icon: Globe2,
-  },
-];
-
-interface MajorServicesProps {
-  onServiceClick?: (service: string) => void;
-}
-
-const MajorServices: React.FC<MajorServicesProps> = ({
-  onServiceClick,
-}) => {
+const MajorServices = () => {
   return (
-    <div className="flex h-full w-full flex-col rounded-xl border border-slate-300 bg-white p-4 shadow-sm">
+    <div className="h-full w-full flex flex-col rounded-brand-12 border border-border-clr bg-white p-4 shadow-card default-transition hover:shadow-card-hover">
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-[14px] font-semibold text-[#172033]">
+      <div className="flex items-center justify-between gap-2 mb-4">
+        <div className="flex flex-col gap-1">
+          <h2 className="text-[14px] font-semibold text-text-dark">
             Major Services
           </h2>
 
-          <p className="mt-1 text-[14px] text-[#7A8799]">
+          <p className="para-tiny text-text-secondary-muter">
             Quick access to our most popular services
           </p>
         </div>
 
         <button
           type="button"
-          className="flex items-center gap-1 text-[14px] font-medium text-[#c8102e] transition-opacity hover:opacity-70"
+          className="flex items-center gap-1 para-small font-medium text-primary default-transition transition-opacity hover:opacity-70 cursor-pointer group"
         >
           View all
-          <ChevronRight size={16} />
+          <ChevronRight size={16} className="group-hover:translate-x-0.5 default-transition" />
         </button>
       </div>
 
-      {/* Services */}
-      <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4">
-        {majorServices.map((service) => {
-          const Icon = service.icon;
-
-          return (
-            <button
-              key={service.name}
-              type="button"
-              onClick={() => onServiceClick?.(service.name)}
-              className="group flex flex-col items-center justify-center rounded-xl border border-slate-100 bg-slate-50/50 px-2 py-3 text-center transition-all duration-200 hover:border-[#c8102e]/20 hover:bg-[#FEF2F2]"
-            >
-              {/* Icon */}
-              <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-lg bg-[#FEF2F2] text-[#c8102e] transition-all duration-200 group-hover:bg-[#c8102e] group-hover:text-white">
-                <Icon size={20} strokeWidth={1.8} />
-              </div>
-
-              {/* Service Name */}
-              <span className="text-[13px] font-medium leading-5 text-[#515D6E] transition-colors group-hover:text-[#c8102e]">
-                {service.name}
-              </span>
-            </button>
-          );
-        })}
+      {/* Services Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {servicesGridData.slice(0, 8).map((service) => (
+          <ServiceCard
+            key={service.id}
+            {...service}
+          />
+        ))}
       </div>
     </div>
   );
