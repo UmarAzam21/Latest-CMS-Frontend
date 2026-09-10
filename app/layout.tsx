@@ -28,7 +28,12 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", plusJakarta.variable, inter.variable, "font-sans")}
       suppressHydrationWarning
     >
-      <body className="min-h-full">{children}</body>
+      <body
+        className="min-h-full flex flex-col text-text-dark bg-page-bg default-transition"
+        suppressHydrationWarning
+      >
+        {children}
+      </body>
     </html>
   );
 }

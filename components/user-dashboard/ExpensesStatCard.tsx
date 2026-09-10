@@ -20,18 +20,20 @@ export default function ExpenseStatCard({ item }: ExpenseStatCardProps) {
   const isUp = item.trendDirection === "up";
 
   return (
-    <div className="flex flex-col gap-4 rounded-brand-12 border border-border-clr bg-white p-4 shadow-card cursor-pointer default-transition hover:shadow-card-hover hover:-translate-y-0.5">
+    <div className="flex flex-col gap-4 rounded-brand-12 border border-border-clr bg-white p-4 shadow-card cursor-pointer group default-transition hover:shadow-card-hover hover:-translate-y-0.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span
             className={cn(
-              "flex h-8 w-8 shrink-0 items-center justify-center rounded-brand-8",
+              "flex h-8 w-8 shrink-0 items-center justify-center rounded-brand-8 group-hover:scale-110 default-transition",
               chipStyles[item.chip]
             )}
           >
             <Icon size={16} strokeWidth={2} />
           </span>
-          <span className="para-small text-text-secondary-muted">{item.title}</span>
+          <span className="para-small text-text-secondary-muted">
+            {item.title}
+          </span>
         </div>
         <button
           type="button"
@@ -42,7 +44,7 @@ export default function ExpenseStatCard({ item }: ExpenseStatCardProps) {
         </button>
       </div>
 
-      <span className="heading-h5 text-text-dark">{item.value}</span>
+      <span className="heading-h5 text-text-dark group-hover:text-primary default-transition">{item.value}</span>
 
       <div className="flex items-center gap-1.5">
         <span
