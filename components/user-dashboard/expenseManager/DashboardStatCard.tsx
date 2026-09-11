@@ -1,6 +1,6 @@
 "use client"
 
-import { useDashboardStats } from "@/lib/useDashboardStats";
+import { useDashboardStats } from "@/hooks/useDashboardStats";
 import { useMemo } from "react";
 import { TrendingUp, MessageSquare, Zap, Users, Check, Calendar, FileText } from 'lucide-react';
 

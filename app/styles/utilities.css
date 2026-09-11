@@ -38,6 +38,10 @@
     background-image: var(--gradient-how-it-works);
 }
 
+@utility bg-gradient-wallet-card {
+    background-image: var(--gradient-wallet-card);
+}
+
 /* @utility default-card {
     background-color: white;
     border: 1px solid var(--color-border-clr);

@@ -79,6 +79,11 @@
         --z-dropdown: 60;
         --z-modal: 100;
         --z-toast: 110;
+
+        /* wallet-card gradient — darker depth variant of brand-primary,
+       used only by ExpenseManagerCardV2 */
+        --gradient-wallet-start: var(--brand-primary);
+        --gradient-wallet-end: #6B0A1B;
     }
 
     html {

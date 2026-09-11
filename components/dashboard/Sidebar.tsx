@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { ArrowRight, ChevronDown, FileText, LogOut, Lock, UserRoundPlus } from "lucide-react";
-import { getNavData, getUserNavData, SERVICE_CATEGORIES, SERVICE_ICONS } from "@/lib/data";
+import { getNavData, getUserNavData, SERVICE_CATEGORIES, SERVICE_ICONS } from "@/data/dashboard/data";
 import { ASSETS } from "@/lib/assets";
 import {
   hasModuleAccess,
@@ -111,9 +111,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
       <aside
         onMouseEnter={() => setCollapsed(false)}
         onMouseLeave={() => setCollapsed(true)}
-        className={`fixed left-0 top-0 z-50 flex h-screen flex-col bg-white justify-between text-black border-r border-slate-200 transition-[width,box-shadow] duration-300 ease-in-out overflow-hidden ${
-          collapsed ? "w-[76px] shadow-none" : "w-[225px]"
-        }`}
+        className={`fixed left-0 top-0 z-50 flex h-screen flex-col bg-white justify-between text-black border-r border-slate-200 transition-[width,box-shadow] duration-300 ease-in-out overflow-hidden ${collapsed ? "w-[76px] shadow-none" : "w-[225px]"
+          }`}
       >
         <div className="flex min-h-0 flex-1 flex-col">
           {/* Header — icon slot is fixed, label fades in beside it */}
@@ -123,9 +122,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
             </div>
 
             <span
-              className={`text-sm font-semibold tracking-wide text-3 whitespace-nowrap transition-opacity duration-200 ${
-                collapsed ? "opacity-0" : "opacity-100 delay-100"
-              }`}
+              className={`text-sm font-semibold tracking-wide text-3 whitespace-nowrap transition-opacity duration-200 ${collapsed ? "opacity-0" : "opacity-100 delay-100"
+                }`}
             >
               {isUser ? "User Dashboard" : "Admin CMS"}
             </span>
@@ -150,20 +148,18 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                         setEnrollServicesOpen(true);
                       }
                     }}
-                    className={`relative flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-all whitespace-nowrap ${
-                      isActive
+                    className={`relative flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-all whitespace-nowrap ${isActive
                         ? "hover:bg-primary-light text-primary"
                         : "text-[#4B5563]"
-                    }`}
+                      }`}
                   >
                     {isActive && (
                       <div className="absolute -left-3 top-1/2 -translate-y-1/2 h-10 w-1.5 rounded-r-full bg-primary" />
                     )}
                     <Icon size={19} strokeWidth={1.8} className="shrink-0" />
                     <span
-                      className={`transition-opacity duration-200 ${
-                        collapsed ? "opacity-0" : "opacity-100 delay-100"
-                      }`}
+                      className={`transition-opacity duration-200 ${collapsed ? "opacity-0" : "opacity-100 delay-100"
+                        }`}
                     >
                       {item.label}
                     </span>
@@ -207,9 +203,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                               </span>
                               <ChevronDown
                                 size={13}
-                                className={`transition-transform duration-200 ${
-                                  openServiceCategory === category.label ? "rotate-180" : ""
-                                }`}
+                                className={`transition-transform duration-200 ${openServiceCategory === category.label ? "rotate-180" : ""
+                                  }`}
                               />
                             </button>
                             {openServiceCategory === category.label && (
@@ -282,9 +277,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
             >
               <LogOut size={19} strokeWidth={1.8} className="text-primary shrink-0" />
               <span
-                className={`transition-opacity duration-200 ${
-                  collapsed ? "opacity-0" : "opacity-100 delay-100"
-                }`}
+                className={`transition-opacity duration-200 ${collapsed ? "opacity-0" : "opacity-100 delay-100"
+                  }`}
               >
                 Log out
               </span>

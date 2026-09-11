@@ -15,3 +15,12 @@ export interface IExpenseStatItem {
     icon: LucideIcon;
     chip: StatChipVariant;
 }
+
+export interface IExpenseManagerSummary {
+    isSetup: boolean;           // false = user hasn't configured Expense Manager yet
+    balance: number;
+    totalIncome: number;
+    totalExpenses: number;
+    linkedAccountLast4: string; // e.g. "1234" — decorative masked reference
+    asOfLabel: string;          // e.g. "Synced 2 hours ago"
+}

@@ -1,11 +1,12 @@
 "use client";
 
-import DraftServices from '@/components/user-dashboard/DraftService';
-import { useDashboardStats } from '@/lib/useDashboardStats';
-import ExpenseManagerCard from '@/components/user-dashboard/ExpenseManager';
-import MajorServices from '@/components/user-dashboard/MajorServices';
-import ExpensesStatsCard from '@/components/user-dashboard/ExpensesStatsCard';
-import DashboardStatCard from '@/components/user-dashboard/DashboardStatCard';
+import DraftServices from '@/components/user-dashboard/services/DraftService';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
+import ExpenseManagerCard from '@/components/user-dashboard/expenseManager/ExpenseManager';
+import MajorServices from '@/components/user-dashboard/services/MajorServices';
+import ExpensesStatsCard from '@/components/user-dashboard/expenseManager/ExpensesStatsCard';
+import DashboardStatCard from '@/components/user-dashboard/expenseManager/DashboardStatCard';
+import ExpenseManagerCardV2 from '@/components/user-dashboard/expenseManager/ExpenseManagerCardV2';
 
 export default function DashboardOverviewPage() {
   const { stats, loading, error } = useDashboardStats();
@@ -32,11 +33,14 @@ export default function DashboardOverviewPage() {
       {/* <DashboardStatCard /> */}
 
       <div className="w-full grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-3">
-        <div className="h-full lg:col-span-2">
+        <div className="h-full lg:col-span-2x">
           <MajorServices />
         </div>
         <div className="h-full">
           <ExpenseManagerCard />
+        </div>
+        <div className="h-full">
+          <ExpenseManagerCardV2 />
         </div>
       </div>
 

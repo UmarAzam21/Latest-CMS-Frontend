@@ -5,7 +5,7 @@ import { TrendingUp, MessageSquare, Zap, Users } from 'lucide-react';
 import RecentActivity from "@/components/dashboard/Activity";
 import SiteVisitorsChart from "@/components/dashboard/Chart";
 import QuickAccess from "@/components/dashboard/QuickAccess";
-import { useDashboardStats } from '@/lib/useDashboardStats';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
 
 export default function DashboardOverviewPage() {
   const { stats, loading, error } = useDashboardStats();
@@ -99,22 +99,22 @@ export default function DashboardOverviewPage() {
         })}
       </div>
 
-    <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
-  <div className="h-full lg:col-span-2">
-    <SiteVisitorsChart stats={stats} loading={loading} />
-  </div>
-  <div className="h-full">
-    <RecentActivity stats={stats} loading={loading} />
-  </div>
-</div>
- 
-<div className="mt-6">
-  
-        <div className="mb-3 flex items-center justify-between">
-            <h1 className="text-sm font-bold">Quick Access</h1>
+      <div className="mt-6 grid grid-cols-1 items-stretch gap-6 lg:grid-cols-3">
+        <div className="h-full lg:col-span-2">
+          <SiteVisitorsChart stats={stats} loading={loading} />
         </div>
-  <QuickAccess />
-</div>
+        <div className="h-full">
+          <RecentActivity stats={stats} loading={loading} />
+        </div>
+      </div>
+
+      <div className="mt-6">
+
+        <div className="mb-3 flex items-center justify-between">
+          <h1 className="text-sm font-bold">Quick Access</h1>
+        </div>
+        <QuickAccess />
+      </div>
 
     </div>
   );

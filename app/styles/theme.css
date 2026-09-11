@@ -51,6 +51,7 @@
     --gradient-primary-tb: linear-gradient(to bottom, var(--color-primary) 0%, var(--color-primary-light) 100%);
     --gradient-primary-rl: linear-gradient(to right, var(--color-primary) 0%, var(--color-primary-light) 100%);
     --gradient-how-it-works: linear-gradient(90deg, var(--gradient-how-it-works-start) 0%, var(--brand-primary) 100%);
+    --gradient-wallet-card: linear-gradient(135deg, var(--gradient-wallet-start) 0%, var(--gradient-wallet-end) 100%);
 
     --color-success: var(--status-success);
     --color-success-bg: var(--status-success-bg);

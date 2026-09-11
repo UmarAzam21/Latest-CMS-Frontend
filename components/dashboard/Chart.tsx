@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { DashboardStats } from "@/lib/useDashboardStats";
+import { DashboardStats } from "@/hooks/useDashboardStats";
 
 const defaultData = [
   { day: "Mon", users: 400 },
@@ -35,11 +35,11 @@ export default function SiteVisitorsChart({ stats, loading }: SiteVisitorsChartP
 
     const total = stats?.admin_leads || 0;
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    
+
     // Distribute users across the week with some variation
     const basePerDay = Math.floor(total / 7);
     const remainder = total % 7;
-    
+
     return days.map((day, index) => ({
       day,
       users: basePerDay + (index < remainder ? 1 : 0),
@@ -47,7 +47,7 @@ export default function SiteVisitorsChart({ stats, loading }: SiteVisitorsChartP
   };
 
   const displayData = generateChartData();
-  
+
   // Calculate dynamic Y-axis domain
   const maxUsers = Math.max(...displayData.map(d => d.users || 0), 1);
   const yAxisMax = Math.ceil(maxUsers * 1.3); // Add 30% padding at top
@@ -72,55 +72,55 @@ export default function SiteVisitorsChart({ stats, loading }: SiteVisitorsChartP
         {loading ? (
           <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>
         ) : (
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={displayData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-            <defs>
-              <linearGradient id="usersGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#C8102E" stopOpacity={0.18} />
-                <stop offset="100%" stopColor="#C8102E" stopOpacity={0} />
-              </linearGradient>
-            </defs>
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={displayData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="usersGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#C8102E" stopOpacity={0.18} />
+                  <stop offset="100%" stopColor="#C8102E" stopOpacity={0} />
+                </linearGradient>
+              </defs>
 
-            <CartesianGrid
-              strokeDasharray="3 3"
-              vertical={false}
-              stroke="#E2E8F0"
-            />
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="#E2E8F0"
+              />
 
-            <XAxis
-              dataKey="day"
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#94A3B8", fontSize: 12 }}
-              dy={10}
-            />
+              <XAxis
+                dataKey="day"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#94A3B8", fontSize: 12 }}
+                dy={10}
+              />
 
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tick={{ fill: "#94A3B8", fontSize: 12 }}
-              domain={[0, yAxisMax]}
-              ticks={yAxisTicks}
-            />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#94A3B8", fontSize: 12 }}
+                domain={[0, yAxisMax]}
+                ticks={yAxisTicks}
+              />
 
-            <Tooltip
-              contentStyle={{
-                borderRadius: 8,
-                border: "1px solid #E2E8F0",
-                fontSize: 12,
-              }}
-              labelStyle={{ color: "#334155", fontWeight: 600 }}
-            />
+              <Tooltip
+                contentStyle={{
+                  borderRadius: 8,
+                  border: "1px solid #E2E8F0",
+                  fontSize: 12,
+                }}
+                labelStyle={{ color: "#334155", fontWeight: 600 }}
+              />
 
-            <Area
-              type="monotone"
-              dataKey="users"
-              stroke="#C8102E"
-              strokeWidth={2.5}
-              fill="url(#usersGradient)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+              <Area
+                type="monotone"
+                dataKey="users"
+                stroke="#C8102E"
+                strokeWidth={2.5}
+                fill="url(#usersGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
         )}
       </div>
     </div>

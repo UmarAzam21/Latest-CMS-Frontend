@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ChevronDown, FileText, Pencil, Plus, Search, Trash2 } from "lucide-react";
-import { mockPages } from "@/lib/mockContent";
+import { mockPages } from "@/data/dashboard/mockContent";
 import type { Page } from "@/types/content";
 
 type StatusFilter = "All" | "Published" | "Draft";
