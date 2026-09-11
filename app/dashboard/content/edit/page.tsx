@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import PageSections from "@/components/dashboard/content/SecondarySidebar";
 import { sectionFormRegistry } from "@/components/dashboard/content/sectionRegistry";
-import { mockSectionsByPage } from "@/lib/mockContent";
+import { mockSectionsByPage } from "@/data/dashboard/mockContent";
 import { fetchPageSections, updateContentBlock, deleteContentBlock } from "@/lib/sectionsApi";
 import type { Section } from "@/types/content";
 
@@ -160,9 +160,8 @@ function ContentEditPageContent() {
             type="button"
             onClick={() => selectedSection && handleSectionSave(selectedSection)}
             disabled={saving || !selectedSection}
-            className={`rounded-lg px-4 py-2 text-[13px] font-semibold text-white transition-all duration-150 ${
-              saving ? "bg-slate-400 cursor-not-allowed" : "bg-primary hover:opacity-90"
-            }`}
+            className={`rounded-lg px-4 py-2 text-[13px] font-semibold text-white transition-all duration-150 ${saving ? "bg-slate-400 cursor-not-allowed" : "bg-primary hover:opacity-90"
+              }`}
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
@@ -205,7 +204,7 @@ function ContentEditPageContent() {
           <div className="flex items-center justify-between bg-white rounded-xl border border-slate-200  p-6 h-[80px]">
             <div>
               <h2 className="text-sm font-medium text-slate-900">
-               Show on Home Page
+                Show on Home Page
               </h2>
               <div className="text-[12px] text-[#4B5563]">
                 Display this section on the home page.
@@ -269,7 +268,7 @@ function ContentEditPageContent() {
         </div>
 
         {/* Preview */}
-      {/* <div className="w-[500px] shrink-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        {/* <div className="w-[500px] shrink-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="text-sm font-semibold text-slate-500">
             Section Preview — updates as you type
           </div>

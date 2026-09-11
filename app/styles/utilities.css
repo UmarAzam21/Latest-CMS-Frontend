@@ -1,0 +1,371 @@
+@utility container-custom {
+    width: 100%;
+    max-width: var(--container-width);
+    margin-inline: auto;
+}
+
+@utility container-x-padding {
+    /* padding-inline: 12px;
+
+    @media (min-width: 768px) {
+        padding-inline: 50px;
+    }
+
+    @media (min-width: 1024px) {
+        padding-inline: 80px;
+    }
+
+    @media (min-width: 1324px) {
+        padding-inline: var(--container-x-padding);
+    } */
+
+    padding-inline: var(--container-x-padding);
+}
+
+@utility container-y-padding {
+    padding-block: var(--container-y-padding);
+}
+
+@utility bg-gradient-primary-tb {
+    background-image: var(--gradient-primary-tb);
+}
+
+@utility bg-gradient-primary-rl {
+    background-image: var(--gradient-primary-rl);
+}
+
+@utility bg-gradient-how-it-works {
+    background-image: var(--gradient-how-it-works);
+}
+
+@utility bg-gradient-wallet-card {
+    background-image: var(--gradient-wallet-card);
+}
+
+/* @utility default-card {
+    background-color: white;
+    border: 1px solid var(--color-border-clr);
+    border-radius: var(--radius-card);
+} */
+
+@utility default-transition {
+    transition: all 0.3s ease-out;
+}
+
+/* fonts utilities */
+@utility heading-h1 {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: normal;
+
+    @media (min-width: 768px) {
+        font-size: 52px;
+        line-height: normal;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 60px;
+        line-height: normal;
+    }
+}
+
+@utility heading-h2 {
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 34px;
+
+    @media (min-width: 768px) {
+        font-size: 32px;
+        line-height: 40px;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 36px;
+        line-height: 45px;
+    }
+}
+
+@utility heading-h3 {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 28px;
+
+    @media (min-width: 768px) {
+        font-size: 22px;
+        line-height: 30px;
+    }
+
+    @media (min-width: 1024px) {
+        font-size: 24px;
+        line-height: 32px;
+    }
+}
+
+@utility heading-h4 {
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+
+    @media (min-width: 1024px) {
+        font-size: 20px;
+        line-height: 28px;
+    }
+}
+
+@utility heading-h5 {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: normal;
+
+    @media (min-width: 1024px) {
+        font-size: 18px;
+    }
+}
+
+@utility heading-h6 {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+        line-height: 24px;
+    }
+}
+
+@utility para-tiny {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: normal;
+    letter-spacing: 0px;
+}
+
+@utility para-small {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 18px;
+
+    @media (min-width: 1024px) {
+        font-size: 14px;
+        line-height: 20px;
+    }
+}
+
+@utility para-base {
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 22px;
+
+    @media (min-width: 1024px) {
+        font-size: 16px;
+        line-height: 24px;
+    }
+}
+
+@utility para-18 {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+
+    @media (min-width: 1024px) {
+        font-size: 18px;
+        line-height: 28px;
+    }
+}
+
+
+@keyframes icon-pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+}
+
+@keyframes number-float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-6px);
+    }
+}
+
+@utility icon-pulse {
+    animation: icon-pulse 2.4s ease-in-out infinite;
+}
+
+@utility number-float {
+    animation: number-float 3s ease-in-out infinite;
+}
+
+@utility no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@keyframes fade-scale-in {
+    from {
+        opacity: 0;
+        transform: scale(0.94);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes fade-slide-up {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@utility animate-fade-scale-in {
+    animation: fade-scale-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility animate-fade-slide-up {
+    animation: fade-slide-up 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-fade-slide-up,
+.animate-fade-scale-in {
+    animation-play-state: paused;
+}
+
+html.app-ready .animate-fade-slide-up,
+html.app-ready .animate-fade-scale-in {
+    animation-play-state: running;
+}
+
+@keyframes loader-breathe {
+
+    0%,
+    100% {
+        transform: scale(0.92);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.08);
+        opacity: 0.9;
+    }
+}
+
+@utility loader-breathe {
+    animation: loader-breathe 1.8s ease-in-out infinite;
+}
+
+/* entrance animations are decorative — respect OS-level motion preference */
+@media (prefers-reduced-motion: reduce) {
+
+    .animate-fade-scale-in,
+    .animate-fade-slide-up,
+    .icon-pulse,
+    .loader-breathe {
+        animation: none;
+    }
+}
+
+
+/* about whatWeDo Section keyframes */
+@keyframes orbit-ping {
+    0% {
+        transform: scale(0.92);
+        opacity: 0.55;
+    }
+
+    100% {
+        transform: scale(1.55);
+        opacity: 0;
+    }
+}
+
+@utility orbit-ping {
+    animation: orbit-ping 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+
+@keyframes arc-breathe {
+
+    0%,
+    100% {
+        opacity: 0.4;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@utility arc-breathe {
+    animation: arc-breathe 2.6s ease-in-out infinite;
+}
+
+@keyframes ring-sweep {
+    0% {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+
+    15% {
+        opacity: 0.8;
+    }
+
+    70% {
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: scale(1.06);
+        opacity: 0;
+    }
+}
+
+@utility ring-sweep {
+    animation: ring-sweep 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes capsule-breathe {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.035);
+    }
+}
+
+@utility capsule-breathe {
+    animation: capsule-breathe 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .orbit-ping,
+    .arc-breathe,
+    .capsule-breathe,
+    .ring-sweep {
+        animation: none;
+    }
+}

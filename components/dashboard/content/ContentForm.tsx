@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, FileText, Pencil, Trash2, ChevronDown } from "lucide-react";
-import { pagesData, PageRow } from "@/lib/data";
+import { pagesData, PageRow } from "@/data/dashboard/data";
 import Dropdown from "@/components/ui/Dropdown";
 import DropdownItem from "@/components/ui/DropdownItem";
 
@@ -76,8 +76,8 @@ export default function ContentForm() {
             </div>
           }
         >
-          <DropdownItem label="Newest first" onClick={() => {}} />
-          <DropdownItem label="Oldest first" onClick={() => {}} />
+          <DropdownItem label="Newest first" onClick={() => { }} />
+          <DropdownItem label="Oldest first" onClick={() => { }} />
         </Dropdown>
       </div>
 
@@ -113,11 +113,10 @@ export default function ContentForm() {
 
               <td className="px-5 py-3.5">
                 <span
-                  className={`rounded-md px-2 py-1 text-[11px] font-semibold ${
-                    page.status === "Published"
+                  className={`rounded-md px-2 py-1 text-[11px] font-semibold ${page.status === "Published"
                       ? "bg-emerald-50 text-emerald-600"
                       : "bg-slate-100 text-slate-500"
-                  }`}
+                    }`}
                 >
                   {page.status.toUpperCase()}
                 </span>

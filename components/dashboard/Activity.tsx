@@ -15,7 +15,7 @@ import {
   User,
 } from "lucide-react";
 import { getCurrentAdminUser } from "@/lib/auth";
-import { DashboardStats } from "@/lib/useDashboardStats";
+import { DashboardStats } from "@/hooks/useDashboardStats";
 
 interface RecentActivityProps {
   stats?: DashboardStats | null;
@@ -212,9 +212,8 @@ export default function RecentActivity({ loading }: RecentActivityProps) {
               <a
                 href={item.href}
                 key={index}
-                className={`flex items-start gap-3 py-2 ${
-                  !isLast ? "border-b border-slate-100" : ""
-                }`}
+                className={`flex items-start gap-3 py-2 ${!isLast ? "border-b border-slate-100" : ""
+                  }`}
               >
                 <div
                   className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
