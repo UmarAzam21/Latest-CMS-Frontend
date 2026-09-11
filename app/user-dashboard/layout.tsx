@@ -6,11 +6,13 @@ import Topbar from "@/components/dashboard/Topbar";
 
 export default function UserDashboardLayout({ children }: { children: ReactNode }) {
 	return (
-		<div className="flex h-screen bg-slate-50 bg-page-bg">
+		<div className="fixed inset-0 flex h-dvh min-h-0 overflow-hidden bg-slate-50 bg-page-bg">
 			<Sidebar variant="user" />
-			<div className="flex flex-1 flex-col overflow-hidden">
-				<Topbar variant="user" />
-				<main className="flex-1 overflow-y-auto px-6 py-4">{children}</main>
+			<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+				<div className="z-topbar shrink-0 bg-white">
+					<Topbar variant="user" />
+				</div>
+				<main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-6 py-4">{children}</main>
 			</div>
 		</div>
 	);

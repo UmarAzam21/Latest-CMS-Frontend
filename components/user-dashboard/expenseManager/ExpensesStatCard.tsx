@@ -20,7 +20,7 @@ export default function ExpenseStatCard({ item }: ExpenseStatCardProps) {
   const isUp = item.trendDirection === "up";
 
   return (
-    <div className="flex flex-col gap-4 rounded-brand-12 border border-border-clr bg-white p-4 shadow-card cursor-pointer group default-transition hover:shadow-card-hover hover:-translate-y-0.5">
+    <div className="flex flex-col gap-4 rounded-brand-12 border border-border-clr bg-white p-4  cursor-pointer group default-transition hover:shadow-card-hover hover:-translate-y-0.5">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span

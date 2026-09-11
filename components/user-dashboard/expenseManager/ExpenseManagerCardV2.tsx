@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Wallet, ArrowUpRight, Plus, DollarSign } from "lucide-react";
+import { Wallet, ArrowUpRight, Plus, ArrowDownToLine, ReceiptText } from "lucide-react";
 import { useExpenseManagerSummary } from "@/hooks/useExpenseManagerSummary";
 
 function formatCurrency(value: number) {
@@ -21,50 +21,84 @@ export default function ExpenseManagerCardV2() {
             : 0;
 
     return (
-        <div className="flex h-full flex-col justify-between gap-5 rounded-brand-16 bg-gradient-wallet-cardx bg-primary p-5 text-white shadow-card-hover">
-            <div className="flex items-center justify-between border-b border-b-border-clr-dark pb-3">
-
-                <div className="flex items-center justify-center gap-2">
-
-                    <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[12px] bg-white/30">
-                        <DollarSign size={20} strokeWidth={2} />
+        <div className="expense-card-perspective h-full">
+            <div className="expense-card-inner h-full">
+                <div className="expense-card-face flex h-full flex-col justify-between gap-5 overflow-hidden rounded-brand-16 bg-gradient-wallet-card bg-primary p-5 text-white shadow-card-hover">
+                    <div className="flex items-center justify-between border-b border-b-border-clr-dark pb-3">
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-white/90 p-1.5">
+                                <img src="/primary-logo.png" alt="Filernow logo" className="h-full w-full object-contain" />
+                            </span>
+                        </div>
+                        <Link
+                            href="/user-dashboard/expense-manager"
+                            className="para-tiny flex items-center gap-1 font-semibold text-white/85 default-transition hover:text-white"
+                        >
+                            Open full tracker
+                            <ArrowUpRight size={13} />
+                        </Link>
                     </div>
 
-                    <span className="para-small font-medium text-white/70">Net Balance</span>
+                    <span className="heading-h2 tracking-tight">{formatCurrency(summary.balance)}</span>
+
+                    <div className="flex items-center justify-between para-small text-white">
+                        <span>Linked account •••• {summary.linkedAccountLast4}</span>
+                        <span className="para-tiny">{summary.asOfLabel}</span>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <div className="mb-1.5 flex items-center justify-between para-tiny text-white/70">
+                            <span>Income {formatCurrency(summary.totalIncome)}</span>
+                            <span>Spent {formatCurrency(summary.totalExpenses)}</span>
+                        </div>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
+                            <div
+                                className="h-full rounded-full bg-white default-transition"
+                                style={{ width: `${percentUsed}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-white/15 pt-4">
+                        <CardChip />
+                        <span className="para-tiny text-white">Expense Manager</span>
+                    </div>
                 </div>
-                <Link
-                    href="/user-dashboard/expense-manager"
-                    className="para-tiny flex items-center gap-1 font-semibold text-white/85 default-transition hover:text-white"
-                >
-                    Open full tracker
-                    <ArrowUpRight size={13} />
-                </Link>
-            </div>
 
-            <span className="heading-h2 tracking-tight">{formatCurrency(summary.balance)}</span>
+                <div className="expense-card-face expense-card-back flex h-full flex-col justify-between overflow-hidden rounded-brand-16 bg-gradient-wallet-card bg-primary p-5 text-white shadow-card-hover">
+                    <div className="flex items-start justify-between">
+                        <div>
+                            <p className="para-tiny uppercase tracking-[0.18em] text-white/65">Quick entry</p>
+                            <h3 className="heading-h5 mt-1 text-white">Manage your money</h3>
+                        </div>
+                        <span className="flex h-12 w-12 items-center justify-center rounded-brand-12 bg-white/90 p-2">
+                            <img src="/primary-logo.png" alt="Filernow logo" className="h-full w-full object-contain" />
+                        </span>
+                    </div>
 
-            <div className="flex items-center justify-between para-small text-white/60">
-                <span>Linked account •••• {summary.linkedAccountLast4}</span>
+                    <div className="grid grid-cols-2 gap-3">
+                        <Link
+                            href="/user-dashboard/expense-manager?entry=expense"
+                            className="flex min-h-[82px] flex-col justify-between rounded-brand-12 border border-white/20 bg-black/10 p-3 default-transition hover:bg-white hover:text-primary"
+                        >
+                            <ReceiptText size={19} />
+                            <span className="para-small font-semibold leading-tight">Add expense</span>
+                        </Link>
+                        <Link
+                            href="/user-dashboard/expense-manager?entry=spend"
+                            className="flex min-h-[82px] flex-col justify-between rounded-brand-12 border border-white/20 bg-black/10 p-3 default-transition hover:bg-white hover:text-primary"
+                        >
+                            <ArrowDownToLine size={19} />
+                            <span className="para-small font-semibold leading-tight">Add spend amount</span>
+                        </Link>
+                    </div>
 
-                <span>{summary.asOfLabel}</span>
-            </div>
-
-            <div className="flex flex-col gap-2">
-                <div className="mb-1.5 flex items-center justify-between para-tiny text-white/70">
-                    <span>Income {formatCurrency(summary.totalIncome)}</span>
-                    <span>Spent {formatCurrency(summary.totalExpenses)}</span>
+                    <div className="flex items-center justify-center border-t border-white/15 pt-3">
+                        <Link href="/user-dashboard/expense-manager" className="para-tiny flex items-center gap-1 font-semibold text-white hover:underline">
+                            Full tracker <ArrowUpRight size={13} />
+                        </Link>
+                    </div>
                 </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
-                    <div
-                        className="h-full rounded-full bg-white default-transition"
-                        style={{ width: `${percentUsed}%` }}
-                    />
-                </div>
-            </div>
-
-            <div className="flex items-center justify-between border-t border-white/15 pt-4">
-                <CardChip />
-                <span className="para-tiny text-white/50">Expense Manager</span>
             </div>
         </div>
     );

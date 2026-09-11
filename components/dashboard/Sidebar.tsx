@@ -111,7 +111,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
       <aside
         onMouseEnter={() => setCollapsed(false)}
         onMouseLeave={() => setCollapsed(true)}
-        className={`fixed left-0 top-0 z-50 flex h-screen flex-col bg-white justify-between text-black border-r border-slate-200 transition-[width,box-shadow] duration-300 ease-in-out overflow-hidden ${collapsed ? "w-[76px] shadow-none" : "w-[225px]"
+        className={`fixed left-0 top-0 z-[60] flex h-screen flex-col bg-white justify-between text-black border-r border-slate-200 transition-[width,box-shadow] duration-300 ease-in-out overflow-hidden ${collapsed ? "w-[76px] shadow-none" : "w-[225px]"
           }`}
       >
         <div className="flex min-h-0 flex-1 flex-col">

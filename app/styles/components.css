@@ -1,4 +1,31 @@
 @layer components {
+    .expense-card-perspective {
+        perspective: 1200px;
+    }
+
+    .expense-card-inner {
+        position: relative;
+        min-height: 252px;
+        transform-style: preserve-3d;
+        transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .expense-card-perspective:hover .expense-card-inner,
+    .expense-card-perspective:focus-within .expense-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .expense-card-face {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+
+    .expense-card-back {
+        transform: rotateY(180deg);
+    }
+
     .sheen-sweep-hover::before {
         content: '';
         position: absolute;
@@ -63,6 +90,15 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+
+    .expense-card-inner {
+        transition: none;
+    }
+
+    .expense-card-perspective:hover .expense-card-inner,
+    .expense-card-perspective:focus-within .expense-card-inner {
+        transform: none;
+    }
 
     .cta-shimmer::after,
     .cta-shimmer-dark::after {

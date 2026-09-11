@@ -12,7 +12,7 @@ type Props = {
 const ServiceCard = ({ label, icon, href, highlighted }: Props) => {
     return (
         <Link
-            href={href}
+            href={`/user-dashboard?tab=inbox&service=${encodeURIComponent(label)}`}
             className={cn(
                 "flex flex-col items-center justify-center text-center gap-3 rounded-brand-8 border border-border-clr py-4 px-2 bg-page-bg default-transition hover:-translate-y-0.5 hover:shadow-card-hover group",
                 highlighted
@@ -21,7 +21,7 @@ const ServiceCard = ({ label, icon, href, highlighted }: Props) => {
             )}
         >
             <span
-                className={cn("flex items-center justify-center w-[65px] h-[65px] rounded-full bg-primary-lighter group-hover:scale-110 default-transition"
+                className={cn("flex items-center justify-center w-[65px] h-[60px] rounded-full bg-primary-lighter group-hover:scale-110 default-transition"
                 )}>
                 <Image
                     src={icon}

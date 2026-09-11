@@ -83,7 +83,7 @@
         /* wallet-card gradient — darker depth variant of brand-primary,
        used only by ExpenseManagerCardV2 */
         --gradient-wallet-start: var(--brand-primary);
-        --gradient-wallet-end: #6B0A1B;
+        --gradient-wallet-end: #A51B35;
     }
 
     html {
