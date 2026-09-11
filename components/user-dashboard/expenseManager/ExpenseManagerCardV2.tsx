@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Wallet, ArrowUpRight, Plus } from "lucide-react";
+import { Wallet, ArrowUpRight, Plus, DollarSign } from "lucide-react";
 import { useExpenseManagerSummary } from "@/hooks/useExpenseManagerSummary";
 
 function formatCurrency(value: number) {
@@ -23,7 +23,15 @@ export default function ExpenseManagerCardV2() {
     return (
         <div className="flex h-full flex-col justify-between gap-5 rounded-brand-16 bg-gradient-wallet-cardx bg-primary p-5 text-white shadow-card-hover">
             <div className="flex items-center justify-between">
-                <span className="para-small font-medium text-white/70">Net Balance</span>
+
+                <div className="flex items-center justify-center gap-2">
+
+                    <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[12px] bg-white/15">
+                        <DollarSign size={20} strokeWidth={2} />
+                    </div>
+
+                    <span className="para-small font-medium text-white/70">Net Balance</span>
+                </div>
                 <Link
                     href="/user-dashboard/expense-manager"
                     className="para-tiny flex items-center gap-1 font-semibold text-white/85 default-transition hover:text-white"
@@ -65,7 +73,7 @@ export default function ExpenseManagerCardV2() {
 function CardChip() {
     return (
         <div className="flex items-center">
-            <span className="h-6 w-6 rounded-full bg-secondary/90" />
+            <span className="h-6 w-6 rounded-full bg-secondary/90x bg-secondary-light" />
             <span className="-ml-2.5 h-6 w-6 rounded-full bg-white/85 mix-blend-screen" />
         </div>
     );

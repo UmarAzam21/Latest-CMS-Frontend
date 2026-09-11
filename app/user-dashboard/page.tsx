@@ -33,12 +33,12 @@ export default function DashboardOverviewPage() {
       {/* <DashboardStatCard /> */}
 
       <div className="w-full grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-3">
-        <div className="h-full lg:col-span-2x">
+        <div className="h-full lg:col-span-2">
           <MajorServices />
         </div>
-        <div className="h-full">
+        {/* <div className="h-full">
           <ExpenseManagerCard />
-        </div>
+        </div> */}
         <div className="h-full">
           <ExpenseManagerCardV2 />
         </div>
