@@ -22,11 +22,11 @@ export default function ExpenseManagerCardV2() {
 
     return (
         <div className="flex h-full flex-col justify-between gap-5 rounded-brand-16 bg-gradient-wallet-cardx bg-primary p-5 text-white shadow-card-hover">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between border-b border-b-border-clr-dark pb-3">
 
                 <div className="flex items-center justify-center gap-2">
 
-                    <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[12px] bg-white/15">
+                    <div className="flex h-[36px] w-[36px] items-center justify-center rounded-[12px] bg-white/30">
                         <DollarSign size={20} strokeWidth={2} />
                     </div>
 
@@ -45,15 +45,16 @@ export default function ExpenseManagerCardV2() {
 
             <div className="flex items-center justify-between para-small text-white/60">
                 <span>Linked account •••• {summary.linkedAccountLast4}</span>
+
                 <span>{summary.asOfLabel}</span>
             </div>
 
-            <div>
+            <div className="flex flex-col gap-2">
                 <div className="mb-1.5 flex items-center justify-between para-tiny text-white/70">
                     <span>Income {formatCurrency(summary.totalIncome)}</span>
                     <span>Spent {formatCurrency(summary.totalExpenses)}</span>
                 </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/20">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-white/20">
                     <div
                         className="h-full rounded-full bg-white default-transition"
                         style={{ width: `${percentUsed}%` }}
@@ -81,17 +82,17 @@ function CardChip() {
 
 function ExpenseManagerEmptyState() {
     return (
-        <div className="flex h-full flex-col items-center justify-center gap-3 rounded-brand-16 border border-dashed border-border-clr-dark bg-card-bg-clr p-6 text-center">
-            <span className="flex h-11 w-11 items-center justify-center rounded-brand-12 bg-primary-lighter">
-                <Wallet size={20} className="text-primary" strokeWidth={2} />
+        <div className="flex h-full flex-col items-center justify-center gap-3 rounded-brand-16 border border-dashed border-border-clr-dark bg-card-bg-clr bg-primary p-6 text-center">
+            <span className="flex h-11 w-11 items-center justify-center rounded-brand-12 bg-primary-lighter bg-white/45">
+                <Wallet size={20} className="text-white" strokeWidth={2} />
             </span>
-            <h3 className="heading-h5 text-text-dark">Set up Expense Manager</h3>
-            <p className="para-small max-w-[220px] text-text-secondary-muted">
+            <h3 className="heading-h5 text-white">Set up Expense Manager</h3>
+            <p className="para-small max-w-[220px] text-text-secondary-muted text-white/85">
                 Track income and expenses in one place, and see your monthly net at a glance.
             </p>
             <Link
                 href="/user-dashboard/expense-manager/setup"
-                className="mt-1 flex items-center gap-1.5 rounded-brand-8 bg-primary px-4 py-2 para-small font-semibold text-white default-transition hover:opacity-90"
+                className="mt-1 flex items-center gap-1.5 rounded-brand-8 bg-primary bg-white px-4 py-2 para-small font-semibold text-text-secondary default-transition hover:opacity-90"
             >
                 <Plus size={14} />
                 Get Started
