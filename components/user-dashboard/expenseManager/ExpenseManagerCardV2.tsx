@@ -26,8 +26,8 @@ export default function ExpenseManagerCardV2() {
                 <div className="expense-card-face flex h-full flex-col justify-between gap-5 overflow-hidden rounded-brand-16 bg-gradient-wallet-card bg-primary p-5 text-white shadow-card-hover">
                     <div className="flex items-center justify-between border-b border-b-border-clr-dark pb-3">
                         <div className="flex items-center justify-center gap-2">
-                            <span className="flex h-12 w-12 items-center justify-center rounded-[10px] bg-white/90 p-1.5">
-                                <img src="/primary-logo.png" alt="Filernow logo" className="h-full w-full object-contain" />
+                            <span className="flex h-14 w-14 items-center justify-center rounded-[10px] bg-white/80 p-2">
+                                <img src="/filernow-wellness-icon-01.png" alt="Filernow logo" className="h-full w-full object-contain" />
                             </span>
                         </div>
                         <Link
@@ -71,8 +71,8 @@ export default function ExpenseManagerCardV2() {
                             <p className="para-tiny uppercase tracking-[0.18em] text-white/65">Quick entry</p>
                             <h3 className="heading-h5 mt-1 text-white">Manage your money</h3>
                         </div>
-                        <span className="flex h-12 w-12 items-center justify-center rounded-brand-12 bg-white/90 p-2">
-                            <img src="/primary-logo.png" alt="Filernow logo" className="h-full w-full object-contain" />
+                        <span className="flex h-14 w-14 items-center justify-center rounded-brand-12 bg-white/80 p-2">
+                            <img src="/filernow-wellness-icon-01.png" alt="Filernow logo" className="h-full w-full object-contain" />
                         </span>
                     </div>
 
@@ -94,8 +94,8 @@ export default function ExpenseManagerCardV2() {
                     </div>
 
                     <div className="flex items-center justify-center border-t border-white/15 pt-3">
-                        <Link href="/user-dashboard/expense-manager" className="para-tiny flex items-center gap-1 font-semibold text-white hover:underline">
-                            Full tracker <ArrowUpRight size={13} />
+                        <Link href="/user-dashboard/expense-manager" className="para-small flex items-center gap-1 font-semibold text-white hover:underline">
+                            Full tracker <ArrowUpRight size={14} />
                         </Link>
                     </div>
                 </div>

@@ -44,7 +44,7 @@ function DashboardOverviewContent() {
   }, [requestedTab, serviceName]);
 
   const tabContent = {
-    inbox: <Inbox serviceName={serviceName} />,
+    inbox: <Inbox serviceName={serviceName} onSubmitted={() => setActiveTab('outbox')} />,
     outbox: <Outbox />,
     notices: <Notices />,
   };

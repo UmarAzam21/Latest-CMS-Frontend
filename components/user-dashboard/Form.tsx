@@ -2,21 +2,37 @@
 
 import { FormEvent, useState } from "react";
 import { Check, FileUp, LockKeyhole, UploadCloud } from "lucide-react";
+import { saveServiceRequest } from "@/lib/serviceRequest";
 
 type RegistrationFormProps = {
 	serviceName: string;
+	onSubmitted?: () => void;
 };
 
-export default function Form({ serviceName }: RegistrationFormProps) {
+export default function Form({ serviceName, onSubmitted }: RegistrationFormProps) {
 	const [submitted, setSubmitted] = useState(false);
 	const [files, setFiles] = useState<Record<string, string>>({});
 
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
+		const formData = new FormData(event.currentTarget);
+
+		saveServiceRequest({
+			serviceName,
+			username: String(formData.get("username") || ""),
+			email: String(formData.get("email") || ""),
+			cnic: String(formData.get("cnic") || ""),
+			cnicPhoto: (formData.get("cnicPhoto") as File)?.name || "",
+			certificateFront: (formData.get("certificateFront") as File)?.name || "",
+			certificateBack: (formData.get("certificateBack") as File)?.name || "",
+			submittedAt: new Date().toISOString(),
+		});
+
 		setSubmitted(true);
+		onSubmitted?.();
 	}
 
-	const inputClass = "mt-1.5 w-full rounded-brand-8 border border-border-clr bg-white px-3 py-2.5 para-small text-text-dark outline-none transition placeholder:text-text-secondary-muter focus:border-primary focus:ring-4 focus:ring-primary/10";
+	const inputClass = "mt-1.5 w-full rounded-brand-8 border border-border-clr bg-white px-3.5 py-3 para-small text-text-dark outline-none transition placeholder:text-text-secondary-muter focus:border-primary focus:ring-4 focus:ring-primary/10";
 
 	function handleFileChange(name: string, file?: File) {
 		setFiles((current) => ({ ...current, [name]: file?.name ?? "" }));
@@ -28,7 +44,7 @@ export default function Form({ serviceName }: RegistrationFormProps) {
 				<div className="flex items-start justify-between gap-4">
 					<div>
 						<p className="para-tiny font-semibold uppercase tracking-[0.18em] text-white/75">Service request</p>
-						<h2 className="mt-1 text-[18px] font-bold">{serviceName}</h2>
+						<h2 className="mt-1 text-xl font-bold">{serviceName}</h2>
 						<p className="mt-1 para-tiny text-white/80">Complete your details and upload the required documents.</p>
 					</div>
 					<div className="hidden h-11 w-11 items-center justify-center rounded-brand-12 bg-white/15 sm:flex">

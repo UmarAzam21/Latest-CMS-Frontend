@@ -3,11 +3,12 @@ import Form from "@/components/user-dashboard/Form";
 
 type InboxProps = {
 	serviceName?: string;
+	onSubmitted?: () => void;
 };
 
-export default function Inbox({ serviceName }: InboxProps) {
+export default function Inbox({ serviceName, onSubmitted }: InboxProps) {
 	if (serviceName) {
-		return <Form serviceName={serviceName} />;
+		return <Form serviceName={serviceName} onSubmitted={onSubmitted} />;
 	}
 
 	return (
