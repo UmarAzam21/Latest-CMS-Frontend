@@ -4,60 +4,44 @@ export type TrendDirection = "up" | "down";
 export type StatChipVariant = "green" | "blue" | "purple" | "red";
 
 export interface IExpenseStatItem {
-    id: string;
-    title: string;
-    value: string;          // pre-formatted currency string from backend/formatter,
-    // not a raw number, currency formatting is a display
-    // concern, keep it out of the component's render logic
-    trendDirection: TrendDirection;
-    trendPercent: number;    // e.g. 16, 2, 23, 4, sign is implied by trendDirection
-    trendLabel: string;      // "Increase since last month."
-    icon: LucideIcon;
-    chip: StatChipVariant;
-}
-
-export interface IExpenseManagerSummary {
-    isSetup: boolean;           // false = user hasn't configured Expense Manager yet
-    balance: number;
-    totalIncome: number;
-    totalExpenses: number;
-    linkedAccountLast4: string; // e.g. "1234" — decorative masked reference
-    asOfLabel: string;          // e.g. "Synced 2 hours ago"
-}
-
-export type ExpenseCategory =
-  | "utilities"
-  | "food"
-  | "transport"
-  | "rent"
-  | "business"
-  | "other";
-
-export type EntryKind = "expense" | "income";
-
-export interface IFinancialAccount {
   id: string;
-  name: string;
-  type: "bank" | "cash" | "wallet";
-  accountNumber?: string;
-  last4: string;
-  startingBalance: number;
+  title: string;
+  value: string;          // pre-formatted currency string from backend/formatter,
+  // not a raw number, currency formatting is a display
+  // concern, keep it out of the component's render logic
+  trendDirection: TrendDirection;
+  trendPercent: number;    // e.g. 16, 2, 23, 4, sign is implied by trendDirection
+  trendLabel: string;      // "Increase since last month."
+  icon: LucideIcon;
+  chip: StatChipVariant;
+}
+
+export type EntryKind = "expense" | "income" | "debt";
+
+export interface ICategory {
+  id: string;
+  label: string;
+  color: "primary" | "secondary" | "warning" | "info" | "danger" | "neutral";
 }
 
 export interface IExpenseEntry {
   id: string;
   kind: EntryKind;
   subject: string;
-  category: ExpenseCategory;
+  categoryId: string;      // references ICategory.id — not a hardcoded string
   amount: number;
-  date: string;        // ISO string
+  date: string;             // ISO string
   description?: string;
-  accountId?: string;
-  accountName?: string;
+  receiptImage?: string;    // object URL / base64 for now — see note below
+  // debt-specific, optional so expense/income entries ignore it
+  isSettled?: boolean;
 }
 
+export type SortField = "date" | "amount" | "subject";
+export type SortDirection = "asc" | "desc";
+
 export interface ICategoryBreakdownItem {
-  category: ExpenseCategory;
+  category: ICategory;
   label: string;
   amount: number;
   percentOfTotal: number; // server-computed, same rule as completionPercent elsewhere
