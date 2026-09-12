@@ -24,3 +24,30 @@ export interface IExpenseManagerSummary {
     linkedAccountLast4: string; // e.g. "1234" — decorative masked reference
     asOfLabel: string;          // e.g. "Synced 2 hours ago"
 }
+
+export type ExpenseCategory =
+  | "utilities"
+  | "food"
+  | "transport"
+  | "rent"
+  | "business"
+  | "other";
+
+export type EntryKind = "expense" | "income";
+
+export interface IExpenseEntry {
+  id: string;
+  kind: EntryKind;
+  subject: string;
+  category: ExpenseCategory;
+  amount: number;
+  date: string;        // ISO string
+  description?: string;
+}
+
+export interface ICategoryBreakdownItem {
+  category: ExpenseCategory;
+  label: string;
+  amount: number;
+  percentOfTotal: number; // server-computed, same rule as completionPercent elsewhere
+}
