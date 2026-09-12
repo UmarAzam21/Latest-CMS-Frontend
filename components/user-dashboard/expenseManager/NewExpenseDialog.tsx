@@ -23,7 +23,7 @@ export default function NewExpenseDialog({ onSaved }: NewExpenseDialogProps) {
 
   const onSubmit = async (values: ExpenseEntryFormValues) => {
     // Static-data phase: no real POST yet. Wire to
-    // /api/expense-manager/entries once Umar's endpoint exists.
+    // /api/expense-manager/entries once backend endpoint exists.
     onSaved?.(values);
     reset();
   };
