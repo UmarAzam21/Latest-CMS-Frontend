@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X, Upload, Trash2 } from "lucide-react";
@@ -9,16 +9,19 @@ import {
   ExpenseEntryFormValues,
   expenseEntryFormValuesSchema,
 } from "@/lib/schemas/expenseEntryFormSchema";
-import { ICategory } from "@/types/expenseManager";
+import { ICategory, IExpenseEntry } from "@/types/expenseManager";
 
 interface NewExpenseDialogProps {
   categories: ICategory[];
   onSaved: (values: ExpenseEntryFormValues & { receiptImage?: string }) => void;
+  editingEntry?: IExpenseEntry | null;
+  onClose?: () => void; // called when dialog closes in edit mode, to clear editingEntry upstream
 }
 
-export default function NewExpenseDialog({ categories, onSaved }: NewExpenseDialogProps) {
+export default function NewExpenseDialog({ categories, onSaved, editingEntry, onClose }: NewExpenseDialogProps) {
   const [open, setOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const isEditMode = Boolean(editingEntry);
 
   const {
     register,
@@ -28,7 +31,11 @@ export default function NewExpenseDialog({ categories, onSaved }: NewExpenseDial
     formState: { errors, isSubmitting },
   } = useForm<ExpenseEntryFormValues>({
     resolver: zodResolver(expenseEntryFormValuesSchema),
-    defaultValues: { kind: "expense", accountId: accounts[0]?.id ?? "" },
+    defaultValues: {
+      kind: "expense",
+      accountId: "",
+      isSettled: false,
+    },
   });
 
   const kind = watch("kind");
@@ -41,11 +48,45 @@ export default function NewExpenseDialog({ categories, onSaved }: NewExpenseDial
     reader.readAsDataURL(file);
   };
 
+  //  Open + pre-fill when an entry is passed in from the table's edit button
+  useEffect(() => {
+    if (editingEntry) {
+      reset({
+        kind: editingEntry.kind,
+        subject: editingEntry.subject,
+        categoryId: editingEntry.categoryId,
+        amount: editingEntry.amount,
+        date: editingEntry.date.slice(0, 10),
+        description: editingEntry.description,
+        accountId: "",
+        isSettled: Boolean(editingEntry.isSettled),
+      });
+      setImagePreview(editingEntry.receiptImage ?? null);
+      setOpen(true);
+    }
+  }, [editingEntry, reset]);
+
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) {
+      reset({
+        kind: "expense",
+        subject: "",
+        categoryId: "",
+        amount: 0,
+        date: "",
+        description: "",
+        accountId: "",
+        isSettled: false,
+      });
+      setImagePreview(null);
+      onClose?.();
+    }
+  };
+
   const onSubmit = async (values: ExpenseEntryFormValues) => {
     onSaved({ ...values, receiptImage: imagePreview ?? undefined });
-    reset();
-    setImagePreview(null);
-    setOpen(false);
+    handleOpenChange(false);
   };
 
   return (

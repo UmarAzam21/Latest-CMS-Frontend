@@ -21,9 +21,6 @@ export default function ExpenseManagerPage() {
     const [tableFilter, setTableFilter] = useState<FilterTab>("all");
     const [statDialogKind, setStatDialogKind] = useState<EntryKind | "all" | null>(null);
 
-    // NOTE: passing ALL debts (not just unsettled), DebtSummaryCard needs
-    // both to compute its "% cleared" progress bar. Filtering to unsettled
-    // only here (as before) silently broke that stat.
     const debtEntries = store.entries.filter((e) => e.kind === "debt");
 
     return (
@@ -34,7 +31,6 @@ export default function ExpenseManagerPage() {
                     <CategoryManagerDialog categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
                     <NewExpenseDialog
                         categories={store.categories}
-                        cards={store.cards}
                         editingEntry={editingEntry}
                         onClose={() => setEditingEntry(null)}
                         onSaved={(values) => {
@@ -58,17 +54,11 @@ export default function ExpenseManagerPage() {
                     onTransfer={store.transferBetweenCards}
                 />
 
-                <CardsBalanceChart
-                    cards={store.cards}
-                    variant="area"
-                />
+                <CardsBalanceChart cards={store.cards} variant="area" />
             </div>
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[60%_40%]">
                 <TrendChart title="Daily Activity (Last 7 Days)" data={store.stats.dailyTrend} granularity="day" />
-
-                {/* <DebtSummaryCard debtEntries={debtEntries} /> */}
-
                 <DebtSummaryCardV2 debtEntries={debtEntries} onMakePayment={store.makeDebtPayment} />
             </div>
 
@@ -84,7 +74,10 @@ export default function ExpenseManagerPage() {
                 sortDirection={store.sortDirection}
                 onSort={(field) => {
                     if (field === store.sortField) store.setSortDirection(store.sortDirection === "asc" ? "desc" : "asc");
-                    else { store.setSortField(field); store.setSortDirection("desc"); }
+                    else {
+                        store.setSortField(field);
+                        store.setSortDirection("desc");
+                    }
                 }}
                 onDelete={store.deleteEntry}
                 onEdit={setEditingEntry}

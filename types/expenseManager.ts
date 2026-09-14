@@ -39,10 +39,29 @@ export interface IExpenseEntry {
 
 export type SortField = "date" | "amount" | "subject";
 export type SortDirection = "asc" | "desc";
+export type FilterTab = "all" | EntryKind;
 
 export interface ICategoryBreakdownItem {
   category: ICategory;
-  label: string;
   amount: number;
-  percentOfTotal: number; // server-computed, same rule as completionPercent elsewhere
+  percentOfTotal: number;
+}
+
+export interface IExpenseManagerSummary {
+  isSetup: boolean;
+  balance: number;
+  totalIncome: number;
+  totalExpenses: number;
+  linkedAccountLast4: string;
+  asOfLabel: string;
+}
+
+export interface ICard {
+  id: string;
+  label: string;
+  balance: number;
+  last4: string;
+  expiryMonth: number;
+  expiryYear: number;
+  gradient: "primary" | "secondary" | "dark";
 }

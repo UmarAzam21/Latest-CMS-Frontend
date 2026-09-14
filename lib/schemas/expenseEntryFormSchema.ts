@@ -9,6 +9,8 @@ export const expenseEntryFormValuesSchema = z.object({
   date: z.string().min(1, "Date is required"),
   description: z.string().optional(),
   accountId: z.string().optional(),
+  isSettled: z.boolean().optional(),
+  receiptImage: z.string().optional(),
 });
 
 export type ExpenseEntryFormValues = z.infer<typeof expenseEntryFormValuesSchema>;
