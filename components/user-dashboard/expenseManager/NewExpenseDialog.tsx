@@ -9,19 +9,20 @@ import {
   ExpenseEntryFormValues,
   expenseEntryFormValuesSchema,
 } from "@/lib/schemas/expenseEntryFormSchema";
-import { ICategory, IExpenseEntry } from "@/types/expenseManager";
+import { ICard, ICategory, IExpenseEntry } from "@/types/expenseManager";
 
 interface NewExpenseDialogProps {
   categories: ICategory[];
+  cards: ICard[];
   onSaved: (values: ExpenseEntryFormValues & { receiptImage?: string }) => void;
   editingEntry?: IExpenseEntry | null;
-  onClose?: () => void; // called when dialog closes in edit mode, to clear editingEntry upstream
+  onClose?: () => void;
 }
 
-export default function NewExpenseDialog({ categories, onSaved, editingEntry, onClose }: NewExpenseDialogProps) {
+export default function NewExpenseDialog({ categories, cards, onSaved, editingEntry, onClose }: NewExpenseDialogProps) {
   const [open, setOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const isEditMode = Boolean(editingEntry);
+  const [cardId, setCardId] = useState<string>("");
 
   const {
     register,
@@ -48,7 +49,6 @@ export default function NewExpenseDialog({ categories, onSaved, editingEntry, on
     reader.readAsDataURL(file);
   };
 
-  //  Open + pre-fill when an entry is passed in from the table's edit button
   useEffect(() => {
     if (editingEntry) {
       reset({
@@ -63,6 +63,7 @@ export default function NewExpenseDialog({ categories, onSaved, editingEntry, on
       });
       setImagePreview(editingEntry.receiptImage ?? null);
       setOpen(true);
+      setCardId(editingEntry.cardId ?? "");
     }
   }, [editingEntry, reset]);
 
@@ -80,12 +81,13 @@ export default function NewExpenseDialog({ categories, onSaved, editingEntry, on
         isSettled: false,
       });
       setImagePreview(null);
+      setCardId("");
       onClose?.();
     }
   };
 
   const onSubmit = async (values: ExpenseEntryFormValues) => {
-    onSaved({ ...values, receiptImage: imagePreview ?? undefined });
+    onSaved({ ...values, receiptImage: imagePreview ?? undefined, cardId: cardId || undefined });
     handleOpenChange(false);
   };
 
@@ -165,6 +167,21 @@ export default function NewExpenseDialog({ categories, onSaved, editingEntry, on
                   <input type="checkbox" {...register("isSettled")} />
                   Mark as settled
                 </label>
+              )}
+
+              {kind !== "debt" && (
+                <Field label="Pay From Card (optional)">
+                  <select
+                    value={cardId}
+                    onChange={(e) => setCardId(e.target.value)}
+                    className="w-full rounded-brand-8 border border-border-clr px-3 py-2 para-small outline-none focus:border-primary"
+                  >
+                    <option value="">No card — record only</option>
+                    {cards.map((c) => (
+                      <option key={c.id} value={c.id}>{c.label} — PKR {c.balance.toLocaleString("en-PK")}</option>
+                    ))}
+                  </select>
+                </Field>
               )}
 
               <Field label="Description">

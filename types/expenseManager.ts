@@ -12,6 +12,7 @@ export interface IExpenseStatItem {
   trendDirection: TrendDirection;
   trendPercent: number;    // e.g. 16, 2, 23, 4, sign is implied by trendDirection
   trendLabel: string;      // "Increase since last month."
+  isPositive: boolean; // NEW — whether the trend is good news; independent of arrow direction
   icon: LucideIcon;
   chip: StatChipVariant;
 }
@@ -26,6 +27,7 @@ export interface ICategory {
 
 export interface IExpenseEntry {
   id: string;
+  cardId?: string; // NEW — persisted so edit/delete can reconcile card balance
   kind: EntryKind;
   subject: string;
   categoryId: string;      // references ICategory.id — not a hardcoded string
@@ -65,3 +67,5 @@ export interface ICard {
   expiryYear: number;
   gradient: "primary" | "secondary" | "dark";
 }
+
+export type FilterTab = "all" | EntryKind; // NEW — shared between ExpensesTable and stat card "View" actions

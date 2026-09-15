@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import ExpensesTable from "@/components/user-dashboard/expenseManager/ExpensesTable";
 import TrendChart from "@/components/user-dashboard/expenseManager/TrendChart";
 import CategoryBreakdown from "@/components/user-dashboard/expenseManager/CategoryBreakdown";
@@ -31,6 +31,7 @@ export default function ExpenseManagerPage() {
                     <CategoryManagerDialog categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
                     <NewExpenseDialog
                         categories={store.categories}
+                        cards={store.cards}
                         editingEntry={editingEntry}
                         onClose={() => setEditingEntry(null)}
                         onSaved={(values) => {
@@ -42,7 +43,6 @@ export default function ExpenseManagerPage() {
             </div>
 
             <ExpensesStats entries={store.entries} categories={store.categories} onViewKind={setStatDialogKind} />
-
             <StatDetailDialog kind={statDialogKind} entries={store.entries} categories={store.categories} onClose={() => setStatDialogKind(null)} />
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[40%_60%]">
@@ -53,7 +53,6 @@ export default function ExpenseManagerPage() {
                     onDeleteCard={store.deleteCard}
                     onTransfer={store.transferBetweenCards}
                 />
-
                 <CardsBalanceChart cards={store.cards} variant="area" />
             </div>
 
@@ -73,8 +72,9 @@ export default function ExpenseManagerPage() {
                 sortField={store.sortField}
                 sortDirection={store.sortDirection}
                 onSort={(field) => {
-                    if (field === store.sortField) store.setSortDirection(store.sortDirection === "asc" ? "desc" : "asc");
-                    else {
+                    if (field === store.sortField) {
+                        store.setSortDirection(store.sortDirection === "asc" ? "desc" : "asc");
+                    } else {
                         store.setSortField(field);
                         store.setSortDirection("desc");
                     }

@@ -6,6 +6,7 @@ import { IExpenseEntry, ICategory, SortField, SortDirection, ICard } from "@/typ
 import { defaultCategories } from "@/data/user-dashboard/defaultCategoriesData";
 import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
+import { buildTrend } from "@/lib/utils/trend";
 
 const STORAGE_KEY_ENTRIES = "filernow_expense_entries_v2";
 const STORAGE_KEY_CATEGORIES = "filernow_expense_categories_v2";
@@ -39,12 +40,14 @@ export function useExpenseManagerStore() {
 
     if (alreadySeeded) {
       setEntries(readLocal(STORAGE_KEY_ENTRIES, []));
-      setCards(readLocal(STORAGE_KEY_CARDS, dummyCards));
     } else {
       setEntries(dummyExpenseEntries);
       window.localStorage.setItem(STORAGE_KEY_SEEDED, "true");
     }
 
+    // Cards seed unconditionally, not gated behind entries' seeded flag,
+    // since it's an independent dataset with its own storage key.
+    setCards(readLocal(STORAGE_KEY_CARDS, dummyCards));
     setCategories(readLocal(STORAGE_KEY_CATEGORIES, defaultCategories));
     setHasLoaded(true);
   }, []);
@@ -61,25 +64,46 @@ export function useExpenseManagerStore() {
     window.localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
   }, [categories, hasLoaded]);
 
-  // const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-  //   setEntries((prev) => [{ ...entry, id: crypto.randomUUID() }, ...prev]);
-  // }, []);
-
-  const addEntry = useCallback((entry: Omit<IExpenseEntry, "id"> & { cardId?: string }) => {
-    const { cardId, ...rest } = entry;
-    setEntries((prev) => [{ ...rest, id: crypto.randomUUID() }, ...prev]);
-    if (cardId && entry.kind !== "debt") {
+  const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
+    setEntries((prev) => [{ ...entry, id: crypto.randomUUID() }, ...prev]);
+    if (entry.cardId && entry.kind !== "debt") {
       const delta = entry.kind === "income" ? entry.amount : -entry.amount;
-      setCards((prev) => prev.map((c) => (c.id === cardId ? { ...c, balance: c.balance + delta } : c)));
+      setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
     }
   }, []);
 
   const updateEntry = useCallback((id: string, patch: Partial<IExpenseEntry>) => {
-    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+    setEntries((prev) => {
+      const old = prev.find((e) => e.id === id);
+      if (!old) return prev;
+      const updated = { ...old, ...patch };
+
+      setCards((prevCards) => {
+        let next = prevCards;
+        if (old.cardId && old.kind !== "debt") {
+          const reverse = old.kind === "income" ? -old.amount : old.amount;
+          next = next.map((c) => (c.id === old.cardId ? { ...c, balance: c.balance + reverse } : c));
+        }
+        if (updated.cardId && updated.kind !== "debt") {
+          const apply = updated.kind === "income" ? updated.amount : -updated.amount;
+          next = next.map((c) => (c.id === updated.cardId ? { ...c, balance: c.balance + apply } : c));
+        }
+        return next;
+      });
+
+      return prev.map((e) => (e.id === id ? updated : e));
+    });
   }, []);
 
   const deleteEntry = useCallback((id: string) => {
-    setEntries((prev) => prev.filter((e) => e.id !== id));
+    setEntries((prev) => {
+      const target = prev.find((e) => e.id === id);
+      if (target?.cardId && target.kind !== "debt") {
+        const reverse = target.kind === "income" ? -target.amount : target.amount;
+        setCards((prevCards) => prevCards.map((c) => (c.id === target.cardId ? { ...c, balance: c.balance + reverse } : c)));
+      }
+      return prev.filter((e) => e.id !== id);
+    });
   }, []);
 
   const addCategory = useCallback((label: string, color: ICategory["color"]) => {
@@ -116,6 +140,10 @@ export function useExpenseManagerStore() {
 
   const addCard = useCallback((card: Omit<ICard, "id">) => {
     setCards((prev) => [...prev, { ...card, id: crypto.randomUUID() }]);
+  }, []);
+
+  const updateCard = useCallback((id: string, patch: Partial<ICard>) => {
+    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   }, []);
 
   const deleteCard = useCallback((id: string) => {
@@ -156,25 +184,8 @@ export function useExpenseManagerStore() {
       percentOfTotal: totalCategorized > 0 ? Math.round((c.amount / totalCategorized) * 100) : 0,
     }));
 
-    const dailyMap = new Map<string, number>();
-    entries.filter((e) => e.kind === "expense").forEach((e) => {
-      const day = e.date.slice(0, 10);
-      dailyMap.set(day, (dailyMap.get(day) ?? 0) + e.amount);
-    });
-    const dailyTrend = Array.from(dailyMap.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .slice(-7)
-      .map(([date, amount]) => ({ label: date, amount }));
-
-    const monthlyMap = new Map<string, number>();
-    entries.filter((e) => e.kind === "expense").forEach((e) => {
-      const month = e.date.slice(0, 7);
-      monthlyMap.set(month, (monthlyMap.get(month) ?? 0) + e.amount);
-    });
-    const monthlyTrend = Array.from(monthlyMap.entries())
-      .sort(([a], [b]) => a.localeCompare(b))
-      .slice(-6)
-      .map(([month, amount]) => ({ label: month, amount }));
+    const dailyTrend = buildTrend(entries, (d) => d.slice(0, 10), 7);
+    const monthlyTrend = buildTrend(entries, (d) => d.slice(0, 7), 6);
 
     return { totalIncome, totalExpenses, totalDebt, balance, categoryBreakdown, dailyTrend, monthlyTrend };
   }, [entries, categories]);
@@ -193,6 +204,6 @@ export function useExpenseManagerStore() {
     addCategory,
     updateCategory,
     deleteCategory,
-    cards, addCard, deleteCard, adjustCardBalance, transferBetweenCards,
+    cards, addCard, updateCard, deleteCard, adjustCardBalance, transferBetweenCards,
   };
 }

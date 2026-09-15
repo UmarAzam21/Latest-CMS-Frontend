@@ -13,6 +13,8 @@ interface ExpensesTableProps {
   onSort: (field: SortField) => void;
   onDelete: (id: string) => void;
   onEdit: (entry: IExpenseEntry) => void;
+  activeFilter: FilterTab;
+  onFilterChange: (f: FilterTab) => void;
 }
 
 type FilterTab = "all" | EntryKind;
@@ -28,11 +30,10 @@ function formatCurrency(v: number) {
 }
 
 export default function ExpensesTable({
-  entries, categories, sortField, sortDirection, onSort, onDelete, onEdit,
+  entries, categories, sortField, sortDirection, onSort, onDelete, onEdit, activeFilter, onFilterChange
 }: ExpensesTableProps) {
   const PAGE_SIZE = 8;
   const [page, setPage] = useState(1);
-  const [filter, setFilter] = useState<FilterTab>("all");
 
   const getCategoryLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? "Uncategorized";
 
@@ -43,9 +44,9 @@ export default function ExpensesTable({
     debt: entries.filter((e) => e.kind === "debt").length,
   };
 
-  const filteredEntries = filter === "all" ? entries : entries.filter((e) => e.kind === filter);
+  const filteredEntries = activeFilter === "all" ? entries : entries.filter((e) => e.kind === activeFilter);
 
-  useEffect(() => setPage(1), [filter]);
+  useEffect(() => setPage(1), [activeFilter]);
   const totalPages = Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE));
   const paginatedEntries = filteredEntries.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
@@ -60,17 +61,17 @@ export default function ExpensesTable({
           </p>
         </div>
         <div className="flex gap-1.5">
-          <FilterTabButton label="All" count={counts.all} active={filter === "all"} onClick={() => setFilter("all")} />
-          <FilterTabButton label="Expenses" count={counts.expense} active={filter === "expense"} onClick={() => setFilter("expense")} />
-          <FilterTabButton label="Income" count={counts.income} active={filter === "income"} onClick={() => setFilter("income")} />
-          <FilterTabButton label="Debt" count={counts.debt} active={filter === "debt"} onClick={() => setFilter("debt")} />
+          <FilterTabButton label="All" count={counts.all} active={activeFilter === "all"} onClick={() => onFilterChange("all")} />
+          <FilterTabButton label="Expenses" count={counts.expense} active={activeFilter === "expense"} onClick={() => onFilterChange("expense")} />
+          <FilterTabButton label="Income" count={counts.income} active={activeFilter === "income"} onClick={() => onFilterChange("income")} />
+          <FilterTabButton label="Debt" count={counts.debt} active={activeFilter === "debt"} onClick={() => onFilterChange("debt")} />
         </div>
       </div>
 
       {filteredEntries.length === 0 ? (
         <div className="p-10 text-center">
           <p className="para-small text-text-secondary-muted">
-            No {filter === "all" ? "entries" : filter} yet.
+            No {activeFilter === "all" ? "entries" : activeFilter} yet.
           </p>
         </div>
       ) : (
