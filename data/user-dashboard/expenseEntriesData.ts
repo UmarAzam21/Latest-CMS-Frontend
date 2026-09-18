@@ -9,7 +9,6 @@ export const expenseEntriesData: IExpenseEntry[] = [
     { id: "e2", kind: "expense", subject: "Grocery Run", category: "food", amount: 12300, date: "2026-09-07" },
     { id: "e3", kind: "income", subject: "Freelance Payment", category: "business", amount: 65000, date: "2026-09-05" },
     { id: "e4", kind: "expense", subject: "Fuel", category: "transport", amount: 6200, date: "2026-09-04" },
-    { id: "e5", kind: "expense", subject: "Office Rent Share", category: "rent", amount: 35000, date: "2026-09-01" },
 ];
 
 export const categoryBreakdownData: ICategoryBreakdownItem[] = [

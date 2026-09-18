@@ -19,7 +19,6 @@ type SearchResponse = {
   results: FBREntry[];
 };
 
-const MAX_SIZE_MB = 15;
 const ACCEPTED = [
   "text/csv",
   "application/vnd.ms-excel",
@@ -123,11 +122,6 @@ export default function FBRChecklist() {
   }, [query, runSearch]);
 
   const uploadFile = async (file: File) => {
-    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
-      setError(`${file.name} exceeds the ${MAX_SIZE_MB}MB limit`);
-      return;
-    }
-
     setUploading((prev) => [...prev, { name: file.name, size: file.size }]);
 
     try {
@@ -281,7 +275,7 @@ export default function FBRChecklist() {
           )}
         </p>
         <p className="mt-2 text-[12px] text-neutral-400">
-          Supports: CSV, XLS, XLSX · Max size: {MAX_SIZE_MB}MB
+          Supports: CSV, XLS, XLSX
         </p>
       </div>
 

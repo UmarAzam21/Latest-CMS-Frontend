@@ -35,6 +35,15 @@ export type ExpenseCategory =
 
 export type EntryKind = "expense" | "income";
 
+export interface IFinancialAccount {
+  id: string;
+  name: string;
+  type: "bank" | "cash" | "wallet";
+  accountNumber?: string;
+  last4: string;
+  startingBalance: number;
+}
+
 export interface IExpenseEntry {
   id: string;
   kind: EntryKind;
@@ -43,6 +52,8 @@ export interface IExpenseEntry {
   amount: number;
   date: string;        // ISO string
   description?: string;
+  accountId?: string;
+  accountName?: string;
 }
 
 export interface ICategoryBreakdownItem {

@@ -5,12 +5,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog"; // via shadcn's dialog primitive
 import { ExpenseEntryFormValues, expenseEntryFormValuesSchema } from "@/lib/schemas/expenseEntryFormSchema";
+import { IFinancialAccount } from "@/types/expenseManager";
 
 interface NewExpenseDialogProps {
   onSaved?: (values: ExpenseEntryFormValues) => void;
+  accounts?: IFinancialAccount[];
 }
 
-export default function NewExpenseDialog({ onSaved }: NewExpenseDialogProps) {
+export default function NewExpenseDialog({ onSaved, accounts = [] }: NewExpenseDialogProps) {
   const {
     register,
     handleSubmit,
@@ -18,7 +20,7 @@ export default function NewExpenseDialog({ onSaved }: NewExpenseDialogProps) {
     formState: { errors, isSubmitting },
   } = useForm<ExpenseEntryFormValues>({
     resolver: zodResolver(expenseEntryFormValuesSchema),
-    defaultValues: { kind: "expense" },
+    defaultValues: { kind: "expense", accountId: accounts[0]?.id ?? "" },
   });
 
   const onSubmit = async (values: ExpenseEntryFormValues) => {
@@ -33,7 +35,7 @@ export default function NewExpenseDialog({ onSaved }: NewExpenseDialogProps) {
       <Dialog.Trigger asChild>
         <button
           type="button"
-          className="flex items-center gap-1.5 rounded-brand-8 bg-primary px-4 py-2.5 para-small font-semibold text-white default-transition hover:opacity-90"
+          className="flex items-center gap-1.5 rounded-brand-8 bg-primary px-3 py-2 para-small font-semibold text-white default-transition hover:opacity-90"
         >
           <Plus size={15} />
           New Expense
@@ -97,6 +99,21 @@ export default function NewExpenseDialog({ onSaved }: NewExpenseDialogProps) {
                 />
               </Field>
             </div>
+
+            {accounts.length > 0 && (
+              <Field label="Account">
+                <select
+                  {...register("accountId")}
+                  className="w-full rounded-brand-8 border border-border-clr px-3 py-2 para-small outline-none focus:border-primary"
+                >
+                  {accounts.map((account) => (
+                    <option key={account.id} value={account.id}>
+                      {account.name} •••• {account.last4}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            )}
 
             <Field label="Date" error={errors.date?.message}>
               <input

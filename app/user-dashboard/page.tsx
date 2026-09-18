@@ -12,6 +12,7 @@ import ExpenseManagerCardV2 from '@/components/user-dashboard/expenseManager/Exp
 import Inbox from '@/components/user-dashboard/services/Inbox';
 import Outbox from '@/components/user-dashboard/services/Outbox';
 import Notices from '@/components/user-dashboard/services/Notices';
+import AdvancedExpenseWorkspace from '@/components/user-dashboard/expenseManager/AdvancedExpenseWorkspace';
 
 type DashboardTab = 'inbox' | 'outbox' | 'notices';
 
@@ -74,13 +75,10 @@ function DashboardOverviewContent() {
         <div className="h-full lg:col-span-2">
           <MajorServices />
         </div>
-        {/* <div className="h-full">
-          <ExpenseManagerCard />
-        </div> */}
-        <div className="h-full">
-          <ExpenseManagerCardV2 />
-        </div>
+        <div className="h-full"><ExpenseManagerCardV2 /></div>
       </div>
+
+      <AdvancedExpenseWorkspace dashboardPreview />
 
       <section ref={tabsSectionRef} className="mt-5 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-4 shadow-card">
         <div className="mb-4 flex items-center gap-1 border-b border-border-clr" role="tablist" aria-label="Dashboard messages">
