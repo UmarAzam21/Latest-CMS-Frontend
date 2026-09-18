@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, type UseFormRegister } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, X, Upload, Trash2 } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -9,17 +9,24 @@ import {
   ExpenseEntryFormValues,
   expenseEntryFormValuesSchema,
 } from "@/lib/schemas/expenseEntryFormSchema";
-import { ICard, ICategory, IExpenseEntry } from "@/types/expenseManager";
+import { ICard, ICategory, IExpenseEntry, IFinancialAccount } from "@/types/expenseManager";
 
 interface NewExpenseDialogProps {
-  categories: ICategory[];
-  cards: ICard[];
-  onSaved: (values: ExpenseEntryFormValues & { receiptImage?: string }) => void;
+  categories?: ICategory[];
+  cards?: ICard[];
+  accounts?: IFinancialAccount[];
+  onSaved: (values: ExpenseEntryFormValues & { receiptImage?: string; cardId?: string }) => void;
   editingEntry?: IExpenseEntry | null;
   onClose?: () => void;
 }
 
-export default function NewExpenseDialog({ categories, cards, onSaved, editingEntry, onClose }: NewExpenseDialogProps) {
+export default function NewExpenseDialog({
+  categories = [],
+  cards = [],
+  onSaved,
+  editingEntry,
+  onClose,
+}: NewExpenseDialogProps) {
   const [open, setOpen] = useState(false);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [cardId, setCardId] = useState<string>("");
@@ -239,7 +246,15 @@ export default function NewExpenseDialog({ categories, cards, onSaved, editingEn
   );
 }
 
-function RadioOption({ label, value, register }: { label: string; value: string; register: any }) {
+function RadioOption({
+  label,
+  value,
+  register,
+}: {
+  label: string;
+  value: string;
+  register: UseFormRegister<ExpenseEntryFormValues>;
+}) {
   return (
     <label className="flex items-center gap-1.5 para-small text-text-secondary">
       <input type="radio" value={value} {...register("kind")} defaultChecked={value === "expense"} />

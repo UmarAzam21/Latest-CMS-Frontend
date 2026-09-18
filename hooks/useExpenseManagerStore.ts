@@ -8,10 +8,10 @@ import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
 import { buildTrend } from "@/lib/utils/trend";
 
-const STORAGE_KEY_ENTRIES = "filernow_expense_entries_v3";
-const STORAGE_KEY_CATEGORIES = "filernow_expense_categories_v3";
-const STORAGE_KEY_SEEDED = "filernow_expense_seeded_v3";
-const STORAGE_KEY_CARDS = "filernow_expense_cards_v3";
+const STORAGE_KEY_ENTRIES = "filernow_expense_entries_v4";
+const STORAGE_KEY_CATEGORIES = "filernow_expense_categories_v4";
+const STORAGE_KEY_SEEDED = "filernow_expense_seeded_v4";
+const STORAGE_KEY_CARDS = "filernow_expense_cards_v4";
 
 
 function readLocal<T>(key: string, fallback: T): T {
