@@ -37,11 +37,11 @@ export interface IExpenseEntry {
   receiptImage?: string;    // object URL / base64 for now — see note below
   // debt-specific, optional so expense/income entries ignore it
   isSettled?: boolean;
+  originalAmount?: number;
 }
 
 export type SortField = "date" | "amount" | "subject";
 export type SortDirection = "asc" | "desc";
-export type FilterTab = "all" | EntryKind;
 
 export interface ICategoryBreakdownItem {
   category: ICategory;
@@ -68,4 +68,4 @@ export interface ICard {
   gradient: "primary" | "secondary" | "dark";
 }
 
-export type FilterTab = "all" | EntryKind; // NEW — shared between ExpensesTable and stat card "View" actions
+export type FilterTab = "all" | EntryKind;

@@ -8,10 +8,10 @@ import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
 import { buildTrend } from "@/lib/utils/trend";
 
-const STORAGE_KEY_ENTRIES = "filernow_expense_entries_v2";
-const STORAGE_KEY_CATEGORIES = "filernow_expense_categories_v2";
-const STORAGE_KEY_SEEDED = "filernow_expense_seeded_v2";
-const STORAGE_KEY_CARDS = "filernow_expense_cards_v1";
+const STORAGE_KEY_ENTRIES = "filernow_expense_entries_v3";
+const STORAGE_KEY_CATEGORIES = "filernow_expense_categories_v3";
+const STORAGE_KEY_SEEDED = "filernow_expense_seeded_v3";
+const STORAGE_KEY_CARDS = "filernow_expense_cards_v3";
 
 
 function readLocal<T>(key: string, fallback: T): T {
@@ -65,7 +65,8 @@ export function useExpenseManagerStore() {
   }, [categories, hasLoaded]);
 
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-    setEntries((prev) => [{ ...entry, id: crypto.randomUUID() }, ...prev]);
+    const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
+    setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
     if (entry.cardId && entry.kind !== "debt") {
       const delta = entry.kind === "income" ? entry.amount : -entry.amount;
       setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
@@ -104,6 +105,14 @@ export function useExpenseManagerStore() {
       }
       return prev.filter((e) => e.id !== id);
     });
+  }, []);
+
+  const makeDebtPayment = useCallback((id: string, paymentAmount: number) => {
+    setEntries((prev) => prev.map((e) => {
+      if (e.id !== id) return e;
+      const remaining = Math.max(0, e.amount - paymentAmount);
+      return { ...e, amount: remaining, isSettled: remaining === 0 };
+    }));
   }, []);
 
   const addCategory = useCallback((label: string, color: ICategory["color"]) => {
@@ -201,6 +210,7 @@ export function useExpenseManagerStore() {
     addEntry,
     updateEntry,
     deleteEntry,
+    makeDebtPayment,
     addCategory,
     updateCategory,
     deleteCategory,

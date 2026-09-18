@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpDown, Pencil, Trash2 } from "lucide-react";
+import { ArrowUpDown, Download, Pencil, Trash2 } from "lucide-react";
 import { IExpenseEntry, ICategory, SortField, SortDirection, EntryKind } from "@/types/expenseManager";
 import { cn } from "@/lib/cn";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { exportToCsv, exportToPdf, exportToXlsx } from "@/lib/utils/exportTransactionsData";
 
 interface ExpensesTableProps {
   entries: IExpenseEntry[];
@@ -60,11 +62,31 @@ export default function ExpensesTable({
             All expenses, income, and debt entries in one place.
           </p>
         </div>
-        <div className="flex gap-1.5">
-          <FilterTabButton label="All" count={counts.all} active={activeFilter === "all"} onClick={() => onFilterChange("all")} />
-          <FilterTabButton label="Expenses" count={counts.expense} active={activeFilter === "expense"} onClick={() => onFilterChange("expense")} />
-          <FilterTabButton label="Income" count={counts.income} active={activeFilter === "income"} onClick={() => onFilterChange("income")} />
-          <FilterTabButton label="Debt" count={counts.debt} active={activeFilter === "debt"} onClick={() => onFilterChange("debt")} />
+
+        {/* Entries Filters Tabs */}
+        <div className="flex gap-8">
+          <div className="flex gap-1.5">
+            <FilterTabButton label="All" count={counts.all} active={activeFilter === "all"} onClick={() => onFilterChange("all")} />
+            <FilterTabButton label="Expenses" count={counts.expense} active={activeFilter === "expense"} onClick={() => onFilterChange("expense")} />
+            <FilterTabButton label="Income" count={counts.income} active={activeFilter === "income"} onClick={() => onFilterChange("income")} />
+            <FilterTabButton label="Debt" count={counts.debt} active={activeFilter === "debt"} onClick={() => onFilterChange("debt")} />
+          </div>
+
+          {/* Entries Export Dropdown */}
+          <DropdownMenu.Root>
+            <DropdownMenu.Trigger asChild>
+              <button className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 py-1.5 para-tiny font-semibold text-text-secondary hover:bg-page-bg">
+                <Download size={13} /> Export
+              </button>
+            </DropdownMenu.Trigger>
+            <DropdownMenu.Portal>
+              <DropdownMenu.Content align="end" className="z-dropdown w-40 rounded-brand-8 border border-border-clr bg-white p-1 shadow-card-hover">
+                <DropdownMenu.Item onClick={() => exportToCsv(filteredEntries, categories, "transactions.csv")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-small text-text-secondary hover:bg-page-bg outline-none">CSV</DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => exportToXlsx(filteredEntries, categories, "transactions.xlsx")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-small text-text-secondary hover:bg-page-bg outline-none">Excel (.xlsx)</DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => exportToPdf(filteredEntries, categories, "transactions.pdf")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-small text-text-secondary hover:bg-page-bg outline-none">PDF</DropdownMenu.Item>
+              </DropdownMenu.Content>
+            </DropdownMenu.Portal>
+          </DropdownMenu.Root>
         </div>
       </div>
 

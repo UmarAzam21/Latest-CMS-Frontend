@@ -40,7 +40,7 @@ function monthlyDelta(entries: IExpenseEntry[] = [], kind: EntryKind | "net") {
     };
 }
 
-export default function ExpensesStatsCard({ entries = [], categories = [], onViewKind }: ExpensesStatsCardProps) {
+export default function ExpensesStats({ entries = [], categories = [], onViewKind }: ExpensesStatsCardProps) {
     // Defensively handle edge cases where array wraps as undefined from serverside props
     const safeEntries = entries || [];
     const safeCategories = categories || [];

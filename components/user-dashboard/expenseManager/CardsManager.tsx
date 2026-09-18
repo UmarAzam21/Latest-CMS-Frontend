@@ -10,6 +10,7 @@ import { cn } from "@/lib/cn";
 interface CardsManagerProps {
     cards: ICard[];
     onAddCard: (card: Omit<ICard, "id">) => void;
+    onUpdateCard: (id: string, patch: Partial<ICard>) => void;
     onDeleteCard: (id: string) => void;
     onTransfer: (fromId: string, toId: string, amount: number) => void;
 }
@@ -20,9 +21,13 @@ const gradientStyles: Record<ICard["gradient"], string> = {
     dark: "bg-gradient-to-br from-[#1F2937] to-[#111827]",
 };
 
-export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteCard, onTransfer }: CardsManagerProps) {
+export default function CardsManager({ cards,
+    onAddCard,
+    onUpdateCard,
+    onDeleteCard,
+    onTransfer
+}: CardsManagerProps) {
     const [activeIndex, setActiveIndex] = useState(0);
-    const [editingCard, setEditingCard] = useState<ICard | null>(null);
     const totalBalance = cards.reduce((s, c) => s + c.balance, 0);
     const active = cards[activeIndex] ?? cards[0];
 
@@ -74,9 +79,8 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
             )}
 
             <div className="flex gap-2">
-                <ManageCardsDialog cards={cards} onDelete={onDeleteCard} />
+                <ManageCardsDialog cards={cards} onDelete={onDeleteCard} onUpdateCard={onUpdateCard} />
                 <TransferDialog cards={cards} onTransfer={onTransfer} />
-                <CardFormDialog editingCard={editingCard} onClose={() => setEditingCard(null)} onAdd={() => {}} onUpdate={onUpdateCard} />
             </div>
         </div>
     );
@@ -93,7 +97,8 @@ function CardChip() {
 
 function CardFormDialog({ editingCard, onClose, onAdd, onUpdate }: {
     editingCard?: ICard | null; onClose?: () => void;
-    onAdd: (card: Omit<ICard, "id">) => void; onUpdate: (id: string, patch: Partial<ICard>) => void;
+    onAdd: (card: Omit<ICard, "id">) => void;
+    onUpdate: (id: string, patch: Partial<ICard>) => void;
 }) {
     const [open, setOpen] = useState(false);
     const [label, setLabel] = useState(""); const [last4, setLast4] = useState(""); const [balance, setBalance] = useState("");
@@ -130,7 +135,9 @@ function CardFormDialog({ editingCard, onClose, onAdd, onUpdate }: {
                 <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
                 <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-brand-16 bg-white p-5">
                     <div className="mb-4 flex items-center justify-between">
-                        <Dialog.Title className="heading-h5 text-text-dark">{isEdit ? "Edit Card" : "Add Card"}</Dialog.Title>
+                        <Dialog.Title className="heading-h5 text-text-dark">
+                            {isEdit ? "Edit Card" : "Add Card"}
+                        </Dialog.Title>
                         <Dialog.Close><X size={16} /></Dialog.Close>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -147,7 +154,14 @@ function CardFormDialog({ editingCard, onClose, onAdd, onUpdate }: {
     );
 }
 
-function ManageCardsDialog({ cards, onDelete }: { cards: ICard[]; onDelete: (id: string) => void }) {
+function ManageCardsDialog({ cards, onDelete, onUpdateCard }: {
+    cards: ICard[];
+    onDelete: (id: string) => void;
+    onUpdateCard: (id: string, patch: Partial<ICard>) => void;
+}) {
+
+    const [editingCard, setEditingCard] = useState<ICard | null>(null);
+
     return (
         <Dialog.Root>
             <Dialog.Trigger asChild>
@@ -169,16 +183,20 @@ function ManageCardsDialog({ cards, onDelete }: { cards: ICard[]; onDelete: (id:
                                     <p className="para-small font-semibold text-text-dark">{c.label}</p>
                                     <p className="para-tiny text-text-secondary-muter">•••• {c.last4} — PKR {c.balance.toLocaleString("en-PK")}</p>
                                 </div>
-                                <button onClick={() => setEditingCard(c)} className="text-text-secondary-muter hover:text-primary">
-                                    <Pencil size={14} />
-                                </button>
-                                <button onClick={() => onDelete(c.id)} className="text-text-secondary-muter hover:text-danger">
-                                    <Trash2 size={15} />
-                                </button>
+
+                                <div className="flex items-center gap-2">
+                                    <button onClick={() => setEditingCard(c)} className="text-text-secondary-muter hover:text-primary">
+                                        <Pencil size={14} />
+                                    </button>
+                                    <button onClick={() => onDelete(c.id)} className="text-text-secondary-muter hover:text-danger">
+                                        <Trash2 size={14} />
+                                    </button>
+                                </div>
                             </div>
                         ))}
                     </div>
                 </Dialog.Content>
+                <CardFormDialog editingCard={editingCard} onClose={() => setEditingCard(null)} onAdd={() => { }} onUpdate={onUpdateCard} />
             </Dialog.Portal>
         </Dialog.Root>
     );

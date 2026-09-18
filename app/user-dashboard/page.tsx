@@ -6,13 +6,13 @@ import { useSearchParams } from 'next/navigation';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import ExpenseManagerCard from '@/components/user-dashboard/expenseManager/ExpenseManager';
 import MajorServices from '@/components/user-dashboard/services/MajorServices';
-import ExpensesStatsCard from '@/components/user-dashboard/expenseManager/ExpensesStatsCard';
 import DashboardStatCard from '@/components/user-dashboard/expenseManager/DashboardStatCard';
 import ExpenseManagerCardV2 from '@/components/user-dashboard/expenseManager/ExpenseManagerCardV2';
 import Inbox from '@/components/user-dashboard/services/Inbox';
 import Outbox from '@/components/user-dashboard/services/Outbox';
 import Notices from '@/components/user-dashboard/services/Notices';
 import AdvancedExpenseWorkspace from '@/components/user-dashboard/expenseManager/AdvancedExpenseWorkspace';
+import ExpensesStats from '@/components/user-dashboard/expenseManager/ExpensesStats';
 
 type DashboardTab = 'inbox' | 'outbox' | 'notices';
 
@@ -66,10 +66,8 @@ function DashboardOverviewContent() {
       )}
 
       <div className="py-2x">
-        <ExpensesStatsCard />
+        <ExpensesStats />
       </div>
-
-      {/* <DashboardStatCard /> */}
 
       <div className="w-full grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-5">
         <div className="h-full lg:col-span-2">
@@ -89,11 +87,10 @@ function DashboardOverviewContent() {
               role="tab"
               aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
-              className={`border-b-2 px-3 py-2 para-small font-medium capitalize default-transition ${
-                activeTab === tab
+              className={`border-b-2 px-3 py-2 para-small font-medium capitalize default-transition ${activeTab === tab
                   ? 'border-primary text-primary'
                   : 'border-transparent text-text-secondary hover:text-primary'
-              }`}
+                }`}
             >
               {tab}
             </button>
@@ -101,9 +98,6 @@ function DashboardOverviewContent() {
         </div>
         {tabContent[activeTab]}
       </section>
-
-    
-
     </div>
   );
 }

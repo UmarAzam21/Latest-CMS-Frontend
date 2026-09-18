@@ -120,7 +120,7 @@ export default function TrendChart({ title, data, granularity, variant = "bar" }
           <ChevronDown size={12} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary-muter" />
         </div>
       </div>
-      <ResponsiveContainer width="100%" height={240}>
+      <ResponsiveContainer width="100%" height={330}>
         <BarChart data={data}>
           <CartesianGrid strokeDasharray="3 3" stroke="var(--border-clr)" />
           <XAxis dataKey="label" tickFormatter={(v) => formatTick(v, granularity)} tick={{ fontSize: 11, fill: "var(--text-secondary-muter)" }} />
