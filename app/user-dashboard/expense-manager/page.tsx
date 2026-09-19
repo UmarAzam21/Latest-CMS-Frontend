@@ -4,7 +4,6 @@ import { useState } from "react";
 import ExpensesTable from "@/components/user-dashboard/expenseManager/ExpensesTable";
 import TrendChart from "@/components/user-dashboard/expenseManager/TrendChart";
 import CategoryBreakdown from "@/components/user-dashboard/expenseManager/CategoryBreakdown";
-import DebtSummaryCard from "@/components/user-dashboard/expenseManager/DebtSummaryCard";
 import NewExpenseDialog from "@/components/user-dashboard/expenseManager/NewExpenseDialog";
 import CategoryManagerDialog from "@/components/user-dashboard/expenseManager/CategoryManagerDialog";
 import CardsManager from "@/components/user-dashboard/expenseManager/CardsManager";
@@ -57,13 +56,15 @@ export default function ExpenseManagerPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[60%_40%]">
-                <TrendChart title="Daily Activity (Last 7 Days)" data={store.stats.dailyTrend} granularity="day" />
+                {/* <TrendChart title="Daily Activity (Last 7 Days)" data={store.stats.dailyTrend} granularity="day" /> */}
+                <TrendChart title="Activity" dataByGranularity={{ day: store.stats.dailyTrend, week: store.stats.weeklyTrend, month: store.stats.monthlyTrend }} />
                 <DebtSummaryCardV2 debtEntries={debtEntries} onMakePayment={store.makeDebtPayment} />
             </div>
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                 <CategoryBreakdown data={store.stats.categoryBreakdown} />
-                <TrendChart title="Monthly Expenses (Last 6 Months)" data={store.stats.monthlyTrend} granularity="month" variant="pie" />
+                {/* <TrendChart title="Monthly Expenses (Last 6 Months)" data={store.stats.monthlyTrend} granularity="month" variant="pie" /> */}
+                <TrendChart title="Expenses by Period" dataByGranularity={{ day: store.stats.dailyTrend, week: store.stats.weeklyTrend, month: store.stats.monthlyTrend }} variant="pie" />
             </div>
 
             <ExpensesTable
