@@ -73,7 +73,7 @@ function DashboardOverviewContent() {
         <ExpensesStats entries={store.entries} categories={store.categories} onViewKind={() => { }} />
       </div>
 
-      <div className="w-full grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-5">
+      <div className="w-full grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-3">
         <div className="h-full lg:col-span-2">
           <MajorServices />
         </div>
@@ -87,7 +87,7 @@ function DashboardOverviewContent() {
         onSaved={(values) => store.addEntry(values)}
       />
 
-      <section ref={tabsSectionRef} className="mt-5 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-4 shadow-card">
+      <section ref={tabsSectionRef} className="mt-3 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-4 shadow-card">
         <div className="mb-4 flex items-center gap-1 border-b border-border-clr" role="tablist" aria-label="Dashboard messages">
           {(['inbox', 'outbox', 'notices'] as const).map((tab) => (
             <button
