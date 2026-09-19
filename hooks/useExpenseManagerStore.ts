@@ -6,12 +6,26 @@ import { IExpenseEntry, ICategory, SortField, SortDirection, ICard } from "@/typ
 import { defaultCategories } from "@/data/user-dashboard/defaultCategoriesData";
 import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
-import { buildTrend } from "@/lib/utils/trend";
+import { buildTrend, weekKey } from "@/lib/utils/trend";
 
-const STORAGE_KEY_ENTRIES = "filernow_expense_entries_v4";
-const STORAGE_KEY_CATEGORIES = "filernow_expense_categories_v4";
-const STORAGE_KEY_SEEDED = "filernow_expense_seeded_v4";
-const STORAGE_KEY_CARDS = "filernow_expense_cards_v4";
+// hooks/useExpenseManagerStore.ts — replace the 4 key lines with:
+
+// Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
+// RENAMED or REMOVED. Adding a new OPTIONAL field does NOT require a bump —
+// old stored JSON simply parses with that field undefined, which is valid.
+const SCHEMA_VERSION = "v5";
+const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
+const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
+const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
+const STORAGE_KEY_CARDS = `filernow_expense_cards_${SCHEMA_VERSION}`;
+
+// Safety net for teammates who forget to bump: if stored entries don't match
+// the current required shape (e.g. still using old `category` instead of
+// `categoryId`), auto-reseed instead of silently rendering broken/empty data.
+function isValidEntry(e: any): e is IExpenseEntry {
+  return e && typeof e.id === "string" && typeof e.kind === "string" &&
+    typeof e.categoryId === "string" && typeof e.amount === "number" && typeof e.date === "string";
+}
 
 
 function readLocal<T>(key: string, fallback: T): T {
@@ -39,7 +53,9 @@ export function useExpenseManagerStore() {
     const alreadySeeded = window.localStorage.getItem(STORAGE_KEY_SEEDED) === "true";
 
     if (alreadySeeded) {
-      setEntries(readLocal(STORAGE_KEY_ENTRIES, []));
+      const raw = readLocal<IExpenseEntry[]>(STORAGE_KEY_ENTRIES, []);
+      const isHealthy = Array.isArray(raw) && (raw.length === 0 || raw.every(isValidEntry));
+      setEntries(isHealthy ? raw : dummyExpenseEntries); // auto-heal on shape mismatch
     } else {
       setEntries(dummyExpenseEntries);
       window.localStorage.setItem(STORAGE_KEY_SEEDED, "true");
@@ -177,6 +193,7 @@ export function useExpenseManagerStore() {
     const totalExpenses = entries.filter((e) => e.kind === "expense").reduce((s, e) => s + e.amount, 0);
     const totalDebt = entries.filter((e) => e.kind === "debt" && !e.isSettled).reduce((s, e) => s + e.amount, 0);
     const balance = totalIncome - totalExpenses;
+    const weeklyTrend = buildTrend(entries, weekKey, 8);
 
     const categoryTotals = categories
       .map((cat) => {
@@ -196,7 +213,7 @@ export function useExpenseManagerStore() {
     const dailyTrend = buildTrend(entries, (d) => d.slice(0, 10), 7);
     const monthlyTrend = buildTrend(entries, (d) => d.slice(0, 7), 6);
 
-    return { totalIncome, totalExpenses, totalDebt, balance, categoryBreakdown, dailyTrend, monthlyTrend };
+    return { totalIncome, totalExpenses, totalDebt, balance, categoryBreakdown, dailyTrend, weeklyTrend, monthlyTrend };
   }, [entries, categories]);
 
   return {

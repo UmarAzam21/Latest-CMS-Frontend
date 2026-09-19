@@ -11,8 +11,10 @@ import ExpenseManagerCardV2 from '@/components/user-dashboard/expenseManager/Exp
 import Inbox from '@/components/user-dashboard/services/Inbox';
 import Outbox from '@/components/user-dashboard/services/Outbox';
 import Notices from '@/components/user-dashboard/services/Notices';
-import AdvancedExpenseWorkspace from '@/components/user-dashboard/expenseManager/AdvancedExpenseWorkspace';
 import ExpensesStats from '@/components/user-dashboard/expenseManager/ExpensesStats';
+import { useExpenseManagerStore } from '@/hooks/useExpenseManagerStore';
+import AdvancedExpenseWorkspaceV2 from '@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2';
+
 
 type DashboardTab = 'inbox' | 'outbox' | 'notices';
 
@@ -23,6 +25,8 @@ function DashboardOverviewContent() {
   const serviceName = searchParams.get('service') || undefined;
   const tabsSectionRef = useRef<HTMLElement>(null);
   const [activeTab, setActiveTab] = useState<DashboardTab>(requestedTab === 'outbox' || requestedTab === 'notices' ? requestedTab : 'inbox');
+
+  const store = useExpenseManagerStore();
 
   useEffect(() => {
     const nextTab: DashboardTab = requestedTab === 'outbox' || requestedTab === 'notices' ? requestedTab : 'inbox';
@@ -66,7 +70,7 @@ function DashboardOverviewContent() {
       )}
 
       <div className="py-2x">
-        <ExpensesStats />
+        <ExpensesStats entries={store.entries} categories={store.categories} onViewKind={() => { }} />
       </div>
 
       <div className="w-full grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-5">
@@ -76,7 +80,12 @@ function DashboardOverviewContent() {
         <div className="h-full"><ExpenseManagerCardV2 /></div>
       </div>
 
-      <AdvancedExpenseWorkspace dashboardPreview />
+      <AdvancedExpenseWorkspaceV2
+        entries={store.entries}
+        categories={store.categories}
+        cards={store.cards}
+        onSaved={(values) => store.addEntry(values)}
+      />
 
       <section ref={tabsSectionRef} className="mt-5 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-4 shadow-card">
         <div className="mb-4 flex items-center gap-1 border-b border-border-clr" role="tablist" aria-label="Dashboard messages">
@@ -88,8 +97,8 @@ function DashboardOverviewContent() {
               aria-selected={activeTab === tab}
               onClick={() => setActiveTab(tab)}
               className={`border-b-2 px-3 py-2 para-small font-medium capitalize default-transition ${activeTab === tab
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-text-secondary hover:text-primary'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-text-secondary hover:text-primary'
                 }`}
             >
               {tab}
