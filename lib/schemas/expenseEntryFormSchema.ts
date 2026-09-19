@@ -2,13 +2,15 @@
 import { z } from "zod";
 
 export const expenseEntryFormValuesSchema = z.object({
-  kind: z.enum(["expense", "income"]),
+  kind: z.enum(["expense", "income", "debt"]),
   subject: z.string().min(2, "Subject is required"),
-  category: z.enum(["utilities", "food", "transport", "rent", "business", "other"]),
+  categoryId: z.string().min(1, "Category is required"),
   amount: z.number().positive("Enter an amount greater than 0"),
   date: z.string().min(1, "Date is required"),
   description: z.string().optional(),
   accountId: z.string().optional(),
+  isSettled: z.boolean().optional(),
+  receiptImage: z.string().optional(),
 });
 
 export type ExpenseEntryFormValues = z.infer<typeof expenseEntryFormValuesSchema>;
