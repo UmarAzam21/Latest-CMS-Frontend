@@ -9,7 +9,7 @@ const MajorServices = () => {
       <div className="flex items-center justify-between gap-2 mb-4">
         <div className="flex flex-col gap-1">
           <h2 className="text-[14px] font-semibold text-text-dark">
-            Major Services
+            Premium Services
           </h2>
 
           <p className="para-tiny text-text-secondary-muter">
