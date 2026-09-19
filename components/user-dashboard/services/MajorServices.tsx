@@ -27,8 +27,8 @@ const MajorServices = () => {
       </div>
 
       {/* Services Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-        {servicesGridData.slice(0, 8).map((service) => (
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        {servicesGridData.slice(0, 10).map((service) => (
           <ServiceCard
             key={service.id}
             {...service}
