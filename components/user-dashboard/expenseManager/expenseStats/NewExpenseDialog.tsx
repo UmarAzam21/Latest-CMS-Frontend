@@ -1,3 +1,5 @@
+// components/user-dashboard/expenseManager/expenseStats/NewExpenseDialog.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";

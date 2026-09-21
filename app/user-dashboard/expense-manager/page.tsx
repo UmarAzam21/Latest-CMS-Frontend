@@ -3,15 +3,15 @@
 import { useState } from "react";
 import ExpensesTable from "@/components/user-dashboard/expenseManager/ExpensesTable";
 import TrendChart from "@/components/user-dashboard/expenseManager/TrendChart";
-import CategoryBreakdown from "@/components/user-dashboard/expenseManager/CategoryBreakdown";
-import NewExpenseDialog from "@/components/user-dashboard/expenseManager/NewExpenseDialog";
-import CategoryManagerDialog from "@/components/user-dashboard/expenseManager/CategoryManagerDialog";
-import CardsManager from "@/components/user-dashboard/expenseManager/CardsManager";
-import CardsBalanceChart from "@/components/user-dashboard/expenseManager/CardsBalanceChart";
+import CategoryBreakdown from "@/components/user-dashboard/expenseManager/expenseCategory/CategoryBreakdown";
+import NewExpenseDialog from "@/components/user-dashboard/expenseManager/expenseStats/NewExpenseDialog";
+import CategoryManagerDialog from "@/components/user-dashboard/expenseManager/expenseCategory/CategoryManagerDialog";
+import CardsManager from "@/components/user-dashboard/expenseManager/cardsManager/CardsManager";
+import CardsBalanceChart from "@/components/user-dashboard/expenseManager/cardsManager/CardsBalanceChart";
 import { EntryKind, FilterTab, IExpenseEntry } from "@/types/expenseManager";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
-import StatDetailDialog from "@/components/user-dashboard/expenseManager/StatDetailDialog";
-import ExpensesStats from "@/components/user-dashboard/expenseManager/ExpensesStats";
+import StatDetailDialog from "@/components/user-dashboard/expenseManager/expenseStats/StatDetailDialog";
+import ExpensesStats from "@/components/user-dashboard/expenseManager/expenseStats/ExpensesStats";
 import DebtSummaryCardV2 from "@/components/user-dashboard/expenseManager/DebtSummaryCardV2";
 
 export default function ExpenseManagerPage() {
@@ -23,10 +23,10 @@ export default function ExpenseManagerPage() {
     const debtEntries = store.entries.filter((e) => e.kind === "debt");
 
     return (
-        <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between border-b border-border-clr pb-3">
-                <h1 className="heading-h4 text-text-dark">Expense Manager</h1>
-                <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-brand-12">
+            <div className="flex items-center justify-between border-b border-border-clr pb-brand-8">
+                <h1 className="heading-h6 text-sm leading-tight">Digital Khatta</h1>
+                <div className="flex items-center gap-brand-8">
                     <CategoryManagerDialog categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
                     <NewExpenseDialog
                         categories={store.categories}

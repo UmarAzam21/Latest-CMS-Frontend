@@ -15,18 +15,18 @@ export default function CategoryRail({ data }: { data: ICategoryBreakdownItem[] 
     const total = top.reduce((s, i) => s + i.amount, 0);
 
     return (
-        <div className="rounded-brand-16 border border-border-clr bg-white p-5">
+        <div className="rounded-brand-16 border border-border-clr bg-white p-brand-12">
             <div className="mb-4">
-                <h3 className="para-small font-semibold text-text-dark">Category Breakdown</h3>
+                <h3 className="heading-h6 text-sm">Category Breakdown</h3>
                 <p className="para-tiny text-text-secondary-muter">Expense distribution this period</p>
             </div>
 
             {top.length === 0 ? (
                 <p className="para-small text-text-secondary-muted">No expenses recorded for this period.</p>
             ) : (
-                <div className="flex flex-col gap-5 sm:flex-rowx sm:items-centerx">
+                <div className="flex flex-col gap-brand-12 sm:flex-rowx sm:items-centerx">
                     <div className="flex self-center">
-                        <div className="relative mx-auto h-[170px] w-[170px] shrink-0 sm:mx-0">
+                        <div className="relative mx-auto h-[160px] w-[160px] shrink-0 sm:mx-0">
                             <ResponsiveContainer width="100%" height="100%">
                                 <PieChart>
                                     <Pie

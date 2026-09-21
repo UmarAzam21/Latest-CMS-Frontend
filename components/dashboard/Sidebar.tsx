@@ -116,9 +116,9 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
       >
         <div className="flex min-h-0 flex-1 flex-col">
           {/* Header — icon slot is fixed, label fades in beside it */}
-          <div className="flex items-center h-[60px] border-b border-slate-200 px-[18px] gap-3">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-primary-light text-sm font-semibold text-black">
-              <img src={ASSETS()[0].src} alt={ASSETS()[0].alt} className="w-7" />
+          <div className="flex items-center h-[60px]x border-b border-slate-200 px-[18px] py-1.5 gap-brand-12">
+            <div className="flex h-8x h-10 w-8x w-10 shrink-0 items-center justify-center rounded-md bg-primary-light/35x heading-h6 text-sm">
+              <img src={ASSETS()[0].src} alt={ASSETS()[0].alt} className="w-7x w-10" />
             </div>
 
             <span

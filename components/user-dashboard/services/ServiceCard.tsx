@@ -14,7 +14,7 @@ const ServiceCard = ({ label, icon, href, highlighted }: Props) => {
         <Link
             href={`/user-dashboard?tab=inbox&service=${encodeURIComponent(label)}`}
             className={cn(
-                "flex flex-col items-center justify-center text-center gap-2 rounded-brand-8 border border-border-clr py-2.5 px-2 bg-page-bg default-transition hover:-translate-y-0.5 hover:shadow-card-hover group",
+                "flex flex-col items-center justify-center text-center gap-2 rounded-brand-8 border border-border-clr p-2 bg-page-bg default-transition hover:-translate-y-0.5 hover:shadow-card-hover group",
                 highlighted
                     ? "border-primary/20 shadow-service-card"
                     : "border-border-clr hover:border-primary/15",

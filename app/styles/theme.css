@@ -35,6 +35,8 @@
 
     /* spacing */
     --spacing-brand: 16px;
+    --spacing-brand-8: 8px;
+    --spacing-brand-12: 12px;
     --spacing-brand-20: 20px;
 
     /* shadows */

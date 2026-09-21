@@ -1,3 +1,4 @@
+// /data/user-dashboard/dummyExpenseEntries.ts
 import { IExpenseEntry } from "@/types/expenseManager";
 
 // Dummy seed data, gives a first-time user a fully populated dashboard to

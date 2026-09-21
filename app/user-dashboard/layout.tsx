@@ -17,7 +17,7 @@ export default function UserDashboardLayout({ children }: { children: ReactNode 
 					<div className="z-topbar shrink-0 bg-white">
 						<Topbar variant="user" />
 					</div>
-					<main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-6 py-4">{children}</main>
+					<main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-brand-20x py-brandx p-brand">{children}</main>
 				</div>
 			</div>
 			<NoticeModel isOpen={isNoticeOpen} onClose={() => setIsNoticeOpen(false)} />

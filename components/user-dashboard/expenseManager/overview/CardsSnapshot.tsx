@@ -9,9 +9,9 @@ export default function CardsSnapshot({ cards }: { cards: ICard[] }) {
     const total = cards.reduce((s, c) => s + c.balance, 0);
 
     return (
-        <div className="flex h-full flex-col rounded-brand-16 border border-border-clr bg-white p-5">
+        <div className="flex h-full flex-col rounded-brand-16 border border-border-clr bg-whitex bg-page-bg p-brand-12">
             <div className="flex justify-between items-center gap-2">
-                <h3 className="para-tiny font-semibold uppercase text-text-dark">My Cards</h3>
+                <h3 className="heading-h6 text-sm">My Cards</h3>
                 <span className="rounded-full bg-danger-bg px-2 py-0.5 text-[9px] font-semibold uppercase text-primary">
                     {cards.length} linked
                 </span>
@@ -24,7 +24,7 @@ export default function CardsSnapshot({ cards }: { cards: ICard[] }) {
                     <p className="para-small text-text-secondary-muted">No cards linked yet.</p>
                 )}
                 {cards.map((c) => (
-                    <div key={c.id} className="flex items-center gap-3 rounded-brand-8 bg-page-bg p-3">
+                    <div key={c.id} className="flex items-center gap-3 rounded-brand-8 bg-page-bg bg-white p-3">
                         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-brand-8 bg-danger-bg">
                             <Landmark size={18} className="text-primary" />
                         </span>
@@ -42,7 +42,7 @@ export default function CardsSnapshot({ cards }: { cards: ICard[] }) {
 
             <Link
                 href="/user-dashboard/expense-manager"
-                className="mt-3 flex items-center justify-center gap-1.5 rounded-brand-8 border border-dashed border-border-clr-dark py-2.5 para-tiny font-semibold text-text-secondary default-transition hover:border-primary hover:text-primary"
+                className="mt-3 flex items-center justify-center gap-1.5 rounded-brand-8 border border-dashed border-border-clr-dark bg-white py-2.5 para-tiny font-semibold text-text-secondary default-transition hover:border-primary hover:text-primary"
             >
                 Manage Cards <ArrowUpRight size={13} />
             </Link>
