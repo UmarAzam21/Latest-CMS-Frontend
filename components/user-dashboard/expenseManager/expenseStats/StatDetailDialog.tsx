@@ -1,3 +1,5 @@
+// components/user-dashboard/expenseManager/expenseStats/StatDetailDialog.tsx
+
 "use client";
 import { useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";

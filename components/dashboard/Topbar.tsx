@@ -145,7 +145,7 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
   }
 
   return (
-    <header className="flex h-[60px] items-center justify-between gap-4 border-b border-slate-200 bg-white px-6">
+    <header className="flex h-[60px]x items-center justify-between gap-4 border-b border-slate-200 bg-white px-brand py-1">
       {/* Search */}
       <div className="relative w-full max-w-sm">
         <Search

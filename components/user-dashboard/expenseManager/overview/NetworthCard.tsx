@@ -48,41 +48,43 @@ export default function NetWorthCard({
   const active = tabs.find((t) => t.key === metric)!;
 
   return (
-    <div className="h-full rounded-brand-16 border border-border-clr bg-white p-5">
+    <div className="h-full rounded-brand-16 border border-border-clr bg-whitex bg-page-bg p-brand-12">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="inline-flex items-center gap-1 rounded-brand-8 bg-page-bg p-1">
+          {/* tabs */}
+          <div className="inline-flex items-center gap-1 rounded-brand-8 bg-page-bgx bg-white p-1">
             {tabs.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setMetric(t.key)}
-                className={`rounded-brand-8 px-3 py-1.5 para-tiny font-semibold default-transition ${
-                  metric === t.key
+                className={`rounded-brand-8 px-3 py-1.5 para-tiny font-semibold default-transition ${metric === t.key
                     ? "bg-primary text-white"
                     : "text-text-secondary hover:text-text-dark"
-                }`}
+                  }`}
               >
                 {t.label}
               </button>
             ))}
           </div>
-          
-          <p className="mt-4 heading-h3 text-text-dark">{fmt(active.value)}</p>
-          
+
+          {/* amount */}
+          <p className="mt-3 heading-h6 text-text-dark">{fmt(active.value)}</p>
+
           <p className="mt-1 para-tiny text-text-secondary-muter">
             Income <span className="font-semibold text-success">{fmt(income)}</span> ·{" "}
             Expenses <span className="font-semibold text-danger">{fmt(expenses)}</span>
           </p>
         </div>
 
+        {/* month dropdown */}
         <div className="relative">
           <button
             onClick={() => setRangeOpen((o) => !o)}
-            className="flex items-center gap-1 rounded-brand-8 border border-border-clr px-2.5 py-1.5 para-tiny text-text-secondary hover:border-primary hover:text-primary"
+            className="flex items-center gap-1 rounded-brand-8 border border-border-clr px-2.5 py-1.5 bg-white para-tiny text-text-secondary hover:border-primary hover:text-primary"
           >
             {range === "month" ? monthLabel : "All time"} <ChevronDown size={13} />
           </button>
-          
+
           {rangeOpen && (
             <div className="absolute right-0 z-dropdown mt-1 min-w-full rounded-brand-8 border border-border-clr bg-white p-1 shadow-card-hover">
               {([
@@ -95,11 +97,10 @@ export default function NetWorthCard({
                     onRangeChange(v);
                     setRangeOpen(false);
                   }}
-                  className={`block w-full whitespace-nowrap rounded-brand-8 px-3 py-2 text-left para-tiny ${
-                    range === v
+                  className={`block w-full whitespace-nowrap rounded-brand-8 px-3 py-2 text-left para-tiny ${range === v
                       ? "bg-primary font-semibold text-white"
                       : "text-text-secondary hover:bg-page-bg"
-                  }`}
+                    }`}
                 >
                   {l}
                 </button>
@@ -109,7 +110,7 @@ export default function NetWorthCard({
         </div>
       </div>
 
-      <div className="mt-4 h-[220px] w-full">
+      <div className="mt-3 h-[200px] w-full">
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart
             data={chartData}
@@ -121,13 +122,13 @@ export default function NetWorthCard({
                 <stop offset="100%" stopColor="var(--brand-primary)" stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            
+
             <CartesianGrid
               stroke="var(--border-clr)"
               strokeDasharray="3 3"
               vertical={false}
             />
-            
+
             <XAxis
               dataKey="day"
               interval={Math.ceil(chartData.length / 8)}
@@ -135,9 +136,9 @@ export default function NetWorthCard({
               axisLine={false}
               tickLine={false}
             />
-            
+
             <YAxis hide domain={["dataMin - 2000", "dataMax + 2000"]} />
-            
+
             <Tooltip
               formatter={(v) => fmt(Number(v))}
               contentStyle={{
@@ -146,7 +147,7 @@ export default function NetWorthCard({
                 fontSize: 12,
               }}
             />
-            
+
             <Area
               type="monotone"
               dataKey="netWorth"

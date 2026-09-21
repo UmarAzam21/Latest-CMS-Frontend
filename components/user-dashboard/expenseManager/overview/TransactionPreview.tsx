@@ -10,15 +10,15 @@ export default function TransactionPreview({ entries, categories }: { entries: I
     const label = (id: string) => categories.find((c) => c.id === id)?.label ?? "Uncategorized";
 
     return (
-        <div className="rounded-brand-16 border border-border-clr bg-white p-5">
+        <div className="rounded-brand-16 border border-border-clr bg-whitex bg-page-bg p-brand-12">
             <div className="mb-4 flex items-center justify-between">
                 <div>
-                    <h3 className="para-small font-semibold text-text-dark">Latest Transactions</h3>
+                    <h3 className="heading-h6 text-sm">Latest Transactions</h3>
                     <p className="para-tiny text-text-secondary-muter">Your most recent activity</p>
                 </div>
                 <Link
                     href="/user-dashboard/expense-manager"
-                    className="flex h-8 w-8 items-center justify-center rounded-brand-8 border border-border-clr text-text-secondary-muter default-transition hover:border-primary hover:text-primary"
+                    className="flex h-8 w-8 items-center justify-center rounded-brand-8 border border-border-clr hover:border-primary/55 bg-white text-text-secondary-muter hover:text-primary default-transition"
                 >
                     <ArrowUpRight size={15} />
                 </Link>
@@ -29,23 +29,23 @@ export default function TransactionPreview({ entries, categories }: { entries: I
                     <p className="para-small text-text-secondary">No transactions yet</p>
                 </div>
             ) : (
-                <div className="flex flex-col gap-1.5">
+                <div className="flex flex-col gap-2">
                     {recent.map((e) => {
                         const isIncome = e.kind === "income";
                         return (
-                            <div key={e.id} className="flex items-center justify-between gap-3 rounded-brand-8 px-2 py-2 default-transition bg-page-bg hover:bg-danger-bg">
+                            <div key={e.id} className="flex items-center justify-between gap-3 rounded-brand-8 px-2 py-2 default-transition bg-page-bgx bg-white hover:bg-danger-bg group">
                                 <div className="flex min-w-0 items-center gap-3">
-                                    <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${isIncome ? "bg-success-bg text-success" : e.kind === "debt" ? "bg-warning-bg text-warning" : "bg-danger-bg text-primary"}`}>
+                                    <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${isIncome ? "bg-success-bg text-success" : e.kind === "debt" ? "bg-warning-bg text-warning" : "bg-danger-bg text-primary"} group-hover:bg-white default-transition`}>
                                         {isIncome ? <ArrowDownLeft size={15} /> : <ArrowUpRight size={15} />}
                                     </span>
                                     <div className="min-w-0">
-                                        <p className="truncate para-small font-semibold text-text-dark">{e.subject}</p>
-                                        <p className="para-tiny text-text-secondary-muter">
+                                        <p className="truncate heading-h6 text-xs text-text-secondary">{e.subject}</p>
+                                        <p className="para-tiny text-[10px] text-text-secondary-muter">
                                             {label(e.categoryId)} · {new Date(e.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}
                                         </p>
                                     </div>
                                 </div>
-                                <p className={`shrink-0 para-small font-semibold ${isIncome ? "text-success" : "text-text-dark"}`}>
+                                <p className={`shrink-0 para-tiny font-semibold ${isIncome ? "text-success/65" : "text-text-secondary"}`}>
                                     {isIncome ? "+" : "-"}{fmt(e.amount)}
                                 </p>
                             </div>

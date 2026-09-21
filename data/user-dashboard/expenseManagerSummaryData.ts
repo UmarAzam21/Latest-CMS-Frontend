@@ -1,3 +1,4 @@
+// /data/user-dashboard/expenseManagerSummaryData.ts
 import { IExpenseManagerSummary } from "@/types/expenseManager";
 
 // Static placeholder — backend contract pending. Flagged in

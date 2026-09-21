@@ -3,8 +3,8 @@
 
 import { Wallet, TrendingUp, TrendingDown, CircleDollarSign } from "lucide-react";
 import { IExpenseEntry, ICategory, EntryKind, IExpenseStatItem } from "@/types/expenseManager";
-import ExpenseStatCard from "./ExpensesStatCard";
 import { exportEntriesToCsv } from "@/lib/utils/exportCsv";
+import ExpenseStatCard from "./ExpensesStatCard";
 
 interface ExpensesStatsCardProps {
     entries?: IExpenseEntry[];
@@ -55,8 +55,8 @@ export default function ExpensesStats({ entries = [], categories = [], onViewKin
 
     const items: (IExpenseStatItem & { filterKind: EntryKind | "all" })[] = [
         {
-            id: "balance",
-            title: "Total Balance",
+            id: "cardBalance",
+            title: "Total Cards Balance",
             value: `PKR ${balance.toLocaleString("en-PK")}`,
             trendDirection: bal.direction,
             trendPercent: bal.percent,
@@ -67,8 +67,8 @@ export default function ExpensesStats({ entries = [], categories = [], onViewKin
             filterKind: "all"
         },
         {
-            id: "income",
-            title: "Total Income",
+            id: "aamdni",
+            title: "Total Aamdni",
             value: `PKR ${totalIncome.toLocaleString("en-PK")}`,
             trendDirection: inc.direction,
             trendPercent: inc.percent,
@@ -79,8 +79,8 @@ export default function ExpensesStats({ entries = [], categories = [], onViewKin
             filterKind: "income"
         },
         {
-            id: "expenses",
-            title: "Total Expenses",
+            id: "kharcha",
+            title: "Total kharcha",
             value: `PKR ${totalExpenses.toLocaleString("en-PK")}`,
             trendDirection: exp.direction,
             trendPercent: exp.percent,
@@ -91,8 +91,8 @@ export default function ExpensesStats({ entries = [], categories = [], onViewKin
             filterKind: "expense"
         },
         {
-            id: "debt",
-            title: "Outstanding Debt",
+            id: "udhaar",
+            title: "Total Udhaar",
             value: `PKR ${totalDebt.toLocaleString("en-PK")}`,
             trendDirection: debt.direction,
             trendPercent: debt.percent,
@@ -106,7 +106,7 @@ export default function ExpensesStats({ entries = [], categories = [], onViewKin
 
 
     return (
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-brand-8 sm:grid-cols-2 lg:grid-cols-4">
             {items.map((item) => (
                 <ExpenseStatCard
                     key={item.id}

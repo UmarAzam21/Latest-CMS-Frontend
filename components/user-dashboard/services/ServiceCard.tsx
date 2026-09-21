@@ -14,26 +14,26 @@ const ServiceCard = ({ label, icon, href, highlighted }: Props) => {
         <Link
             href={`/user-dashboard?tab=inbox&service=${encodeURIComponent(label)}`}
             className={cn(
-                "flex flex-col items-center justify-center text-center gap-3 rounded-brand-8 border border-border-clr py-4 px-2 bg-page-bg default-transition hover:-translate-y-0.5 hover:shadow-card-hover group",
+                "flex flex-col items-center justify-center text-center gap-2 rounded-brand-8 border border-border-clr p-2 bg-page-bg default-transition hover:-translate-y-0.5 hover:shadow-card-hover group",
                 highlighted
                     ? "border-primary/20 shadow-service-card"
                     : "border-border-clr hover:border-primary/15",
             )}
         >
             <span
-                className={cn("flex items-center justify-center w-[65px] h-[60px] rounded-full bg-primary-lighter group-hover:scale-110 default-transition"
+                className={cn("flex items-center justify-center w-[35px] h-[35px] rounded-full bg-primary-lighter group-hover:scale-110 default-transition"
                 )}>
                 <Image
                     src={icon}
                     alt={label}
-                    width={35}
-                    height={35}
+                    width={20}
+                    height={20}
                 />
             </span>
 
             <p
                 className={cn(
-                    "para-tiny font-medium group-hover:text-primary default-transition", highlighted ? "text-primary font-semibold" : "text-text-secondary"
+                    "para-tiny text-[10px] font-medium group-hover:text-primary default-transition", highlighted ? "text-primary font-semibold" : "text-text-secondary"
                 )}>
                 {label}
             </p>
