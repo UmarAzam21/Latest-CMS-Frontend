@@ -12,6 +12,7 @@ import Notices from '@/components/user-dashboard/services/Notices';
 import ExpensesStats from '@/components/user-dashboard/expenseManager/expenseStats/ExpensesStats';
 import { useExpenseManagerStore } from '@/hooks/useExpenseManagerStore';
 import AdvancedExpenseWorkspaceV2 from '@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2';
+import PromoBanner from '@/components/user-dashboard/expenseManager/PromoBanner';
 
 
 type DashboardTab = 'inbox' | 'outbox' | 'notices';
@@ -54,9 +55,9 @@ function DashboardOverviewContent() {
 
   return (
     <div>
-      <div className="pb-brand-8 mb-3x border-b border-slate-200">
+      <div className="pb-2 mb-3 border-b border-slate-200">
         {/* <span className="text-xs text-[#4B5563]">Hi,</span> */}
-        <h1 className="heading-h6 text-sm leading-tight">
+        <h1 className="text-lg font-bold">
           Welcome Back, <span className="text-primary">User!</span>
         </h1>
       </div>
@@ -67,9 +68,9 @@ function DashboardOverviewContent() {
         </div>
       )}
 
-      {/* <div className="py-2x">
-        <ExpensesStats entries={store.entries} categories={store.categories} onViewKind={() => { }} />
-      </div> */}
+      <div className="py-2x">
+        <PromoBanner />
+      </div>
 
       <div className="w-full grid grid-cols-1 gap-brand-12 sm:grid-cols-2 lg:grid-cols-3 mt-brand-12">
         <div className="h-full lg:col-span-2">
