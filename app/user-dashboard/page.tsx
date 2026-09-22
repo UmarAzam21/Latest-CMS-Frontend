@@ -13,6 +13,7 @@ import ExpensesStats from '@/components/user-dashboard/expenseManager/expenseSta
 import { useExpenseManagerStore } from '@/hooks/useExpenseManagerStore';
 import AdvancedExpenseWorkspaceV2 from '@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2';
 import PromoBanner from '@/components/user-dashboard/expenseManager/PromoBanner';
+import DigitalKhataDashboardCard from '@/components/user-dashboard/expenseManager/khata/DigitalKhataDashboardCard';
 
 
 type DashboardTab = 'inbox' | 'outbox' | 'notices';
@@ -77,6 +78,15 @@ function DashboardOverviewContent() {
           <MajorServices />
         </div>
         <div className="h-full"><ExpenseManagerCardV2 /></div>
+        {/* <DigitalKhataDashboardCard entries={store.entries} categories={store.categories} cards={store.cards} onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })} /> */}
+      </div>
+
+      <div className="w-full grid grid-cols-1 gap-brand-12 sm:grid-cols-2 lg:grid-cols-3 mt-brand-12">
+        <div className="h-full lg:col-span-2">
+          <MajorServices />
+        </div>
+        {/* <div className="h-full"><ExpenseManagerCardV2 /></div> */}
+        <DigitalKhataDashboardCard entries={store.entries} categories={store.categories} cards={store.cards} onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })} />
       </div>
 
       <section ref={tabsSectionRef} className="mt-brand-12 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-brand-12 shadow-card">

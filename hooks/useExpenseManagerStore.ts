@@ -18,6 +18,7 @@ const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
 const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CARDS = `filernow_expense_cards_${SCHEMA_VERSION}`;
+const STORAGE_KEY_MODE = `filernow_khata_mode_${SCHEMA_VERSION}`; // "demo" | "blank"
 
 // Safety net for teammates who forget to bump: if stored entries don't match
 // the current required shape (e.g. still using old `category` instead of
@@ -45,6 +46,8 @@ export function useExpenseManagerStore() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [hasLoaded, setHasLoaded] = useState(false);
   const [cards, setCards] = useState<ICard[]>([]);
+  const [dataMode, setDataMode] = useState<"demo" | "blank">("demo");
+
 
   useEffect(() => {
     // "Seeded" is tracked independently of entries' emptiness, so that a
@@ -66,6 +69,7 @@ export function useExpenseManagerStore() {
     setCards(readLocal(STORAGE_KEY_CARDS, dummyCards));
     setCategories(readLocal(STORAGE_KEY_CATEGORIES, defaultCategories));
     setHasLoaded(true);
+    setDataMode((readLocal(STORAGE_KEY_MODE, "demo") as "demo" | "blank"));
   }, []);
 
   // Guarded: never persist before the load-effect has actually run, so we
@@ -129,6 +133,20 @@ export function useExpenseManagerStore() {
       const remaining = Math.max(0, e.amount - paymentAmount);
       return { ...e, amount: remaining, isSettled: remaining === 0 };
     }));
+  }, []);
+
+  const loadDemoData = useCallback(() => {
+    setEntries(dummyExpenseEntries);
+    setCards(dummyCards);
+    window.localStorage.setItem(STORAGE_KEY_MODE, "demo");
+    setDataMode("demo");
+  }, []);
+
+  const resetToBlank = useCallback(() => {
+    setEntries([]);
+    setCards([]);
+    window.localStorage.setItem(STORAGE_KEY_MODE, "blank");
+    setDataMode("blank");
   }, []);
 
   const addCategory = useCallback((label: string, color: ICategory["color"]) => {
@@ -232,5 +250,6 @@ export function useExpenseManagerStore() {
     updateCategory,
     deleteCategory,
     cards, addCard, updateCard, deleteCard, adjustCardBalance, transferBetweenCards,
+    dataMode, loadDemoData, resetToBlank,
   };
 }

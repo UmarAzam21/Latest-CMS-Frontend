@@ -17,9 +17,11 @@ interface ExpenseStatCardProps {
   item: IExpenseStatItem;
   onView: () => void;
   onExport: () => void;
+  ctaLabel?: string;
+  onCtaClick?: () => void;
 }
 
-export default function ExpenseStatCard({ item, onView, onExport }: ExpenseStatCardProps) {
+export default function ExpenseStatCard({ item, onView, onExport, ctaLabel, onCtaClick }: ExpenseStatCardProps) {
   const Icon = item.icon;
 
   return (
@@ -71,20 +73,31 @@ export default function ExpenseStatCard({ item, onView, onExport }: ExpenseStatC
         </DropdownMenu.Root>
       </div>
 
-      <div className="flex flex-col justify-between gap-brand-8">
+      <div className="flex flex-col justify-between gap-brand-8x gap-1">
         <span className="heading-h6 text-text-dark group-hover:text-primary default-transition">
           {item.value}
         </span>
 
-        <div className="flex items-center gap-1.5">
-          <span className={cn(
-            "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 para-tiny font-medium",
-            item.isPositive ? "bg-success-bg text-success" : "bg-danger-bg text-danger"
-          )}>
-            {item.trendDirection === "up" ? <ArrowUp size={11} /> : <ArrowDown size={11} />}
-            {item.trendPercent}%
-          </span>
-          <span className="para-tiny text-text-secondary-muter">{item.trendLabel}</span>
+        <div className="flex items-center justify-between gap-brand-8">
+          <div className="flex items-center gap-1.5">
+            <span className={cn(
+              "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 para-tiny font-medium",
+              item.isPositive ? "bg-success-bg text-success" : "bg-danger-bg text-danger"
+            )}>
+              {item.trendDirection === "up" ? <ArrowUp size={11} /> : <ArrowDown size={11} />}
+              {item.trendPercent}%
+            </span>
+            <span className="para-tiny text-text-secondary-muter">{item.trendLabel}</span>
+          </div>
+
+          {ctaLabel && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onCtaClick?.(); }}
+              className="self-end rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary default-transition hover:bg-primary hover:text-white"
+            >
+              + {ctaLabel}
+            </button>
+          )}
         </div>
       </div>
     </div>

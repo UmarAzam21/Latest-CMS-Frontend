@@ -13,6 +13,7 @@ import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 import StatDetailDialog from "@/components/user-dashboard/expenseManager/expenseStats/StatDetailDialog";
 import ExpensesStats from "@/components/user-dashboard/expenseManager/expenseStats/ExpensesStats";
 import DebtSummaryCardV2 from "@/components/user-dashboard/expenseManager/DebtSummaryCardV2";
+import NewEntryMenu from "@/components/user-dashboard/expenseManager/expenseStats/NewEntryMenu";
 
 export default function ExpenseManagerPage() {
     const store = useExpenseManagerStore();
@@ -26,23 +27,52 @@ export default function ExpenseManagerPage() {
         <div className="flex flex-col gap-brand-12">
             <div className="flex items-center justify-between border-b border-border-clr pb-brand-8">
                 <h1 className="heading-h6 text-sm leading-tight">Digital Khatta</h1>
-                <div className="flex items-center gap-brand-8">
-                    <CategoryManagerDialog categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
-                    <NewExpenseDialog
-                        categories={store.categories}
-                        cards={store.cards}
-                        editingEntry={editingEntry}
-                        onClose={() => setEditingEntry(null)}
-                        onSaved={(values) => {
-                            if (editingEntry) store.updateEntry(editingEntry.id, values);
-                            else store.addEntry(values);
-                        }}
-                    />
+
+                <div className="flex gap-2">
+                    <div className="flex items-center gap-2 para-tiny text-text-secondary-muter">
+                        <span>Mode: {store.dataMode === "demo" ? "Demo" : "Blank"}</span>
+                        <button onClick={store.dataMode === "demo" ? store.resetToBlank : store.loadDemoData}
+                            className="rounded-brand-8 border border-border-clr px-2.5 py-1 font-semibold hover:bg-page-bg">
+                            {store.dataMode === "demo" ? "Start Fresh" : "Load Demo Data"}
+                        </button>
+                    </div>
+
+                    <div className="flex items-center gap-brand-8">
+                        <CategoryManagerDialog
+                            categories={store.categories}
+                            onAdd={store.addCategory}
+                            onDelete={store.deleteCategory}
+                        />
+
+                        <NewEntryMenu
+                            categories={store.categories}
+                            cards={store.cards}
+                            editingEntry={editingEntry}
+                            onCloseEdit={() => setEditingEntry(null)}
+                            onSaved={(values) => {
+                                if (editingEntry) store.updateEntry(editingEntry.id, values);
+                                else store.addEntry(values);
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
 
-            <ExpensesStats entries={store.entries} categories={store.categories} onViewKind={setStatDialogKind} />
-            <StatDetailDialog kind={statDialogKind} entries={store.entries} categories={store.categories} onClose={() => setStatDialogKind(null)} />
+            {/* <ExpensesStats entries={store.entries} categories={store.categories} onViewKind={setStatDialogKind} /> */}
+            <ExpensesStats
+                entries={store.entries}
+                categories={store.categories}
+                onViewKind={setStatDialogKind}
+                onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })}
+                onAddCard={store.addCard}
+            />
+
+            <StatDetailDialog
+                kind={statDialogKind}
+                entries={store.entries}
+                categories={store.categories}
+                onClose={() => setStatDialogKind(null)}
+            />
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[40%_60%]">
                 <CardsManager
@@ -57,14 +87,32 @@ export default function ExpenseManagerPage() {
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[60%_40%]">
                 {/* <TrendChart title="Daily Activity (Last 7 Days)" data={store.stats.dailyTrend} granularity="day" /> */}
-                <TrendChart title="Activity" dataByGranularity={{ day: store.stats.dailyTrend, week: store.stats.weeklyTrend, month: store.stats.monthlyTrend }} />
-                <DebtSummaryCardV2 debtEntries={debtEntries} onMakePayment={store.makeDebtPayment} />
+                <TrendChart
+                    title="Activity"
+                    dataByGranularity={{
+                        day: store.stats.dailyTrend,
+                        week: store.stats.weeklyTrend,
+                        month: store.stats.monthlyTrend
+                    }}
+                />
+                <DebtSummaryCardV2
+                    debtEntries={debtEntries}
+                    onMakePayment={store.makeDebtPayment}
+                />
             </div>
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                 <CategoryBreakdown data={store.stats.categoryBreakdown} />
                 {/* <TrendChart title="Monthly Expenses (Last 6 Months)" data={store.stats.monthlyTrend} granularity="month" variant="pie" /> */}
-                <TrendChart title="Expenses by Period" dataByGranularity={{ day: store.stats.dailyTrend, week: store.stats.weeklyTrend, month: store.stats.monthlyTrend }} variant="pie" />
+                <TrendChart
+                    title="Expenses by Period"
+                    dataByGranularity={{
+                        day: store.stats.dailyTrend,
+                        week: store.stats.weeklyTrend,
+                        month: store.stats.monthlyTrend
+                    }}
+                    variant="pie"
+                />
             </div>
 
             <ExpensesTable
