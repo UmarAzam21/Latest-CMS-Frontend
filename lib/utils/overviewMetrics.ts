@@ -1,4 +1,4 @@
-import { IExpenseEntry, ICategory, ICategoryBreakdownItem } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory, ICategoryBreakdownItem } from "@/types/expenseManagerTy";
 import { buildTrend } from "@/lib/utils/trend";
 
 export type RangeFilter = "all" | "month";

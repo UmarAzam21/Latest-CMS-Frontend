@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { CircleDollarSign, TrendingDown, CheckCircle2 } from "lucide-react";
-import { IExpenseEntry } from "@/types/expenseManager";
+import { IExpenseEntry } from "@/types/expenseManagerTy";
 
 interface DebtSummaryCardProps { debtEntries: IExpenseEntry[]; onMakePayment: (id: string, amount: number) => void }
 

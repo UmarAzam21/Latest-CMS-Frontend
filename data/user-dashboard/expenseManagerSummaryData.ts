@@ -1,5 +1,5 @@
 // /data/user-dashboard/expenseManagerSummaryData.ts
-import { IExpenseManagerSummary } from "@/types/expenseManager";
+import { IExpenseManagerSummary } from "@/types/expenseManagerTy";
 
 // Static placeholder — backend contract pending. Flagged in
 // backend-handoff-dashboard.md: needs GET /api/expense-manager/summary

@@ -1,31 +1,26 @@
-// components/user-dashboard/expenseManager/ExpensesStatsCard.tsx
+// components/user-dashboard/expenseManager/ExpensesStats.tsx
 "use client";
 
 import { Wallet, TrendingUp, TrendingDown, CircleDollarSign } from "lucide-react";
-import { IExpenseEntry, ICategory, EntryKind, IExpenseStatItem, KHATA_LABELS, ICard } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory, EntryKind, IExpenseStatItem, KHATA_LABELS, ICard } from "@/types/expenseManagerTy";
 import { exportEntriesToCsv } from "@/lib/utils/exportCsv";
 import ExpenseStatCard from "./ExpensesStatCard";
-import { QuickEntryValues } from "@/lib/schemas/quickEntrySchema";
 import { useState } from "react";
-import AamdniDialog from "../khata/AamdniDialog";
-import KharchaDialog from "../khata/KharchaDialog";
-import UdhaarDialog from "../khata/UdhaarDialog";
 import CardFormDialog from "../cardsManager/CardFormDialog";
+import DetailedEntryDialog from "./DetailedEntryDialog";
+import { DetailedEntryValues } from "@/lib/schemas/detailedEntrySchema";
 
-// interface ExpensesStatsCardProps {
-//     entries?: IExpenseEntry[];
-//     categories?: ICategory[];
-//     onViewKind: (kind: EntryKind | "all") => void;
-// }
 interface ExpensesStatsProps {
     entries: IExpenseEntry[];
     categories: ICategory[];
+    cards: ICard[];
     onViewKind: (kind: EntryKind | "all") => void;
-    onSaved: (v: QuickEntryValues & { kind: EntryKind }) => void;
-    onAddCard: (card: Omit<ICard, "id">) => void; // NEW
+    onSaved: (v: DetailedEntryValues & { kind: EntryKind }) => void;
+    onAddCard: (card: Omit<ICard, "id">) => void;
 }
 
 const monthKey = (d: string) => d.slice(0, 7);
+
 const shiftMonth = (key: string, offset: number) => {
     const [y, m] = key.split("-").map(Number);
     const d = new Date(y, m - 1 + offset, 1);
@@ -33,7 +28,9 @@ const shiftMonth = (key: string, offset: number) => {
 };
 
 function monthlyDelta(entries: IExpenseEntry[] = [], kind: EntryKind | "net") {
-    if (!entries || entries.length === 0) return { percent: 0, direction: "up" as const };
+    if (!entries || entries.length === 0) {
+        return { percent: 0, direction: "up" as const };
+    }
 
     const now = monthKey(new Date().toISOString());
     const prev = shiftMonth(now, -1);
@@ -44,8 +41,12 @@ function monthlyDelta(entries: IExpenseEntry[] = [], kind: EntryKind | "net") {
             entries.filter((e) => e.kind === "expense" && monthKey(e.date) === key).reduce((s, e) => s + e.amount, 0)
             : entries.filter((e) => e.kind === kind && monthKey(e.date) === key).reduce((s, e) => s + e.amount, 0);
 
-    const current = totalFor(now), previous = totalFor(prev);
-    if (previous === 0) return { percent: 0, direction: "up" as const };
+    const current = totalFor(now);
+    const previous = totalFor(prev);
+
+    if (previous === 0) {
+        return { percent: 0, direction: "up" as const };
+    }
 
     return {
         percent: Math.round((Math.abs(current - previous) / Math.abs(previous)) * 100),
@@ -53,16 +54,31 @@ function monthlyDelta(entries: IExpenseEntry[] = [], kind: EntryKind | "net") {
     };
 }
 
-export default function ExpensesStats({ entries = [], categories = [], onViewKind, onSaved, onAddCard }: ExpensesStatsProps) {
+
+export default function ExpensesStats({ entries = [], categories = [], cards = [], onViewKind, onSaved, onAddCard }: ExpensesStatsProps) {
     const [dialogKind, setDialogKind] = useState<EntryKind | null>(null);
-    const [cardDialogOpen, setCardDialogOpen] = useState(false); // NEW — was missing entirely
+    const [cardDialogOpen, setCardDialogOpen] = useState(false);
 
 
-    const totalIncome = entries.filter((e) => e.kind === "income").reduce((s, e) => s + e.amount, 0);
-    const totalExpenses = entries.filter((e) => e.kind === "expense").reduce((s, e) => s + e.amount, 0);
-    const totalDebt = entries.filter((e) => e.kind === "debt" && !e.isSettled).reduce((s, e) => s + e.amount, 0);
+    const totalIncome = entries
+        .filter((e) => e.kind === "income")
+        .reduce((s, e) => s + e.amount, 0);
+
+    const totalExpenses = entries
+        .filter((e) => e.kind === "expense")
+        .reduce((s, e) => s + e.amount, 0);
+
+    const totalDebt = entries
+        .filter((e) => e.kind === "debt" && !e.isSettled)
+        .reduce((s, e) => s + e.amount, 0);
+
     const balance = totalIncome - totalExpenses;
-    const bal = monthlyDelta(entries, "net"), inc = monthlyDelta(entries, "income"), exp = monthlyDelta(entries, "expense"), debt = monthlyDelta(entries, "debt");
+
+    const bal = monthlyDelta(entries, "net");
+    const inc = monthlyDelta(entries, "income");
+    const exp = monthlyDelta(entries, "expense");
+    const debt = monthlyDelta(entries, "debt");
+
 
     const items: (IExpenseStatItem & { filterKind: EntryKind | "all"; ctaLabel?: string })[] = [
         {
@@ -131,7 +147,7 @@ export default function ExpensesStats({ entries = [], categories = [], onViewKin
                         />
                         <button
                             onClick={() => setCardDialogOpen(true)}
-                            className="absolute bottom-brand-8 right-brand-8 rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary hover:bg-primary hover:text-white"
+                            className="absolute bottom-3.5 right-brand-12 rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary hover:bg-primary hover:text-white"
                         >
                             + Add Card
                         </button>
@@ -160,9 +176,13 @@ export default function ExpensesStats({ entries = [], categories = [], onViewKin
                 onUpdate={() => { }}
             />
 
-            <AamdniDialog categories={categories} open={dialogKind === "income"} onOpenChange={(o) => !o && setDialogKind(null)} onSaved={onSaved} />
-            <KharchaDialog categories={categories} open={dialogKind === "expense"} onOpenChange={(o) => !o && setDialogKind(null)} onSaved={onSaved} />
-            <UdhaarDialog categories={categories} open={dialogKind === "debt"} onOpenChange={(o) => !o && setDialogKind(null)} onSaved={onSaved} />
+            <DetailedEntryDialog
+                kind={dialogKind}
+                categories={categories}
+                cards={cards}
+                onClose={() => setDialogKind(null)}
+                onSaved={onSaved}
+            />
         </>
     );
 }

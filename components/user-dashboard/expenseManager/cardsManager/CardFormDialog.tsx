@@ -1,4 +1,4 @@
-import { ICard } from "@/types/expenseManager";
+import { ICard } from "@/types/expenseManagerTy";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Plus, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -12,27 +12,69 @@ export default function CardFormDialog({ editingCard, onClose, onAdd, onUpdate, 
     onOpenChange?: (open: boolean) => void;
     hideTrigger?: boolean;
 }) {
-    const [open, setOpen] = useState(false);
-    const [label, setLabel] = useState(""); const [last4, setLast4] = useState(""); const [balance, setBalance] = useState("");
+    const [internalOpen, setInternalOpen] = useState(false);
+    const isControlled = openProp !== undefined;
+    const open = isControlled ? openProp : internalOpen;
+
+    const [label, setLabel] = useState("");
+    const [last4, setLast4] = useState("");
+    const [balance, setBalance] = useState("");
     const isEdit = Boolean(editingCard);
 
     useEffect(() => {
         if (editingCard) {
-            setLabel(editingCard.label); setLast4(editingCard.last4); setBalance(String(editingCard.balance)); setOpen(true);
+            setLabel(editingCard.label);
+            setLast4(editingCard.last4);
+            setBalance(String(editingCard.balance));
+
+            if (isControlled) {
+                onOpenChange?.(true);
+            } else {
+                setInternalOpen(true);
+            }
         }
     }, [editingCard]);
 
-    const reset = () => { setLabel(""); setLast4(""); setBalance(""); };
+    const reset = () => {
+        setLabel("");
+        setLast4("");
+        setBalance("");
+    };
+
     const isValid = label.trim().length > 0 && last4.trim().length === 4 && balance.trim().length > 0;
 
-    const handleOpenChange = (next: boolean) => { setOpen(next); if (!next) { reset(); onClose?.(); } };
+    const handleOpenChange = (next: boolean) => {
+        if (isControlled) {
+            onOpenChange?.(next);
+        } else {
+            setInternalOpen(next);
+        }
+
+        if (!next) {
+            reset();
+            onClose?.();
+        }
+    };
 
     const handleSubmit = () => {
         if (!isValid) return;
-        if (isEdit && editingCard) onUpdate(editingCard.id, { label, last4, balance: Number(balance) });
-        else onAdd({ label, last4, balance: Number(balance), expiryMonth: 12, expiryYear: (new Date().getFullYear() % 100) + 3, gradient: "dark" });
+
+        if (isEdit && editingCard) {
+            onUpdate(editingCard.id, { label, last4, balance: Number(balance) });
+        } else {
+            onAdd({
+                label,
+                last4,
+                balance: Number(balance),
+                expiryMonth: 12,
+                expiryYear: (new Date().getFullYear() % 100) + 3,
+                gradient: "dark"
+            });
+        }
+
         handleOpenChange(false);
     };
+
 
     return (
         <Dialog.Root open={open} onOpenChange={handleOpenChange}>

@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { Plus, ArrowLeftRight, Settings2, Trash2, X, Pencil } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ICard } from "@/types/expenseManager";
+import { ICard } from "@/types/expenseManagerTy";
 import { cn } from "@/lib/cn";
 import CardFormDialog from "./CardFormDialog";
 

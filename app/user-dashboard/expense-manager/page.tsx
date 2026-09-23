@@ -4,16 +4,16 @@ import { useState } from "react";
 import ExpensesTable from "@/components/user-dashboard/expenseManager/ExpensesTable";
 import TrendChart from "@/components/user-dashboard/expenseManager/TrendChart";
 import CategoryBreakdown from "@/components/user-dashboard/expenseManager/expenseCategory/CategoryBreakdown";
-import NewExpenseDialog from "@/components/user-dashboard/expenseManager/expenseStats/NewExpenseDialog";
 import CategoryManagerDialog from "@/components/user-dashboard/expenseManager/expenseCategory/CategoryManagerDialog";
 import CardsManager from "@/components/user-dashboard/expenseManager/cardsManager/CardsManager";
 import CardsBalanceChart from "@/components/user-dashboard/expenseManager/cardsManager/CardsBalanceChart";
-import { EntryKind, FilterTab, IExpenseEntry } from "@/types/expenseManager";
+import { EntryKind, FilterTab, IExpenseEntry } from "@/types/expenseManagerTy";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 import StatDetailDialog from "@/components/user-dashboard/expenseManager/expenseStats/StatDetailDialog";
 import ExpensesStats from "@/components/user-dashboard/expenseManager/expenseStats/ExpensesStats";
 import DebtSummaryCardV2 from "@/components/user-dashboard/expenseManager/DebtSummaryCardV2";
 import NewEntryMenu from "@/components/user-dashboard/expenseManager/expenseStats/NewEntryMenu";
+import AdvancedExpenseWorkspaceV2 from "@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2";
 
 export default function ExpenseManagerPage() {
     const store = useExpenseManagerStore();
@@ -58,10 +58,10 @@ export default function ExpenseManagerPage() {
                 </div>
             </div>
 
-            {/* <ExpensesStats entries={store.entries} categories={store.categories} onViewKind={setStatDialogKind} /> */}
             <ExpensesStats
                 entries={store.entries}
                 categories={store.categories}
+                cards={store.cards}  // NEW
                 onViewKind={setStatDialogKind}
                 onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })}
                 onAddCard={store.addCard}
@@ -85,8 +85,14 @@ export default function ExpenseManagerPage() {
                 <CardsBalanceChart cards={store.cards} variant="area" />
             </div>
 
+            {/* <AdvancedExpenseWorkspaceV2
+                entries={store.entries}
+                categories={store.categories}
+                cards={store.cards}
+                onSaved={(values) => store.addEntry(values)}
+            /> */}
+
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[60%_40%]">
-                {/* <TrendChart title="Daily Activity (Last 7 Days)" data={store.stats.dailyTrend} granularity="day" /> */}
                 <TrendChart
                     title="Activity"
                     dataByGranularity={{
@@ -103,7 +109,6 @@ export default function ExpenseManagerPage() {
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                 <CategoryBreakdown data={store.stats.categoryBreakdown} />
-                {/* <TrendChart title="Monthly Expenses (Last 6 Months)" data={store.stats.monthlyTrend} granularity="month" variant="pie" /> */}
                 <TrendChart
                     title="Expenses by Period"
                     dataByGranularity={{

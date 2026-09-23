@@ -1,5 +1,5 @@
 // data/user-dashboard/dummyCards.ts
-import { ICard } from "@/types/expenseManager";
+import { ICard } from "@/types/expenseManagerTy";
 
 export const dummyCards: ICard[] = [
     { id: "card-1", label: "Primary Account", balance: 155950, last4: "1289", expiryMonth: 9, expiryYear: 25, gradient: "primary" },

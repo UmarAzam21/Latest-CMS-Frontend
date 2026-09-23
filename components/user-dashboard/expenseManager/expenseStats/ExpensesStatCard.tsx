@@ -4,7 +4,7 @@
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { MoreHorizontal, ArrowUp, ArrowDown, Eye, Download } from "lucide-react";
 import { cn } from "@/lib/cn";
-import { IExpenseStatItem, StatChipVariant } from "@/types/expenseManager";
+import { IExpenseStatItem, StatChipVariant } from "@/types/expenseManagerTy";
 
 const chipStyles: Record<StatChipVariant, string> = {
   green: "bg-chip-green-bg text-chip-green",

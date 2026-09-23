@@ -2,11 +2,12 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { IExpenseEntry, ICategory, SortField, SortDirection, ICard } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory, SortField, SortDirection, ICard } from "@/types/expenseManagerTy";
 import { defaultCategories } from "@/data/user-dashboard/defaultCategoriesData";
 import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
 import { buildTrend, weekKey } from "@/lib/utils/trend";
+import { toast } from "sonner";
 
 // hooks/useExpenseManagerStore.ts — replace the 4 key lines with:
 
@@ -85,35 +86,45 @@ export function useExpenseManagerStore() {
   }, [categories, hasLoaded]);
 
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-    const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
-    setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
-    if (entry.cardId && entry.kind !== "debt") {
-      const delta = entry.kind === "income" ? entry.amount : -entry.amount;
-      setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
+    try {
+      const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
+      setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
+      if (entry.cardId && entry.kind !== "debt") {
+        const delta = entry.kind === "income" ? entry.amount : -entry.amount;
+        setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
+      }
+      toast.success(`${entry.subject} saved`);
+    } catch {
+      toast.error("Couldn't save entry. Please try again.");
     }
   }, []);
 
   const updateEntry = useCallback((id: string, patch: Partial<IExpenseEntry>) => {
-    setEntries((prev) => {
-      const old = prev.find((e) => e.id === id);
-      if (!old) return prev;
-      const updated = { ...old, ...patch };
+    try {
+      setEntries((prev) => {
+        const old = prev.find((e) => e.id === id);
+        if (!old) return prev;
+        const updated = { ...old, ...patch };
 
-      setCards((prevCards) => {
-        let next = prevCards;
-        if (old.cardId && old.kind !== "debt") {
-          const reverse = old.kind === "income" ? -old.amount : old.amount;
-          next = next.map((c) => (c.id === old.cardId ? { ...c, balance: c.balance + reverse } : c));
-        }
-        if (updated.cardId && updated.kind !== "debt") {
-          const apply = updated.kind === "income" ? updated.amount : -updated.amount;
-          next = next.map((c) => (c.id === updated.cardId ? { ...c, balance: c.balance + apply } : c));
-        }
-        return next;
+        setCards((prevCards) => {
+          let next = prevCards;
+          if (old.cardId && old.kind !== "debt") {
+            const reverse = old.kind === "income" ? -old.amount : old.amount;
+            next = next.map((c) => (c.id === old.cardId ? { ...c, balance: c.balance + reverse } : c));
+          }
+          if (updated.cardId && updated.kind !== "debt") {
+            const apply = updated.kind === "income" ? updated.amount : -updated.amount;
+            next = next.map((c) => (c.id === updated.cardId ? { ...c, balance: c.balance + apply } : c));
+          }
+          return next;
+        });
+
+        return prev.map((e) => (e.id === id ? updated : e));
       });
-
-      return prev.map((e) => (e.id === id ? updated : e));
-    });
+      toast.success(`${patch.subject ?? "Entry"} updated`);
+    } catch {
+      toast.error("Couldn't update entry. Please try again.");
+    }
   }, []);
 
   const deleteEntry = useCallback((id: string) => {

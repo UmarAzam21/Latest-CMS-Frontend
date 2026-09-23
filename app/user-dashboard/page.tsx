@@ -5,16 +5,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import MajorServices from '@/components/user-dashboard/services/MajorServices';
-import ExpenseManagerCardV2 from '@/components/user-dashboard/expenseManager/ExpenseManagerCardV2';
 import Inbox from '@/components/user-dashboard/services/Inbox';
 import Outbox from '@/components/user-dashboard/services/Outbox';
 import Notices from '@/components/user-dashboard/services/Notices';
-import ExpensesStats from '@/components/user-dashboard/expenseManager/expenseStats/ExpensesStats';
 import { useExpenseManagerStore } from '@/hooks/useExpenseManagerStore';
 import AdvancedExpenseWorkspaceV2 from '@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2';
 import PromoBanner from '@/components/user-dashboard/expenseManager/PromoBanner';
 import DigitalKhataDashboardCard from '@/components/user-dashboard/expenseManager/khata/DigitalKhataDashboardCard';
-
 
 type DashboardTab = 'inbox' | 'outbox' | 'notices';
 
@@ -57,8 +54,7 @@ function DashboardOverviewContent() {
   return (
     <div>
       <div className="pb-2 mb-3 border-b border-slate-200">
-        {/* <span className="text-xs text-[#4B5563]">Hi,</span> */}
-        <h1 className="text-lg font-bold">
+        <h1 className="heading-h6 text-sm leading-tight">
           Welcome Back, <span className="text-primary">User!</span>
         </h1>
       </div>
@@ -77,18 +73,15 @@ function DashboardOverviewContent() {
         <div className="h-full lg:col-span-2">
           <MajorServices />
         </div>
-        <div className="h-full"><ExpenseManagerCardV2 /></div>
-        {/* <DigitalKhataDashboardCard entries={store.entries} categories={store.categories} cards={store.cards} onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })} /> */}
+        <DigitalKhataDashboardCard
+          entries={store.entries}
+          categories={store.categories}
+          cards={store.cards}
+          onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })}
+        />
       </div>
 
-      <div className="w-full grid grid-cols-1 gap-brand-12 sm:grid-cols-2 lg:grid-cols-3 mt-brand-12">
-        <div className="h-full lg:col-span-2">
-          <MajorServices />
-        </div>
-        {/* <div className="h-full"><ExpenseManagerCardV2 /></div> */}
-        <DigitalKhataDashboardCard entries={store.entries} categories={store.categories} cards={store.cards} onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })} />
-      </div>
-
+      {/* Inbox Draft Tabs */}
       <section ref={tabsSectionRef} className="mt-brand-12 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-brand-12 shadow-card">
         <div className="mb-4 flex items-center gap-1 border-b border-border-clr" role="tablist" aria-label="Dashboard messages">
           {(['inbox', 'outbox', 'notices'] as const).map((tab) => (
@@ -110,12 +103,12 @@ function DashboardOverviewContent() {
         {tabContent[activeTab]}
       </section>
 
-      <AdvancedExpenseWorkspaceV2
+      {/* <AdvancedExpenseWorkspaceV2
         entries={store.entries}
         categories={store.categories}
         cards={store.cards}
         onSaved={(values) => store.addEntry(values)}
-      />
+      /> */}
     </div>
   );
 }

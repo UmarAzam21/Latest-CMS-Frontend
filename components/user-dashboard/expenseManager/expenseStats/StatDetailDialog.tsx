@@ -6,8 +6,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { X } from "lucide-react";
 import { buildTrend, weekKey } from "@/lib/utils/trend";
-import { IExpenseEntry, ICategory, EntryKind } from "@/types/expenseManager";
-import { KHATA_LABELS } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory, EntryKind } from "@/types/expenseManagerTy";
+import { KHATA_LABELS } from "@/types/expenseManagerTy";
 
 interface StatDetailDialogProps {
     kind: EntryKind | "all" | null;

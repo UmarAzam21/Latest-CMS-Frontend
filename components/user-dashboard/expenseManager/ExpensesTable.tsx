@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ArrowUpDown, Download, Pencil, Trash2 } from "lucide-react";
-import { IExpenseEntry, ICategory, SortField, SortDirection, EntryKind, KHATA_LABELS } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory, SortField, SortDirection, EntryKind, KHATA_LABELS } from "@/types/expenseManagerTy";
 import { cn } from "@/lib/cn";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { exportToCsv, exportToPdf, exportToXlsx } from "@/lib/utils/exportTransactionsData";

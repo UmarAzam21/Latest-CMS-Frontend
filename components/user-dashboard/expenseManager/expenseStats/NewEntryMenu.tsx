@@ -4,7 +4,7 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Plus, ChevronDown } from "lucide-react";
 import DetailedEntryDialog from "./DetailedEntryDialog";
 import { DetailedEntryValues } from "@/lib/schemas/detailedEntrySchema";
-import { EntryKind, ICategory, ICard, IExpenseEntry, KHATA_LABELS } from "@/types/expenseManager";
+import { EntryKind, ICategory, ICard, IExpenseEntry, KHATA_LABELS } from "@/types/expenseManagerTy";
 
 export default function NewEntryMenu({ categories, cards, editingEntry, onCloseEdit, onSaved }: {
     categories: ICategory[]; cards: ICard[]; editingEntry?: IExpenseEntry | null; onCloseEdit: () => void;

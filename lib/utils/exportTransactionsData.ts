@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { IExpenseEntry, ICategory } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory } from "@/types/expenseManagerTy";
 
 function rows(entries: IExpenseEntry[], categories: ICategory[]) {
   const label = (id: string) => categories.find((c) => c.id === id)?.label ?? "Uncategorized";

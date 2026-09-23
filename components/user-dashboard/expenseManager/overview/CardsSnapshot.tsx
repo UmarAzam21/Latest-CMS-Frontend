@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Landmark, CircleCheck, ArrowUpRight } from "lucide-react";
-import { ICard } from "@/types/expenseManager";
+import { ICard } from "@/types/expenseManagerTy";
 
 function fmt(v: number) { return `PKR ${v.toLocaleString("en-PK")}`; }
 
