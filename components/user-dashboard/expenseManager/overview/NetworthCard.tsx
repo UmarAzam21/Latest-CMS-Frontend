@@ -27,7 +27,7 @@ interface NetWorthCardProps {
   monthLabel: string;
 }
 
-export default function NetWorthCard({
+export default function NetworthCard({
   chartData,
   income,
   expenses,

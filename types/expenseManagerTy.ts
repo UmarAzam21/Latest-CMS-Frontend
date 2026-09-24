@@ -1,3 +1,5 @@
+// dashboard\types\expenseManagerTy.ts
+
 import { LucideIcon } from "lucide-react";
 
 export type TrendDirection = "up" | "down";
@@ -69,3 +71,17 @@ export interface ICard {
 }
 
 export type FilterTab = "all" | EntryKind;
+
+// Human-facing labels only — internal kind values (expense/income/debt) stay
+// English so all existing code (filters, badges, schemas) is untouched.
+// export const KHATA_LABELS: Record<EntryKind, { title: string; verb: string; noun: string }> = {
+//   income: { title: "Total Aamdani", verb: "Add Aamdani", noun: "Aamdani" },
+//   expense: { title: "Total Kharcha", verb: "Add Kharcha", noun: "Kharcha" },
+//   debt: { title: "Total Udhaar", verb: "Add Udhaar", noun: "Udhaar" },
+// };
+
+export const KHATA_LABELS: Record<EntryKind, { title: string; verb: string; noun: string; subjectLabel: string }> = {
+  income: { title: "Total Aamdani", verb: "Add Aamdani", noun: "Aamdani", subjectLabel: "Kis se aamdani?" },
+  expense: { title: "Total Kharcha", verb: "Add Kharcha", noun: "Kharcha", subjectLabel: "Kis cheez ka kharcha?" },
+  debt: { title: "Total Udhaar", verb: "Add Udhaar", noun: "Udhaar", subjectLabel: "Kis ka udhaar?" },
+};

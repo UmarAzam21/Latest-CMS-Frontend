@@ -1,6 +1,6 @@
 "use client";
 import { RadialBarChart, RadialBar, AreaChart, Area, LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip } from "recharts";
-import { ICard } from "@/types/expenseManager";
+import { ICard } from "@/types/expenseManagerTy";
 
 const CARD_COLORS = ["#C8102E", "#34B08D", "#7C3AED", "#2563EB"];
 interface CardsBalanceChartProps { cards: ICard[]; variant?: "radial" | "area" | "line" }

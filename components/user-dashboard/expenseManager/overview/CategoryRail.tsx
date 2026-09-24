@@ -1,6 +1,6 @@
 "use client";
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { ICategoryBreakdownItem } from "@/types/expenseManager";
+import { ICategoryBreakdownItem } from "@/types/expenseManagerTy";
 
 const PALETTE = [
     "var(--brand-primary)",

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { ChevronDown } from "lucide-react";
-import { EntryKind } from "@/types/expenseManager";
+import { EntryKind } from "@/types/expenseManagerTy";
 
 interface TrendDatum { label: string; expense: number; income: number; debt: number }
 type Granularity = "day" | "week" | "month";

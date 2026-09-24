@@ -1,4 +1,4 @@
-import { ICategory } from "@/types/expenseManager";
+import { ICategory } from "@/types/expenseManagerTy";
 
 export const defaultCategories: ICategory[] = [
     { id: "cat-utilities", label: "Utilities", color: "info" },

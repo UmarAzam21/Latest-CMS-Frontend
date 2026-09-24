@@ -1,4 +1,4 @@
-import { ICategoryBreakdownItem } from "@/types/expenseManager";
+import { ICategoryBreakdownItem } from "@/types/expenseManagerTy";
 
 interface CategoryBreakdownProps {
   data: ICategoryBreakdownItem[];

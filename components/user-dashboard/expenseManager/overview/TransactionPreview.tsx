@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { ArrowUpRight, ArrowDownLeft } from "lucide-react";
-import { IExpenseEntry, ICategory } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory } from "@/types/expenseManagerTy";
 
 function fmt(v: number) { return `PKR ${v.toLocaleString("en-PK")}`; }
 

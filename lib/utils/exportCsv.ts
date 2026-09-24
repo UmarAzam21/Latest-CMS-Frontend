@@ -1,4 +1,4 @@
-import { IExpenseEntry, ICategory } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory } from "@/types/expenseManagerTy";
 
 export function exportEntriesToCsv(entries: IExpenseEntry[], categories: ICategory[], filename: string) {
     const label = (id: string) => categories.find((c) => c.id === id)?.label ?? "Uncategorized";

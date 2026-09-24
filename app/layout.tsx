@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/cn";
+import { Toaster } from "sonner";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -33,6 +34,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

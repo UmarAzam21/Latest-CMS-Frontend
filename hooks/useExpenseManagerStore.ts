@@ -2,11 +2,12 @@
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { IExpenseEntry, ICategory, SortField, SortDirection, ICard } from "@/types/expenseManager";
+import { IExpenseEntry, ICategory, SortField, SortDirection, ICard } from "@/types/expenseManagerTy";
 import { defaultCategories } from "@/data/user-dashboard/defaultCategoriesData";
 import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
 import { buildTrend, weekKey } from "@/lib/utils/trend";
+import { toast } from "sonner";
 
 // hooks/useExpenseManagerStore.ts — replace the 4 key lines with:
 
@@ -18,6 +19,7 @@ const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
 const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CARDS = `filernow_expense_cards_${SCHEMA_VERSION}`;
+const STORAGE_KEY_MODE = `filernow_khata_mode_${SCHEMA_VERSION}`; // "demo" | "blank"
 
 // Safety net for teammates who forget to bump: if stored entries don't match
 // the current required shape (e.g. still using old `category` instead of
@@ -45,6 +47,8 @@ export function useExpenseManagerStore() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [hasLoaded, setHasLoaded] = useState(false);
   const [cards, setCards] = useState<ICard[]>([]);
+  const [dataMode, setDataMode] = useState<"demo" | "blank">("demo");
+
 
   useEffect(() => {
     // "Seeded" is tracked independently of entries' emptiness, so that a
@@ -66,6 +70,7 @@ export function useExpenseManagerStore() {
     setCards(readLocal(STORAGE_KEY_CARDS, dummyCards));
     setCategories(readLocal(STORAGE_KEY_CATEGORIES, defaultCategories));
     setHasLoaded(true);
+    setDataMode((readLocal(STORAGE_KEY_MODE, "demo") as "demo" | "blank"));
   }, []);
 
   // Guarded: never persist before the load-effect has actually run, so we
@@ -81,35 +86,45 @@ export function useExpenseManagerStore() {
   }, [categories, hasLoaded]);
 
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-    const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
-    setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
-    if (entry.cardId && entry.kind !== "debt") {
-      const delta = entry.kind === "income" ? entry.amount : -entry.amount;
-      setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
+    try {
+      const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
+      setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
+      if (entry.cardId && entry.kind !== "debt") {
+        const delta = entry.kind === "income" ? entry.amount : -entry.amount;
+        setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
+      }
+      toast.success(`${entry.subject} saved`);
+    } catch {
+      toast.error("Couldn't save entry. Please try again.");
     }
   }, []);
 
   const updateEntry = useCallback((id: string, patch: Partial<IExpenseEntry>) => {
-    setEntries((prev) => {
-      const old = prev.find((e) => e.id === id);
-      if (!old) return prev;
-      const updated = { ...old, ...patch };
+    try {
+      setEntries((prev) => {
+        const old = prev.find((e) => e.id === id);
+        if (!old) return prev;
+        const updated = { ...old, ...patch };
 
-      setCards((prevCards) => {
-        let next = prevCards;
-        if (old.cardId && old.kind !== "debt") {
-          const reverse = old.kind === "income" ? -old.amount : old.amount;
-          next = next.map((c) => (c.id === old.cardId ? { ...c, balance: c.balance + reverse } : c));
-        }
-        if (updated.cardId && updated.kind !== "debt") {
-          const apply = updated.kind === "income" ? updated.amount : -updated.amount;
-          next = next.map((c) => (c.id === updated.cardId ? { ...c, balance: c.balance + apply } : c));
-        }
-        return next;
+        setCards((prevCards) => {
+          let next = prevCards;
+          if (old.cardId && old.kind !== "debt") {
+            const reverse = old.kind === "income" ? -old.amount : old.amount;
+            next = next.map((c) => (c.id === old.cardId ? { ...c, balance: c.balance + reverse } : c));
+          }
+          if (updated.cardId && updated.kind !== "debt") {
+            const apply = updated.kind === "income" ? updated.amount : -updated.amount;
+            next = next.map((c) => (c.id === updated.cardId ? { ...c, balance: c.balance + apply } : c));
+          }
+          return next;
+        });
+
+        return prev.map((e) => (e.id === id ? updated : e));
       });
-
-      return prev.map((e) => (e.id === id ? updated : e));
-    });
+      toast.success(`${patch.subject ?? "Entry"} updated`);
+    } catch {
+      toast.error("Couldn't update entry. Please try again.");
+    }
   }, []);
 
   const deleteEntry = useCallback((id: string) => {
@@ -129,6 +144,20 @@ export function useExpenseManagerStore() {
       const remaining = Math.max(0, e.amount - paymentAmount);
       return { ...e, amount: remaining, isSettled: remaining === 0 };
     }));
+  }, []);
+
+  const loadDemoData = useCallback(() => {
+    setEntries(dummyExpenseEntries);
+    setCards(dummyCards);
+    window.localStorage.setItem(STORAGE_KEY_MODE, "demo");
+    setDataMode("demo");
+  }, []);
+
+  const resetToBlank = useCallback(() => {
+    setEntries([]);
+    setCards([]);
+    window.localStorage.setItem(STORAGE_KEY_MODE, "blank");
+    setDataMode("blank");
   }, []);
 
   const addCategory = useCallback((label: string, color: ICategory["color"]) => {
@@ -232,5 +261,6 @@ export function useExpenseManagerStore() {
     updateCategory,
     deleteCategory,
     cards, addCard, updateCard, deleteCard, adjustCardBalance, transferBetweenCards,
+    dataMode, loadDemoData, resetToBlank,
   };
 }
