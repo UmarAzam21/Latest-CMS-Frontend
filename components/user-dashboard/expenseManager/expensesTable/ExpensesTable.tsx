@@ -1,3 +1,5 @@
+// dashboard\components\user-dashboard\expenseManager\expensesTable\ExpensesTable.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -17,6 +19,7 @@ interface ExpensesTableProps {
   onEdit: (entry: IExpenseEntry) => void;
   activeFilter: FilterTab;
   onFilterChange: (f: FilterTab) => void;
+  showTypeFilters?: boolean;
 }
 
 type FilterTab = "all" | EntryKind;
@@ -32,7 +35,7 @@ function formatCurrency(v: number) {
 }
 
 export default function ExpensesTable({
-  entries, categories, sortField, sortDirection, onSort, onDelete, onEdit, activeFilter, onFilterChange
+  entries, categories, sortField, sortDirection, onSort, onDelete, onEdit, activeFilter, onFilterChange, showTypeFilters = true
 }: ExpensesTableProps) {
   const PAGE_SIZE = 8;
   const [page, setPage] = useState(1);
@@ -66,33 +69,35 @@ export default function ExpensesTable({
         {/* Entries Filters Tabs */}
         <div className="flex gap-8">
           <div className="flex gap-1.5">
-            <FilterTabButton
-              label="All"
-              count={counts.all}
-              active={activeFilter === "all"}
-              onClick={() => onFilterChange("all")}
-            />
-            <FilterTabButton
-              // label="Expenses"
-              label={KHATA_LABELS.expense.noun}
-              count={counts.expense}
-              active={activeFilter === "expense"}
-              onClick={() => onFilterChange("expense")}
-            />
-            <FilterTabButton
-              // label="Income"
-              label={KHATA_LABELS.income.noun}
-              count={counts.income}
-              active={activeFilter === "income"}
-              onClick={() => onFilterChange("income")}
-            />
-            <FilterTabButton
-              // label="Debt"
-              label={KHATA_LABELS.debt.noun}
-              count={counts.debt}
-              active={activeFilter === "debt"}
-              onClick={() => onFilterChange("debt")}
-            />
+            {showTypeFilters && (<>
+              <FilterTabButton
+                label="All"
+                count={counts.all}
+                active={activeFilter === "all"}
+                onClick={() => onFilterChange("all")}
+              />
+              <FilterTabButton
+                // label="Expenses"
+                label={KHATA_LABELS.expense.noun}
+                count={counts.expense}
+                active={activeFilter === "expense"}
+                onClick={() => onFilterChange("expense")}
+              />
+              <FilterTabButton
+                // label="Income"
+                label={KHATA_LABELS.income.noun}
+                count={counts.income}
+                active={activeFilter === "income"}
+                onClick={() => onFilterChange("income")}
+              />
+              <FilterTabButton
+                // label="Debt"
+                label={KHATA_LABELS.debt.noun}
+                count={counts.debt}
+                active={activeFilter === "debt"}
+                onClick={() => onFilterChange("debt")}
+              />
+            </>)}
 
           </div>
 

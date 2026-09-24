@@ -1,5 +1,8 @@
 import { ServicesSectionForm } from "@/components/dashboard/content/sections/ServicesSectionForm";
-import { BadgeCheck, BellRing, Building2, Calculator, Clock, CreditCard, Ellipsis, FileCheck2, FileClock, FileText, Globe, Globe2, ImageIcon, KeyRound, Landmark, LayoutDashboard, LifeBuoy, LucideIcon, Mail, Pencil, Plus, ReceiptText, Search, Settings, ShieldCheck, ShoppingCart, Stamp, TrendingUp, Upload, User, Users, UsersRound } from "lucide-react";
+import {
+  BadgeCheck, BellRing, Building2, Calculator, Clock, CreditCard, Ellipsis, FileCheck2, FileClock, FileHeadphone, FileText, Globe, Globe2, Headset, ImageIcon, KeyRound, Landmark, LayoutDashboard, LifeBuoy, LucideIcon, Mail, Pencil, Plus, ReceiptText, Scale, Search, Settings, ShieldCheck, ShoppingCart, Stamp, TrendingUp, Upload, User, Users, UsersRound,
+  Wallet
+} from "lucide-react";
 
 export interface NavItem {
   label: string;
@@ -21,6 +24,11 @@ export interface NavItem {
    * regardless of any module grants.
    */
   superAdminOnly?: boolean;
+  children?: {
+    label: string;
+    href: string;
+    icon: LucideIcon
+  }[];
 }
 
 export interface DashboardContent {
@@ -50,13 +58,56 @@ export interface PageRow {
 }
 
 export const pagesData: PageRow[] = [
-  { id: "1", name: "Home", slug: "/", sections: 6, status: "Published", lastEdited: "2 hours ago" },
-  { id: "2", name: "About Us", slug: "/about", sections: 4, status: "Published", lastEdited: "Yesterday" },
-  { id: "3", name: "Services", slug: "/services", sections: 5, status: "Published", lastEdited: "3 days ago" },
-  { id: "4", name: "Portfolio", slug: "/portfolio", sections: 3, status: "Draft", lastEdited: "1 week ago" },
-  { id: "5", name: "Contact", slug: "/contact", sections: 2, status: "Published", lastEdited: "2 weeks ago" },
-  { id: "6", name: "Blog", slug: "/blog", sections: 1, status: "Draft", lastEdited: "1 month ago" },
+  {
+    id: "1",
+    name: "Home",
+    slug: "/",
+    sections: 6,
+    status: "Published",
+    lastEdited: "2 hours ago"
+  },
+  {
+    id: "2",
+    name: "About Us",
+    slug: "/about",
+    sections: 4,
+    status: "Published",
+    lastEdited: "Yesterday"
+  },
+  {
+    id: "3",
+    name: "Services",
+    slug: "/services",
+    sections: 5,
+    status: "Published",
+    lastEdited: "3 days ago"
+  },
+  {
+    id: "4",
+    name: "Portfolio",
+    slug: "/portfolio",
+    sections: 3,
+    status: "Draft",
+    lastEdited: "1 week ago"
+  },
+  {
+    id: "5",
+    name: "Contact",
+    slug: "/contact",
+    sections: 2,
+    status: "Published",
+    lastEdited: "2 weeks ago"
+  },
+  {
+    id: "6",
+    name: "Blog",
+    slug: "/blog",
+    sections: 1,
+    status: "Draft",
+    lastEdited: "1 month ago"
+  },
 ];
+
 
 export function Activities(): ActivityItem[] {
   return [
@@ -138,43 +189,129 @@ export function DashboardCards(): DashboardContent[] {
 export function getNavData(): NavItem[] {
   return [
     { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-    { label: "Content", href: "/dashboard/content", icon: FileText, moduleKey: "pages", access: "read" },
-    { label: "FBR CheckList", href: "/dashboard/fbr", icon: Landmark, moduleKey: "xlsx_import", access: "read" },
-    { label: "Messages", href: "/dashboard/messages", icon: Mail, moduleKey: "support_system", access: "read" },
+    {
+      label: "Content",
+      href: "/dashboard/content",
+      icon: FileText,
+      moduleKey: "pages",
+      access: "read"
+    },
+    {
+      label: "FBR CheckList",
+      href: "/dashboard/fbr",
+      icon: Landmark,
+      moduleKey: "xlsx_import",
+      access: "read"
+    },
+    {
+      label: "Messages",
+      href: "/dashboard/messages",
+      icon: Mail,
+      moduleKey: "support_system",
+      access: "read"
+    },
     // No backend module protection confirmed for Media Library / SEO yet —
     // open to any logged-in admin for now, per explicit product decision.
     { label: "Media Library", href: "/dashboard/media", icon: ImageIcon },
     // { label: "SEO", href: "/dashboard/seo", icon: Search },
-    { label: "Users", href: "/dashboard/users", icon: Users, superAdminOnly: true },
-    { label: "Settings", href: "/dashboard/settings", icon: Settings, moduleKey: "settings", access: "read" },
+    {
+      label: "Users",
+      href: "/dashboard/users",
+      icon: Users,
+      superAdminOnly: true
+    },
+    {
+      label: "Settings",
+      href: "/dashboard/settings",
+      icon: Settings,
+      moduleKey: "settings",
+      access: "read"
+    },
     // Backend protects users/roles with require_super_admin, not module grants.
   ];
 }
 
 export function getUserNavData(): NavItem[] {
   return [
-    { label: "Dashboard", href: "/user-dashboard", icon: LayoutDashboard },
-    { label: "Enroll Service", href: "/user-dashboard/enroll-service", icon: FileText },
-    { label: "My Services", href: "/user-dashboard/my-services", icon: Users },
-    { label: "Expense Manager", href: "/user-dashboard/expense-manager", icon: CreditCard },
-    { label: "Legal Consultation", href: "/user-dashboard/legal-consultation", icon: Users },
-    { label: "Support", href: "/user-dashboard/support", icon: LifeBuoy },
-    { label: "Settings", href: "/user-dashboard/settings", icon: Settings },
+    {
+      label: "Dashboard",
+      href: "/user-dashboard",
+      icon: LayoutDashboard
+    },
+    {
+      label: "Enroll Service",
+      href: "/user-dashboard/enroll-service",
+      icon: FileText
+    },
+    {
+      label: "My Enroled Services",
+      href: "/user-dashboard/my-services",
+      icon: FileHeadphone
+    },
+    // {
+    //   label: "Expense Manager",
+    //   href: "/user-dashboard/expense-manager",
+    //   icon: CreditCard
+    // },
+    {
+      label: "Digital Khata",
+      href: "/user-dashboard/digital-khata/daily",
+      icon: CreditCard,
+      children: [
+        { label: "Daily Khata", href: "/user-dashboard/digital-khata/daily", icon: Wallet },
+        { label: "Business Khata", href: "/user-dashboard/digital-khata/business", icon: Building2 },
+        { label: "Udhaar Khata", href: "/user-dashboard/digital-khata/udhaar", icon: Landmark },
+      ],
+    },
+    {
+      label: "Legal Consultation",
+      href: "/user-dashboard/legal-consultation",
+      icon: Scale
+    },
+    {
+      label: "Support",
+      href: "/user-dashboard/support",
+      icon: Headset
+    },
+    {
+      label: "Settings",
+      href: "/user-dashboard/settings",
+      icon: Settings
+    },
   ];
 }
 
 export const SERVICE_CATEGORIES = [
   {
     label: "Registration",
-    values: ["business_ntn", "simple_ntn_registration", "business_registration", "company_registration", "filer_registration", "gst_registration"],
+    values: [
+      "business_ntn",
+      "simple_ntn_registration",
+      "business_registration",
+      "company_registration",
+      "filer_registration",
+      "gst_registration"
+    ],
   },
   {
     label: "Compliance",
-    values: ["tax_return_filing", "fbr_notices", "wealth_statement", "dts_registration"],
+    values: [
+      "tax_return_filing",
+      "fbr_notices",
+      "wealth_statement",
+      "dts_registration"
+    ],
   },
   {
     label: "Licenses",
-    values: ["imp_exp_license_psw", "trade_mark_registration", "pec_registration", "chamber_membership", "pseb", "dnfbp"],
+    values: [
+      "imp_exp_license_psw",
+      "trade_mark_registration",
+      "pec_registration",
+      "chamber_membership",
+      "pseb",
+      "dnfbp"
+    ],
   },
 ] as const;
 

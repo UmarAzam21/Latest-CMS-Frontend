@@ -9,6 +9,15 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/user-dashboard/expense-manager',
+        destination: '/user-dashboard/digital-khata/daily',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

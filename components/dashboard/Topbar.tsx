@@ -185,9 +185,9 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
         {/* Account Dropdown */}
         <Dropdown
           trigger={
-            <div className="flex cursor-pointer items-center gap-3 rounded-lg py-1 pl-1 pr-2 transition-colors hover:bg-primary-light">
+            <div className="flex cursor-pointer items-center gap-3 rounded-lg py-1 pl-1 pr-2 transition-colors hover:bg-danger-bg">
               {/* Avatar */}
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-primary-light text-sm font-semibold text-primary">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-danger-bg text-sm font-semibold text-primary">
                 {admin?.profile_image ? (
                   <Image
                     src={admin.profile_image}

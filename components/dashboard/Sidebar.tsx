@@ -36,6 +36,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
   const [openServiceCategory, setOpenServiceCategory] = useState("Registration");
   // Bumped after a fresh profile fetch so the nav list re-renders with real access data.
   const [profileVersion, setProfileVersion] = useState(0);
+  // digital-khata subMenus
+  const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
 
   const visibleNavItems = NAV_ITEMS.filter((item) => {
     const hasAccess = item.superAdminOnly
@@ -117,7 +119,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
         <div className="flex min-h-0 flex-1 flex-col">
           {/* Header — icon slot is fixed, label fades in beside it */}
           <div className="flex items-center h-[60px]x border-b border-slate-200 px-[18px] py-1.5 gap-brand-12">
-            <div className="flex h-8x h-10 w-8x w-10 shrink-0 items-center justify-center rounded-md bg-primary-light/35x heading-h6 text-sm">
+            <div className="flex h-8x h-10 w-8x w-10 shrink-0 items-center justify-center rounded-md bg-danger-bg/35x heading-h6 text-sm">
               <img src={ASSETS()[0].src} alt={ASSETS()[0].alt} className="w-7x w-10" />
             </div>
 
@@ -137,6 +139,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                   : pathname.startsWith(item.href);
 
               const Icon = item.icon;
+              const hasChildren = Boolean(item.children?.length);
+              const submenuOpen = openSubmenus[item.href] ?? item.children?.some((c) => pathname.startsWith(c.href));
 
               return (
                 <div key={item.href} className="relative">
@@ -149,8 +153,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                       }
                     }}
                     className={`relative flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-all whitespace-nowrap ${isActive
-                        ? "hover:bg-primary-light text-primary"
-                        : "text-[#4B5563]"
+                      ? "hover:bg-danger-bg text-primary"
+                      : "text-[#4B5563]x text-text-secondary"
                       }`}
                   >
                     {isActive && (
@@ -165,13 +169,55 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                     </span>
                   </Link>
 
+                  {hasChildren && !collapsed && (
+                    <button
+                      type="button"
+                      aria-label={submenuOpen ? "Collapse" : "Expand"}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setOpenSubmenus((s) => ({ ...s, [item.href]: !submenuOpen }));
+                      }}
+                      className="absolute right-2 top-1.5 z-10 rounded-md p-1.5 text-[#4B5563] hover:bg-danger-bg hover:text-primary"
+                    >
+                      <ChevronDown
+                        size={15}
+                        className={`transition-transform duration-200 ${submenuOpen ? "rotate-180" : ""}`}
+                      />
+                    </button>
+                  )}
+
+                  {/* digital-khata sub-menus */}
+                  {hasChildren && !collapsed && submenuOpen && (
+                    <div className="ml-7 mt-1 flex flex-col gap-0.5">
+                      {item.children!.map((child) => {
+                        const ChildIcon = child.icon;
+                        const childActive = pathname.startsWith(child.href);
+
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors ${childActive
+                                ? "bg-danger-bg text-primary"
+                                : "text-[#4B5563] hover:bg-danger-bg hover:text-primary"
+                              }`}
+                          >
+                            <ChildIcon size={14} strokeWidth={1.8} className="shrink-0" />
+                            <span className="truncate">{child.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+
+
                   {isUser && item.href === "/user-dashboard/enroll-service" && !collapsed && services.length > 0 && (
                     <button
                       type="button"
                       aria-label={enrollServicesOpen ? "Collapse enroll services" : "Expand enroll services"}
                       aria-expanded={enrollServicesOpen}
                       onClick={() => setEnrollServicesOpen((open) => !open)}
-                      className="absolute right-2 top-1.5 z-10 rounded-md p-1.5 text-[#4B5563] transition-colors hover:bg-primary-light hover:text-primary"
+                      className="absolute right-2 top-1.5 z-10 rounded-md p-1.5 text-[#4B5563] transition-colors hover:bg-danger-bg hover:text-primary"
                     >
                       <ChevronDown
                         size={15}
@@ -195,7 +241,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                                   current === category.label ? "" : category.label,
                                 )
                               }
-                              className="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-[#4B5563] transition-colors hover:bg-primary-light hover:text-primary"
+                              className="flex w-full items-center justify-between rounded-md px-2 py-1 text-left text-[10px] font-semibold uppercase tracking-wide text-[#4B5563] transition-colors hover:bg-danger-bg hover:text-primary"
                             >
                               <span className="flex min-w-0 items-center gap-2">
                                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-current" />
@@ -213,7 +259,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                                   <Link
                                     key={service.value}
                                     href={`/user-dashboard/enroll-service?service=${encodeURIComponent(service.value)}`}
-                                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[#4B5563] transition-colors hover:bg-primary-light hover:text-primary"
+                                    className="flex items-center gap-2 rounded-md px-2 py-1.5 text-xs text-[#4B5563] transition-colors hover:bg-danger-bg hover:text-primary"
                                   >
                                     {(() => {
                                       const ServiceIcon = SERVICE_ICONS[service.value] ?? FileText;
@@ -240,7 +286,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
             <Link
               href="/user-dashboard/enroll-service"
               title={collapsed ? "Become a filer" : undefined}
-              className={`group relative mx-3 mb-3 flex overflow-hidden rounded-md bg-primary-light text-primary transition-all duration-300 hover:opacity-90 ${
+              className={`group relative mx-3 mb-3 flex overflow-hidden rounded-md bg-danger-bg text-primary transition-all duration-300 hover:opacity-90 ${
                 collapsed
                   ? "h-[52px] items-center justify-center p-0"
                   : "min-h-[116px] flex-col items-stretch justify-between gap-4 p-4"

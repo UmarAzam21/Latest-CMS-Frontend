@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import ExpensesTable from "@/components/user-dashboard/expenseManager/ExpensesTable";
-import TrendChart from "@/components/user-dashboard/expenseManager/TrendChart";
+import ExpensesTable from "@/components/user-dashboard/expenseManager/expensesTable/ExpensesTable";
+import TrendChart from "@/components/user-dashboard/expenseManager/trendChart/TrendChart";
 import CategoryBreakdown from "@/components/user-dashboard/expenseManager/expenseCategory/CategoryBreakdown";
 import CategoryManagerDialog from "@/components/user-dashboard/expenseManager/expenseCategory/CategoryManagerDialog";
 import CardsManager from "@/components/user-dashboard/expenseManager/cardsManager/CardsManager";
@@ -11,7 +11,7 @@ import { EntryKind, FilterTab, IExpenseEntry } from "@/types/expenseManagerTy";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 import StatDetailDialog from "@/components/user-dashboard/expenseManager/expenseStats/StatDetailDialog";
 import ExpensesStats from "@/components/user-dashboard/expenseManager/expenseStats/ExpensesStats";
-import DebtSummaryCardV2 from "@/components/user-dashboard/expenseManager/DebtSummaryCardV2";
+import DebtSummaryCardV2 from "@/components/user-dashboard/expenseManager/debtCard/DebtSummaryCardV2";
 import NewEntryMenu from "@/components/user-dashboard/expenseManager/expenseStats/NewEntryMenu";
 import AdvancedExpenseWorkspaceV2 from "@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2";
 
@@ -26,7 +26,7 @@ export default function ExpenseManagerPage() {
     return (
         <div className="flex flex-col gap-brand-12">
             <div className="flex items-center justify-between border-b border-border-clr pb-brand-8">
-                <h1 className="heading-h6 text-sm leading-tight">Digital Khatta</h1>
+                <h1 className="heading-h6">Digital Khatta</h1>
 
                 <div className="flex gap-2">
                     <div className="flex items-center gap-2 para-tiny text-text-secondary-muter">

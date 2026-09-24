@@ -1,3 +1,5 @@
+// dashboard\lib\schemas\detailedEntrySchema.ts
+
 import { z } from "zod";
 export const detailedEntrySchema = z.object({
     subject: z.string().min(2, "Zaroori hai"),

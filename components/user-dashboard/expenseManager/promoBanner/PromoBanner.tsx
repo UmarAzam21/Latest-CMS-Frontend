@@ -1,5 +1,4 @@
 import { MoveLeft, FileText, Calculator, UserCheck, Building2 } from "lucide-react";
-import React from "react";
 
 const SKYLINE_BG = `data:image/svg+xml,${encodeURIComponent(`
 <svg xmlns='http://www.w3.org/2000/svg' width='420' height='110' viewBox='0 0 420 110'>

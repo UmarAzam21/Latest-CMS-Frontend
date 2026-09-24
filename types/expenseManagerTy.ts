@@ -1,3 +1,5 @@
+// dashboard\types\expenseManagerTy.ts
+
 import { LucideIcon } from "lucide-react";
 
 export type TrendDirection = "up" | "down";
