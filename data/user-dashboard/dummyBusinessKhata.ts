@@ -9,7 +9,7 @@ export const dummyStock: IStockItem[] = [
         buyingRate: 3200,
         sellingRate: 3600,
         quantity: 40,
-        unit: "box",
+        unit: "Box (box)",
         supplierName: "Ahmed Traders",
         supplierContact: "0300-1234567",
         date: "2026-09-01"
@@ -20,7 +20,7 @@ export const dummyStock: IStockItem[] = [
         buyingRate: 480,
         sellingRate: 560,
         quantity: 60,
-        unit: "ltr",
+        unit: "Liters (ltr)",
         supplierName: "Malik Suppliers",
         supplierContact: "0321-9876543",
         date: "2026-09-05"

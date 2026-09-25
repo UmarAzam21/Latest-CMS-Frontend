@@ -2,8 +2,8 @@
 
 import { LucideIcon } from "lucide-react";
 
-export type TrendDirection = "up" | "down";
-export type StatChipVariant = "green" | "blue" | "purple" | "red";
+export type TrendDirectionTy = "up" | "down";
+export type StatChipVariantTy = "green" | "blue" | "purple" | "red";
 
 export interface IExpenseStatItem {
   id: string;
@@ -11,12 +11,12 @@ export interface IExpenseStatItem {
   value: string;          // pre-formatted currency string from backend/formatter,
   // not a raw number, currency formatting is a display
   // concern, keep it out of the component's render logic
-  trendDirection: TrendDirection;
+  trendDirection: TrendDirectionTy;
   trendPercent: number;    // e.g. 16, 2, 23, 4, sign is implied by trendDirection
   trendLabel: string;      // "Increase since last month."
   isPositive: boolean; // NEW — whether the trend is good news; independent of arrow direction
   icon: LucideIcon;
-  chip: StatChipVariant;
+  chip: StatChipVariantTy;
 }
 
 export type EntryKind = "expense" | "income" | "debt";
@@ -74,14 +74,23 @@ export type FilterTab = "all" | EntryKind;
 
 // Human-facing labels only — internal kind values (expense/income/debt) stay
 // English so all existing code (filters, badges, schemas) is untouched.
-// export const KHATA_LABELS: Record<EntryKind, { title: string; verb: string; noun: string }> = {
-//   income: { title: "Total Aamdani", verb: "Add Aamdani", noun: "Aamdani" },
-//   expense: { title: "Total Kharcha", verb: "Add Kharcha", noun: "Kharcha" },
-//   debt: { title: "Total Udhaar", verb: "Add Udhaar", noun: "Udhaar" },
-// };
-
 export const KHATA_LABELS: Record<EntryKind, { title: string; verb: string; noun: string; subjectLabel: string }> = {
-  income: { title: "Total Aamdani", verb: "Add Aamdani", noun: "Aamdani", subjectLabel: "Kis se aamdani?" },
-  expense: { title: "Total Kharcha", verb: "Add Kharcha", noun: "Kharcha", subjectLabel: "Kis cheez ka kharcha?" },
-  debt: { title: "Total Udhaar", verb: "Add Udhaar", noun: "Udhaar", subjectLabel: "Kis ka udhaar?" },
+  income: {
+    title: "Total Aamdani",
+    verb: "Add Aamdani",
+    noun: "Aamdani",
+    subjectLabel: "Kis se aamdani?"
+  },
+  expense: {
+    title: "Total Kharcha",
+    verb: "Add Kharcha",
+    noun: "Kharcha",
+    subjectLabel: "Kis cheez ka kharcha?"
+  },
+  debt: {
+    title: "Total Udhaar",
+    verb: "Add Udhaar",
+    noun: "Udhaar",
+    subjectLabel: "Kis ka udhaar?"
+  },
 };

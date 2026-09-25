@@ -45,7 +45,7 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
             <Dialog.Trigger asChild>
                 <button
                     type="button"
-                    className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 py-2 para-small font-semibold text-text-secondary default-transition hover:bg-page-bg"
+                    className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-2.5 py-2 para-tiny font-semibold text-text-secondary default-transition hover:bg-page-bg cursor-pointer"
                 >
                     <Settings2 size={14} />
                     Categories
@@ -55,8 +55,8 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
                 <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-brand-16 bg-card-bg-clr p-brand shadow-card-hover">
-                    <div className="flex items-center justify-between border-b border-border-clr pb-brand-8 mb-brand-12">
-                        <Dialog.Title className="heading-h6">Manage Categories</Dialog.Title>
+                    <div className="flex items-center justify-between border-b border-border-clr pb-brand-8 mb-brand-8">
+                        <Dialog.Title className="heading-h6 text-[14px]">Manage Categories</Dialog.Title>
                         <Dialog.Close className="text-text-secondary-muter hover:text-text-secondary">
                             <X size={18} />
                         </Dialog.Close>
@@ -64,10 +64,10 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
 
                     <div className="flex flex-col gap-brand-8 max-h-64 overflow-y-auto">
                         {categories.map((c) => (
-                            <div key={c.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr px-3 py-2">
+                            <div key={c.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr p-2.5 cursor-pointer default-transition hover:bg-danger-bg">
                                 <div className="flex items-center gap-2">
                                     <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", COLOR_SWATCH_CLASS[c.color])} />
-                                    <span className="para-small">{c.label}</span>
+                                    <span className="para-tiny">{c.label}</span>
                                 </div>
 
                                 {confirmDeleteId === c.id ? (
@@ -89,7 +89,7 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                                 ) : (
                                     <button
                                         onClick={() => handleDeleteClick(c.id)}
-                                        className="text-text-secondary-muter hover:text-danger"
+                                        className="text-text-secondary-muter hover:text-danger cursor-pointer"
                                     >
                                         <Trash2 size={14} />
                                     </button>
@@ -101,7 +101,7 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                         )}
                     </div>
 
-                    <div className="mt-4 flex flex-col gap-3 border-t border-border-clr pt-4">
+                    <div className="mt-brand-12 flex flex-col gap-brand-12 border-t border-border-clr pt-brand-12">
                         <input
                             value={label}
                             onChange={(e) => setLabel(e.target.value)}
