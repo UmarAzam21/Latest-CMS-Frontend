@@ -9,7 +9,6 @@ import { dummyCards } from "@/data/user-dashboard/dummyCards";
 import { buildTrend, weekKey } from "@/lib/utils/trend";
 import { toast } from "sonner";
 
-// hooks/useExpenseManagerStore.ts — replace the 4 key lines with:
 
 // Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
 // RENAMED or REMOVED. Adding a new OPTIONAL field does NOT require a bump —
@@ -25,12 +24,16 @@ const STORAGE_KEY_MODE = `filernow_khata_mode_${SCHEMA_VERSION}`; // "demo" | "b
 // the current required shape (e.g. still using old `category` instead of
 // `categoryId`), auto-reseed instead of silently rendering broken/empty data.
 function isValidEntry(e: any): e is IExpenseEntry {
-  return e && typeof e.id === "string" && typeof e.kind === "string" &&
-    typeof e.categoryId === "string" && typeof e.amount === "number" && typeof e.date === "string";
+  return e &&
+    typeof e.id === "string" &&
+    typeof e.kind === "string" &&
+    typeof e.categoryId === "string" &&
+    typeof e.amount === "number" &&
+    typeof e.date === "string";
 }
 
 
-function readLocal<T>(key: string, fallback: T): T {
+function readLocalT<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
   try {
     const raw = window.localStorage.getItem(key);
@@ -57,7 +60,7 @@ export function useExpenseManagerStore() {
     const alreadySeeded = window.localStorage.getItem(STORAGE_KEY_SEEDED) === "true";
 
     if (alreadySeeded) {
-      const raw = readLocal<IExpenseEntry[]>(STORAGE_KEY_ENTRIES, []);
+      const raw = readLocalT<IExpenseEntry[]>(STORAGE_KEY_ENTRIES, []);
       const isHealthy = Array.isArray(raw) && (raw.length === 0 || raw.every(isValidEntry));
       setEntries(isHealthy ? raw : dummyExpenseEntries); // auto-heal on shape mismatch
     } else {
@@ -67,10 +70,10 @@ export function useExpenseManagerStore() {
 
     // Cards seed unconditionally, not gated behind entries' seeded flag,
     // since it's an independent dataset with its own storage key.
-    setCards(readLocal(STORAGE_KEY_CARDS, dummyCards));
-    setCategories(readLocal(STORAGE_KEY_CATEGORIES, defaultCategories));
+    setCards(readLocalT(STORAGE_KEY_CARDS, dummyCards));
+    setCategories(readLocalT(STORAGE_KEY_CATEGORIES, defaultCategories));
     setHasLoaded(true);
-    setDataMode((readLocal(STORAGE_KEY_MODE, "demo") as "demo" | "blank"));
+    setDataMode((readLocalT(STORAGE_KEY_MODE, "demo") as "demo" | "blank"));
   }, []);
 
   // Guarded: never persist before the load-effect has actually run, so we
@@ -85,14 +88,35 @@ export function useExpenseManagerStore() {
     window.localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
   }, [categories, hasLoaded]);
 
+  // load demo data
+  const loadDemoData = useCallback(() => {
+    setEntries(dummyExpenseEntries);
+    setCards(dummyCards);
+    window.localStorage.setItem(STORAGE_KEY_MODE, "demo");
+    setDataMode("demo");
+  }, []);
+
+  // reset to blank
+  const resetToBlank = useCallback(() => {
+    setEntries([]);
+    setCards([]);
+    window.localStorage.setItem(STORAGE_KEY_MODE, "blank");
+    setDataMode("blank");
+  }, []);
+
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
     try {
-      const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
+      const withBaseline = entry.kind === "debt"
+        ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount }
+        : entry;
+
       setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
+
       if (entry.cardId && entry.kind !== "debt") {
         const delta = entry.kind === "income" ? entry.amount : -entry.amount;
         setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
       }
+
       toast.success(`${entry.subject} saved`);
     } catch {
       toast.error("Couldn't save entry. Please try again.");
@@ -108,19 +132,23 @@ export function useExpenseManagerStore() {
 
         setCards((prevCards) => {
           let next = prevCards;
+
           if (old.cardId && old.kind !== "debt") {
             const reverse = old.kind === "income" ? -old.amount : old.amount;
             next = next.map((c) => (c.id === old.cardId ? { ...c, balance: c.balance + reverse } : c));
           }
+
           if (updated.cardId && updated.kind !== "debt") {
             const apply = updated.kind === "income" ? updated.amount : -updated.amount;
             next = next.map((c) => (c.id === updated.cardId ? { ...c, balance: c.balance + apply } : c));
           }
+
           return next;
         });
 
         return prev.map((e) => (e.id === id ? updated : e));
       });
+
       toast.success(`${patch.subject ?? "Entry"} updated`);
     } catch {
       toast.error("Couldn't update entry. Please try again.");
@@ -130,10 +158,12 @@ export function useExpenseManagerStore() {
   const deleteEntry = useCallback((id: string) => {
     setEntries((prev) => {
       const target = prev.find((e) => e.id === id);
+
       if (target?.cardId && target.kind !== "debt") {
         const reverse = target.kind === "income" ? -target.amount : target.amount;
         setCards((prevCards) => prevCards.map((c) => (c.id === target.cardId ? { ...c, balance: c.balance + reverse } : c)));
       }
+
       return prev.filter((e) => e.id !== id);
     });
   }, []);
@@ -146,20 +176,6 @@ export function useExpenseManagerStore() {
     }));
   }, []);
 
-  const loadDemoData = useCallback(() => {
-    setEntries(dummyExpenseEntries);
-    setCards(dummyCards);
-    window.localStorage.setItem(STORAGE_KEY_MODE, "demo");
-    setDataMode("demo");
-  }, []);
-
-  const resetToBlank = useCallback(() => {
-    setEntries([]);
-    setCards([]);
-    window.localStorage.setItem(STORAGE_KEY_MODE, "blank");
-    setDataMode("blank");
-  }, []);
-
   const addCategory = useCallback((label: string, color: ICategory["color"]) => {
     setCategories((prev) => [...prev, { id: crypto.randomUUID(), label, color }]);
   }, []);
@@ -170,6 +186,7 @@ export function useExpenseManagerStore() {
 
   const deleteCategory = useCallback((id: string) => {
     const fallback = categories.find((c) => c.label === "Other");
+
     setEntries((prev) =>
       prev.map((e) => (e.categoryId === id && fallback ? { ...e, categoryId: fallback.id } : e))
     );
@@ -179,9 +196,17 @@ export function useExpenseManagerStore() {
   const sortedEntries = useMemo(() => {
     return [...entries].sort((a, b) => {
       let cmp = 0;
-      if (sortField === "date") cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
-      if (sortField === "amount") cmp = a.amount - b.amount;
-      if (sortField === "subject") cmp = a.subject.localeCompare(b.subject);
+
+      if (sortField === "date") {
+        cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
+      }
+      if (sortField === "amount") {
+        cmp = a.amount - b.amount;
+      }
+      if (sortField === "subject") {
+        cmp = a.subject.localeCompare(b.subject);
+      }
+
       return sortDirection === "asc" ? cmp : -cmp;
     });
   }, [entries, sortField, sortDirection]);
@@ -216,11 +241,19 @@ export function useExpenseManagerStore() {
     }));
   }, []);
 
-
   const stats = useMemo(() => {
-    const totalIncome = entries.filter((e) => e.kind === "income").reduce((s, e) => s + e.amount, 0);
-    const totalExpenses = entries.filter((e) => e.kind === "expense").reduce((s, e) => s + e.amount, 0);
-    const totalDebt = entries.filter((e) => e.kind === "debt" && !e.isSettled).reduce((s, e) => s + e.amount, 0);
+    const totalIncome = entries
+      .filter((e) => e.kind === "income")
+      .reduce((s, e) => s + e.amount, 0);
+
+    const totalExpenses = entries
+      .filter((e) => e.kind === "expense")
+      .reduce((s, e) => s + e.amount, 0);
+
+    const totalDebt = entries
+      .filter((e) => e.kind === "debt" && !e.isSettled)
+      .reduce((s, e) => s + e.amount, 0);
+
     const balance = totalIncome - totalExpenses;
     const weeklyTrend = buildTrend(entries, weekKey, 8);
 
@@ -234,6 +267,7 @@ export function useExpenseManagerStore() {
       .filter((c) => c.amount > 0);
 
     const totalCategorized = categoryTotals.reduce((s, c) => s + c.amount, 0);
+
     const categoryBreakdown = categoryTotals.map((c) => ({
       ...c,
       percentOfTotal: totalCategorized > 0 ? Math.round((c.amount / totalCategorized) * 100) : 0,
@@ -242,8 +276,18 @@ export function useExpenseManagerStore() {
     const dailyTrend = buildTrend(entries, (d) => d.slice(0, 10), 7);
     const monthlyTrend = buildTrend(entries, (d) => d.slice(0, 7), 6);
 
-    return { totalIncome, totalExpenses, totalDebt, balance, categoryBreakdown, dailyTrend, weeklyTrend, monthlyTrend };
+    return {
+      totalIncome,
+      totalExpenses,
+      totalDebt,
+      balance,
+      categoryBreakdown,
+      dailyTrend,
+      weeklyTrend,
+      monthlyTrend
+    };
   }, [entries, categories]);
+
 
   return {
     entries: sortedEntries,
