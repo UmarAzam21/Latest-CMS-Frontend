@@ -5,18 +5,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import MajorServices from '@/components/user-dashboard/services/MajorServices';
-import Inbox from '@/components/user-dashboard/services/Inbox';
-import Outbox from '@/components/user-dashboard/services/Outbox';
-import Notices from '@/components/user-dashboard/services/Notices';
 import { useExpenseManagerStore } from '@/hooks/useExpenseManagerStore';
 import AdvancedExpenseWorkspaceV2 from '@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2';
 import PromoBanner from '@/components/user-dashboard/expenseManager/promoBanner/PromoBanner';
 import DigitalKhataDashboardCard from '@/components/user-dashboard/expenseManager/khata/DigitalKhataDashboardCard';
-import FbrTaskBoard from '@/components/user-dashboard/FbrTaskBoard';
+import FbrTaskBoard from '@/components/user-dashboard/FbrTaskBoard/FbrTaskBoard';
 import { Filter } from 'lucide-react';
-
-// type DashboardTab = 'inbox' | 'outbox' | 'notices';
-
 
 type DashboardTab = 'inbox' | 'draft' | 'outbox' | 'completed';
 
@@ -37,7 +31,6 @@ function DashboardOverviewContent() {
   const requestedTab = searchParams.get('tab');
   const serviceName = searchParams.get('service') || undefined;
   const tabsSectionRef = useRef<HTMLElement>(null);
-  // const [activeTab, setActiveTab] = useState<DashboardTab>(requestedTab === 'outbox' || requestedTab === 'notices' ? requestedTab : 'inbox');
   const [activeTab, setActiveTab] = useState<DashboardTab>(getDashboardTab(requestedTab));
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
@@ -61,14 +54,6 @@ function DashboardOverviewContent() {
       });
     }
   }, [requestedTab, serviceName]);
-
-
-
-  // const tabContent = {
-  //   inbox: <Inbox serviceName={serviceName} onSubmitted={() => setActiveTab('outbox')} />,
-  //   outbox: <Outbox />,
-  //   notices: <Notices />,
-  // };
 
   const tabContent = <FbrTaskBoard mode={activeTab} isFilterOpen={isFilterOpen} onCloseFilter={() => setIsFilterOpen(false)} />;
 
@@ -103,27 +88,6 @@ function DashboardOverviewContent() {
       </div>
 
       {/* Inbox Draft Tabs */}
-      {/* <section ref={tabsSectionRef} className="mt-brand-12 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-brand-12 shadow-card">
-        <div className="mb-4 flex items-center gap-1 border-b border-border-clr" role="tablist" aria-label="Dashboard messages">
-          {(['inbox', 'outbox', 'notices'] as const).map((tab) => (
-            <button
-              key={tab}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tab}
-              onClick={() => setActiveTab(tab)}
-              className={`border-b-2 px-3 py-2 para-small font-medium capitalize default-transition ${activeTab === tab
-                ? 'border-primary text-primary'
-                : 'border-transparent text-text-secondary hover:text-primary'
-                }`}
-            >
-              {tab}
-            </button>
-          ))}
-        </div>
-        {tabContent[activeTab]}
-      </section> */}
-
       <section ref={tabsSectionRef} className="mt-brand-12 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-brand-12 shadow-card">
         <div className="mb-4 flex items-center justify-between gap-4 border-b border-border-clr" role="tablist" aria-label="Dashboard messages">
           <div className="flex min-w-0 items-center gap-1 overflow-x-auto">

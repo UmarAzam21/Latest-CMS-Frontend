@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 import { useState } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import Topbar from "@/components/dashboard/Topbar";
-import NoticeModel from "@/components/user-dashboard/NoticeModel";
+import NoticeModel from "@/components/user-dashboard/NoticeModel/NoticeModel";
 
 export default function UserDashboardLayout({ children }: { children: ReactNode }) {
 	const [isNoticeOpen, setIsNoticeOpen] = useState(true);
@@ -17,7 +17,7 @@ export default function UserDashboardLayout({ children }: { children: ReactNode 
 					<div className="z-topbar shrink-0 bg-white">
 						<Topbar variant="user" />
 					</div>
-					<main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-brand-20x py-brandx p-brand">{children}</main>
+					<main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-brand-12 px-brand">{children}</main>
 				</div>
 			</div>
 			<NoticeModel isOpen={isNoticeOpen} onClose={() => setIsNoticeOpen(false)} />
