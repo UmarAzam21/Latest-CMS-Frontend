@@ -493,7 +493,7 @@ function FilterPanel({ filters, setFilters, onClear, onApply, onClose }: { filte
     );
 }
 
-function Field({ label, type = "text", value, placeholder, onChange, inputRef }: { label: string; type?: string; value: string; placeholder?: string; onChange: (value: string) => void; inputRef?: React.RefObject<HTMLInputElement> }) {
+function Field({ label, type = "text", value, placeholder, onChange, inputRef }: { label: string; type?: string; value: string; placeholder?: string; onChange: (value: string) => void; inputRef?: React.RefObject<HTMLInputElement | null> }) {
     return (
         <label className="grid gap-1.5 text-sm font-medium text-text-dark">
             {label}

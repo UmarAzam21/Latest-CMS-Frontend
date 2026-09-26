@@ -5,6 +5,9 @@ import { LucideIcon } from "lucide-react";
 export type TrendDirectionTy = "up" | "down";
 export type StatChipVariantTy = "green" | "blue" | "purple" | "red";
 
+export type TrendDirection = TrendDirectionTy;
+export type StatChipVariant = StatChipVariantTy;
+
 export interface IExpenseStatItem {
   id: string;
   title: string;

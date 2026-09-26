@@ -106,7 +106,7 @@ export default function Form({ serviceName, onSubmitted }: RegistrationFormProps
 								<LockKeyhole
 									size={16}
 									className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary-muter"
-                                ] />
+											/>
 							</div>
 						</label>
 

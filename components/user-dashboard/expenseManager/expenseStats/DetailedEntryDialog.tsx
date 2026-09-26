@@ -7,6 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { detailedEntrySchema, DetailedEntryValues } from "@/lib/schemas/detailedEntrySchema";
+import { getCategoriesForEntryKind } from "@/data/user-dashboard/defaultCategoriesData";
 import { ICard, ICategory, IExpenseEntry, EntryKind, KHATA_LABELS } from "@/types/expenseManagerTy";
 
 interface DetailedEntryDialogProps {
@@ -19,32 +20,55 @@ interface DetailedEntryDialogProps {
 }
 
 export default function DetailedEntryDialog({ kind, categories, cards, editingEntry, onClose, onSaved }: DetailedEntryDialogProps) {
+    const defaultCardId = cards[0]?.id ?? "";
     const { register, handleSubmit, reset, formState: { errors, isSubmitting } } = useForm<DetailedEntryValues>({
         resolver: zodResolver(detailedEntrySchema),
-        defaultValues: { date: new Date().toISOString().slice(0, 10) },
+        defaultValues: {
+            date: new Date().toISOString().slice(0, 10),
+            cardId: defaultCardId,
+        },
     });
     const activeKind = editingEntry?.kind ?? kind;
     const open = activeKind !== null;
+    const categoryOptions = getCategoriesForEntryKind(activeKind, categories);
 
     useEffect(() => {
+        const nextDate = new Date().toISOString().slice(0, 10);
+        const fallbackCategoryId = categoryOptions[0]?.id ?? "";
+
         if (editingEntry) {
             reset({
                 subject: editingEntry.subject,
-                categoryId: editingEntry.categoryId,
+                categoryId: editingEntry.categoryId || fallbackCategoryId,
                 amount: editingEntry.amount,
                 date: editingEntry.date.slice(0, 10),
                 description: editingEntry.description,
-                cardId: editingEntry.cardId ?? "",
-                isSettled: editingEntry.isSettled
+                cardId: editingEntry.cardId ?? defaultCardId,
+                isSettled: editingEntry.isSettled,
             });
         } else if (kind) {
-            reset({ date: new Date().toISOString().slice(0, 10) });
+            reset({
+                date: nextDate,
+                categoryId: fallbackCategoryId,
+                cardId: defaultCardId,
+            });
         }
-    }, [editingEntry, kind, reset]);
+    }, [defaultCardId, editingEntry, kind, categoryOptions, reset]);
 
     const submit = (values: DetailedEntryValues) => {
         if (!activeKind) return;
-        onSaved({ ...values, kind: activeKind });
+
+        const normalized = {
+            ...values,
+            subject: values.subject.trim(),
+            description: values.description?.trim() || undefined,
+            categoryId: values.categoryId || "cat-other",
+            kind: activeKind,
+            cardId: activeKind === "debt" ? undefined : (values.cardId || undefined),
+            isSettled: activeKind === "debt" ? Boolean(values.isSettled) : false,
+        };
+
+        onSaved(normalized);
         onClose();
     };
 
@@ -81,7 +105,7 @@ export default function DetailedEntryDialog({ kind, categories, cards, editingEn
                                     className="w-full rounded-brand-8 border border-border-clr px-3 py-2 para-small outline-none focus:border-primary"
                                 >
                                     <option value="" disabled>Chunein</option>
-                                    {categories.map((c) => (
+                                    {categoryOptions.map((c) => (
                                         <option key={c.id} value={c.id}>
                                             {c.label}
                                         </option>
