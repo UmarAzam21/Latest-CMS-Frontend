@@ -59,7 +59,7 @@ function DashboardOverviewContent() {
 
   return (
     <div>
-      <div className="pb-2 mb-3 border-b border-slate-200">
+      <div className="mb-3 ">
         <h1 className="heading-h6 text-sm leading-tight">
           Welcome Back, <span className="text-primary">User!</span>
         </h1>
@@ -89,7 +89,7 @@ function DashboardOverviewContent() {
 
       {/* Inbox Draft Tabs */}
       <section ref={tabsSectionRef} className="mt-brand-12 scroll-mt-20 rounded-brand-12 border border-border-clr bg-white p-brand-12 shadow-card">
-        <div className="mb-4 flex items-center justify-between gap-4 border-b border-border-clr" role="tablist" aria-label="Dashboard messages">
+        <div className="mb-4 flex items-center justify-between gap-4 border-b pb-2 border-border-clr" role="tablist" aria-label="Dashboard messages">
           <div className="flex min-w-0 items-center gap-1 overflow-x-auto">
             {dashboardTabs.map((tab) => (
               <button

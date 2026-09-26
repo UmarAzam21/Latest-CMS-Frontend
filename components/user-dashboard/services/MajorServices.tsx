@@ -37,12 +37,12 @@ const MajorServices = () => {
       </div>
 
       {/* bottom cta */}
-      <div className="flex self-end">
+      <div className="flex self-center items-center gap-1 rounded-brand-8 bg-primary/5 px-4 py-2">
         <button
           type="button"
-          className="flex items-center gap-1 para-small font-medium text-primary default-transition transition-opacity hover:opacity-70 cursor-pointer group"
+          className="flex items-center gap-1 para-tiny font-medium text-primary default-transition transition-opacity hover:opacity-70 cursor-pointer group"
         >
-          View all
+          View all Services
           <ChevronRight size={16} className="group-hover:translate-x-0.5 default-transition" />
         </button>
       </div>

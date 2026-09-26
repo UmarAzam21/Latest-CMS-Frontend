@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import { useState } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
-import Topbar from "@/components/dashboard/Topbar";
+import Topbar from "@/components/user-dashboard/Topbar";
 import NoticeModel from "@/components/user-dashboard/NoticeModel/NoticeModel";
 
 export default function UserDashboardLayout({ children }: { children: ReactNode }) {
