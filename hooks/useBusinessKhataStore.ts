@@ -5,11 +5,16 @@ import { useState, useEffect, useCallback } from "react";
 import { IStockItem, IBill, ICashEntry } from "@/types/businessKhataTy";
 import { dummyStock, dummyBills, dummyCash } from "@/data/user-dashboard/dummyBusinessKhata";
 
-const SCHEMA_VERSION = "v1";
+const SCHEMA_VERSION = "v2";
 const K_STOCK = `filernow_bk_stock_${SCHEMA_VERSION}`;
 const K_BILLS = `filernow_bk_bills_${SCHEMA_VERSION}`;
 const K_CASH = `filernow_bk_cash_${SCHEMA_VERSION}`;
 const K_SEEDED = `filernow_bk_seeded_${SCHEMA_VERSION}`;
+
+// add validity guards, mirroring isValidEntry:
+function isValidStock(s: any): s is IStockItem { return s && typeof s.id === "string" && typeof s.itemName === "string" && typeof s.buyingRate === "number"; }
+function isValidBill(b: any): b is IBill { return b && typeof b.id === "string" && typeof b.customerName === "string" && Array.isArray(b.items); }
+function isValidCash(c: any): c is ICashEntry { return c && typeof c.id === "string" && typeof c.direction === "string" && typeof c.amount === "number"; }
 
 function readLocal<T>(key: string, fb: T): T {
     if (typeof window === "undefined") return fb;
@@ -30,13 +35,14 @@ export function useBusinessKhataStore() {
     useEffect(() => {
         const seeded = localStorage.getItem(K_SEEDED) === "true";
         if (seeded) {
-            setStock(readLocal(K_STOCK, []));
-            setBills(readLocal(K_BILLS, []));
-            setCash(readLocal(K_CASH, []));
+            const rawStock = readLocal<IStockItem[]>(K_STOCK, []);
+            const rawBills = readLocal<IBill[]>(K_BILLS, []);
+            const rawCash = readLocal<ICashEntry[]>(K_CASH, []);
+            setStock(rawStock.length === 0 || rawStock.every(isValidStock) ? rawStock : dummyStock);
+            setBills(rawBills.length === 0 || rawBills.every(isValidBill) ? rawBills : dummyBills);
+            setCash(rawCash.length === 0 || rawCash.every(isValidCash) ? rawCash : dummyCash);
         } else {
-            setStock(dummyStock);
-            setBills(dummyBills);
-            setCash(dummyCash);
+            setStock(dummyStock); setBills(dummyBills); setCash(dummyCash);
             localStorage.setItem(K_SEEDED, "true");
         }
         setLoaded(true);
