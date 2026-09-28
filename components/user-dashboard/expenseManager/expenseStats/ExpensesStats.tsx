@@ -1,8 +1,8 @@
 // components/user-dashboard/expenseManager/ExpensesStats.tsx
 "use client";
 
-import { Wallet, TrendingUp, TrendingDown, CircleDollarSign } from "lucide-react";
-import { IExpenseEntry, ICategory, EntryKind, IExpenseStatItem, KHATA_LABELS, ICard } from "@/types/expenseManagerTy";
+import { Wallet, TrendingUp, TrendingDown, CircleDollarSign, Pencil } from "lucide-react";
+import { IExpenseEntry, ICategory, EntryKind, IExpenseStatItem, KHATA_LABELS, ICard, MAX_CARDS } from "@/types/expenseManagerTy";
 import { exportEntriesToCsv } from "@/lib/utils/exportCsv";
 import ExpenseStatCard from "./ExpensesStatCard";
 import { useState } from "react";
@@ -79,12 +79,14 @@ export default function ExpensesStats({ entries = [], categories = [], cards = [
     const exp = monthlyDelta(entries, "expense");
     const debt = monthlyDelta(entries, "debt");
 
+    const cardsBalance = cards.reduce((s, c) => s + c.balance, 0);
 
     const items: (IExpenseStatItem & { filterKind: EntryKind | "all"; ctaLabel?: string })[] = [
         {
             id: "cardBalance",
             title: "Total Cards Balance",
-            value: `PKR ${balance.toLocaleString("en-PK")}`,
+            // value: `PKR ${balance.toLocaleString("en-PK")}`,
+            value: `PKR ${cardsBalance.toLocaleString("en-PK")}`,
             trendDirection: bal.direction,
             trendPercent: bal.percent,
             trendLabel: "vs last month",
@@ -147,9 +149,12 @@ export default function ExpensesStats({ entries = [], categories = [], cards = [
                         />
                         <button
                             onClick={() => setCardDialogOpen(true)}
-                            className="absolute bottom-3.5 right-brand-12 rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary hover:bg-primary hover:text-white"
+                            disabled={cards.length >= MAX_CARDS}
+                            title={cards.length >= MAX_CARDS ? `Max ${MAX_CARDS} cards` : undefined}
+                            className="absolute bottom-3.5 right-brand-12 rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                            + Add Card
+                            {/* + Add Card */}
+                            <Pencil size={14} />
                         </button>
                     </div>
                 ) : (

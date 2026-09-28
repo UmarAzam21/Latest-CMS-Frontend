@@ -2,7 +2,7 @@
 
 "use client";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { MoreHorizontal, ArrowUp, ArrowDown, Eye, Download } from "lucide-react";
+import { MoreHorizontal, ArrowUp, ArrowDown, Eye, Download, Pencil } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { IExpenseStatItem, StatChipVariant } from "@/types/expenseManagerTy";
 
@@ -75,7 +75,12 @@ export default function ExpenseStatCard({ item, onView, onExport, ctaLabel, onCt
 
       <div className="flex flex-col justify-between gap-brand-8x gap-1">
         <span className="heading-h6 text-text-dark group-hover:text-primary default-transition">
-          {item.value}
+          <div className="flex items-center gap-3">
+            {item.value}
+            <Pencil size={13}
+            // onClick={(e) => { e.stopPropagation(); onCtaClick?.(); }}
+            />
+          </div>
         </span>
 
         <div className="flex items-center justify-between gap-brand-8">
@@ -95,7 +100,8 @@ export default function ExpenseStatCard({ item, onView, onExport, ctaLabel, onCt
               onClick={(e) => { e.stopPropagation(); onCtaClick?.(); }}
               className="self-end rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary default-transition hover:bg-primary hover:text-white"
             >
-              + {ctaLabel}
+              {/* + {ctaLabel} */}
+              {/* <Pencil size={14} /> */}
             </button>
           )}
         </div>

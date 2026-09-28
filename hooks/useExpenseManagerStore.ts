@@ -8,12 +8,14 @@ import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
 import { buildTrend, weekKey } from "@/lib/utils/trend";
 import { toast } from "sonner";
+import { cardDelta } from "@/lib/utils/cardDelta";
+import { EntryKind, MAX_CARDS } from "@/types/expenseManagerTy"; // merge into your existing import
 
 
 // Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
 // RENAMED or REMOVED. Adding a new OPTIONAL field does NOT require a bump —
 // old stored JSON simply parses with that field undefined, which is valid.
-const SCHEMA_VERSION = "v5";
+const SCHEMA_VERSION = "v6";
 const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
 const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
@@ -71,7 +73,9 @@ export function useExpenseManagerStore() {
     // Cards seed unconditionally, not gated behind entries' seeded flag,
     // since it's an independent dataset with its own storage key.
     setCards(readLocalT(STORAGE_KEY_CARDS, dummyCards));
-    setCategories(readLocalT(STORAGE_KEY_CATEGORIES, defaultCategories));
+    // setCategories(readLocalT(STORAGE_KEY_CATEGORIES, defaultCategories));
+    const rawCats = readLocalT<ICategory[]>(STORAGE_KEY_CATEGORIES, defaultCategories);
+    setCategories(Array.isArray(rawCats) && rawCats.every((c) => typeof c.kind === "string") ? rawCats : defaultCategories);
     setHasLoaded(true);
     setDataMode((readLocalT(STORAGE_KEY_MODE, "demo") as "demo" | "blank"));
   }, []);
@@ -104,94 +108,119 @@ export function useExpenseManagerStore() {
     setDataMode("blank");
   }, []);
 
+  // ONE place that changes card balances + shows the separate balance toast.
+  const applyCardDeltas = useCallback((deltas: Record<string, number>) => {
+    const touched = Object.entries(deltas).filter(([, d]) => d !== 0);
+    if (touched.length === 0) return;
+    setCards((prev) => prev.map((c) => (deltas[c.id] ? { ...c, balance: c.balance + deltas[c.id] } : c)));
+    touched.forEach(([id, d]) => {
+      const card = cards.find((c) => c.id === id);
+      if (card) toast.success(`${card.label}: ${d > 0 ? "+" : "-"}PKR ${Math.abs(d).toLocaleString("en-PK")} (naya balance PKR ${(card.balance + d).toLocaleString("en-PK")})`);
+    });
+  }, [cards]);
+
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-    try {
-      const withBaseline = entry.kind === "debt"
-        ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount }
-        : entry;
-
-      setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
-
-      if (entry.cardId && entry.kind !== "debt") {
-        const delta = entry.kind === "income" ? entry.amount : -entry.amount;
-        setCards((prev) => prev.map((c) => (c.id === entry.cardId ? { ...c, balance: c.balance + delta } : c)));
-      }
-
-      toast.success(`${entry.subject} saved`);
-    } catch {
-      toast.error("Couldn't save entry. Please try again.");
-    }
-  }, []);
+    const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
+    setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
+    toast.success(`${entry.subject} save ho gaya`);
+    if (entry.cardId) applyCardDeltas({ [entry.cardId]: cardDelta(entry) });
+  }, [applyCardDeltas]);
 
   const updateEntry = useCallback((id: string, patch: Partial<IExpenseEntry>) => {
-    try {
-      setEntries((prev) => {
-        const old = prev.find((e) => e.id === id);
-        if (!old) return prev;
-        const updated = { ...old, ...patch };
-
-        setCards((prevCards) => {
-          let next = prevCards;
-
-          if (old.cardId && old.kind !== "debt") {
-            const reverse = old.kind === "income" ? -old.amount : old.amount;
-            next = next.map((c) => (c.id === old.cardId ? { ...c, balance: c.balance + reverse } : c));
-          }
-
-          if (updated.cardId && updated.kind !== "debt") {
-            const apply = updated.kind === "income" ? updated.amount : -updated.amount;
-            next = next.map((c) => (c.id === updated.cardId ? { ...c, balance: c.balance + apply } : c));
-          }
-
-          return next;
-        });
-
-        return prev.map((e) => (e.id === id ? updated : e));
-      });
-
-      toast.success(`${patch.subject ?? "Entry"} updated`);
-    } catch {
-      toast.error("Couldn't update entry. Please try again.");
+    const old = entries.find((e) => e.id === id);
+    if (!old) return;
+    const updated = { ...old, ...patch };
+    setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
+    toast.success(`${updated.subject} update ho gaya`);
+    // Debt card effects are ledger-style (applied at creation + each payment),
+    // never re-computed on edit. Income/expense are reconciled here.
+    if (updated.kind !== "debt") {
+      const deltas: Record<string, number> = {};
+      if (old.cardId) deltas[old.cardId] = (deltas[old.cardId] ?? 0) - cardDelta(old);
+      if (updated.cardId) deltas[updated.cardId] = (deltas[updated.cardId] ?? 0) + cardDelta(updated);
+      applyCardDeltas(deltas);
     }
-  }, []);
+  }, [entries, applyCardDeltas]);
 
   const deleteEntry = useCallback((id: string) => {
-    setEntries((prev) => {
-      const target = prev.find((e) => e.id === id);
-
-      if (target?.cardId && target.kind !== "debt") {
-        const reverse = target.kind === "income" ? -target.amount : target.amount;
-        setCards((prevCards) => prevCards.map((c) => (c.id === target.cardId ? { ...c, balance: c.balance + reverse } : c)));
-      }
-
-      return prev.filter((e) => e.id !== id);
-    });
-  }, []);
+    const target = entries.find((e) => e.id === id);
+    if (!target) return;
+    setEntries((prev) => prev.filter((e) => e.id !== id));
+    toast.success(`${target.subject} delete ho gaya`);
+    if (target.cardId && target.kind !== "debt") applyCardDeltas({ [target.cardId]: -cardDelta(target) });
+  }, [entries, applyCardDeltas]);
 
   const makeDebtPayment = useCallback((id: string, paymentAmount: number) => {
-    setEntries((prev) => prev.map((e) => {
-      if (e.id !== id) return e;
-      const remaining = Math.max(0, e.amount - paymentAmount);
-      return { ...e, amount: remaining, isSettled: remaining === 0 };
-    }));
-  }, []);
+    const target = entries.find((e) => e.id === id);
+    if (!target || paymentAmount <= 0) return;
+    const paid = Math.min(paymentAmount, target.amount);
+    const remaining = target.amount - paid;
+    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, amount: remaining, isSettled: remaining === 0 } : e)));
+    toast.success(remaining === 0 ? `${target.subject} settle ho gaya` : `${target.subject}: PKR ${paid.toLocaleString("en-PK")} ada, baaki PKR ${remaining.toLocaleString("en-PK")}`);
+    // lena = I owe -> paying reduces my card; dena = they owe me -> receiving increases it
+    if (target.cardId && target.debtDirection) applyCardDeltas({ [target.cardId]: target.debtDirection === "liya" ? -paid : paid });
+  }, [entries, applyCardDeltas]);
 
-  const addCategory = useCallback((label: string, color: ICategory["color"]) => {
-    setCategories((prev) => [...prev, { id: crypto.randomUUID(), label, color }]);
-  }, []);
+  const addCategory = useCallback((label: string, color: ICategory["color"], kind: EntryKind) => {
+    const clean = label.trim();
+    if (categories.some((c) => c.kind === kind && c.label.toLowerCase() === clean.toLowerCase())) {
+      toast.error(`"${clean}" pehle se maujood hai`); return;
+    }
+    setCategories((prev) => [...prev, { id: crypto.randomUUID(), label: clean, color, kind }]);
+    toast.success(`${clean} category add ho gayi`);
+  }, [categories]);
 
   const updateCategory = useCallback((id: string, patch: Partial<ICategory>) => {
     setCategories((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
   }, []);
 
   const deleteCategory = useCallback((id: string) => {
-    const fallback = categories.find((c) => c.label === "Other");
-
-    setEntries((prev) =>
-      prev.map((e) => (e.categoryId === id && fallback ? { ...e, categoryId: fallback.id } : e))
-    );
+    const target = categories.find((c) => c.id === id);
+    if (!target) return;
+    if (target.kind === "debt") { toast.error("Udhaar categories delete nahi ho sakti"); return; }
+    const fallback = categories.find((c) => c.kind === target.kind && c.label === "Other" && c.id !== id);
+    if (!fallback) { toast.error(`"Other" category delete nahi ho sakti`); return; }
+    setEntries((prev) => prev.map((e) => (e.categoryId === id ? { ...e, categoryId: fallback.id } : e)));
     setCategories((prev) => prev.filter((c) => c.id !== id));
+    toast.success(`${target.label} delete ho gayi (entries "Other" me chali gayin)`);
   }, [categories]);
+
+  const addCard = useCallback((card: Omit<ICard, "id">) => {
+    if (cards.length >= MAX_CARDS) { toast.error(`Sirf ${MAX_CARDS} cards add ho sakte hain`); return; }
+    setCards((prev) => [...prev, { ...card, id: crypto.randomUUID() }]);
+    toast.success(`${card.label} add ho gaya`);
+  }, [cards.length]);
+
+  const updateCard = useCallback((id: string, patch: Partial<ICard>) => {
+    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
+    toast.success("Card update ho gaya");
+  }, []);
+
+  const deleteCard = useCallback((id: string) => {
+    const target = cards.find((c) => c.id === id);
+    setCards((prev) => prev.filter((c) => c.id !== id));
+    setEntries((prev) => prev.map((e) => (e.cardId === id ? { ...e, cardId: undefined } : e)));
+    if (target) toast.success(`${target.label} delete ho gaya`);
+  }, [cards]);
+
+  // new persist effect
+  useEffect(() => {
+    if (!hasLoaded) return;
+    window.localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(cards));
+  }, [cards, hasLoaded]);
+
+  const adjustCardBalance = useCallback((id: string, delta: number) => {
+    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, balance: c.balance + delta } : c)));
+  }, []);
+
+  const transferBetweenCards = useCallback((fromId: string, toId: string, amount: number) => {
+    const from = cards.find((c) => c.id === fromId);
+    const to = cards.find((c) => c.id === toId);
+    if (!from || !to || fromId === toId || amount <= 0) { toast.error("Alag alag cards chunein"); return; }
+    if (from.balance < amount) { toast.error(`${from.label} me itna balance nahi hai`); return; }
+    setCards((prev) => prev.map((c) => (c.id === fromId ? { ...c, balance: c.balance - amount } : c.id === toId ? { ...c, balance: c.balance + amount } : c)));
+    toast.success(`PKR ${amount.toLocaleString("en-PK")} ${from.label} se ${to.label} me transfer hue`);
+  }, [cards]);
 
   const sortedEntries = useMemo(() => {
     return [...entries].sort((a, b) => {
@@ -210,36 +239,6 @@ export function useExpenseManagerStore() {
       return sortDirection === "asc" ? cmp : -cmp;
     });
   }, [entries, sortField, sortDirection]);
-
-  // new persist effect
-  useEffect(() => {
-    if (!hasLoaded) return;
-    window.localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(cards));
-  }, [cards, hasLoaded]);
-
-  const addCard = useCallback((card: Omit<ICard, "id">) => {
-    setCards((prev) => [...prev, { ...card, id: crypto.randomUUID() }]);
-  }, []);
-
-  const updateCard = useCallback((id: string, patch: Partial<ICard>) => {
-    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, ...patch } : c)));
-  }, []);
-
-  const deleteCard = useCallback((id: string) => {
-    setCards((prev) => prev.filter((c) => c.id !== id));
-  }, []);
-
-  const adjustCardBalance = useCallback((id: string, delta: number) => {
-    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, balance: c.balance + delta } : c)));
-  }, []);
-
-  const transferBetweenCards = useCallback((fromId: string, toId: string, amount: number) => {
-    setCards((prev) => prev.map((c) => {
-      if (c.id === fromId) return { ...c, balance: c.balance - amount };
-      if (c.id === toId) return { ...c, balance: c.balance + amount };
-      return c;
-    }));
-  }, []);
 
   const stats = useMemo(() => {
     const totalIncome = entries
