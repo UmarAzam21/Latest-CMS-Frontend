@@ -126,7 +126,7 @@ function CompactSelect({
                     border border-border-clr
                     bg-page-bg
                     pl-2.5 pr-7
-                    text-[10px]
+                    para-small
                     font-semibold
                     text-text-secondary
                     outline-none
@@ -170,7 +170,7 @@ function ChartLegend({
                 return (
                     <span
                         key={kind}
-                        className="flex items-center gap-1.5 text-[10px] font-medium text-text-secondary"
+                        className="flex items-center gap-1.5 para-small font-medium text-text-secondary"
                     >
                         <span
                             className="h-2 w-2 rounded-full"
@@ -214,7 +214,7 @@ export default function TrendChart({
                             {title}
                         </h3>
 
-                        <p className="para-tiny text-text-secondary-muter">
+                        <p className="para-small text-text-secondary-muter">
                             Spending activity
                         </p>
                     </div>
@@ -233,7 +233,7 @@ export default function TrendChart({
                             No activity yet
                         </p>
 
-                        <p className="mt-0.5 para-tiny text-text-secondary-muter">
+                        <p className="mt-0.5 para-small text-text-secondary-muter">
                             Your financial activity will appear here.
                         </p>
                     </div>
@@ -261,7 +261,7 @@ export default function TrendChart({
                                 {title}
                             </h3>
 
-                            <p className="para-tiny text-text-secondary-muter">
+                            <p className="para-small text-text-secondary-muter">
                                 Expense distribution
                             </p>
                         </div>
@@ -349,7 +349,7 @@ export default function TrendChart({
                     </ResponsiveContainer>
 
                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-[10px] text-text-secondary-muter">
+                        <span className="para-small text-text-secondary-muter">
                             Total
                         </span>
 
@@ -376,14 +376,14 @@ export default function TrendChart({
                                 }}
                             />
 
-                            <span className="truncate text-[10px] text-text-secondary">
+                            <span className="truncate para-small text-text-secondary">
                                 {formatTick(
                                     item.label,
                                     granularity
                                 )}
                             </span>
 
-                            <span className="ml-auto text-[10px] font-semibold text-text-dark">
+                            <span className="ml-auto para-small font-semibold text-text-dark">
                                 PKR{" "}
                                 {formatAmount(
                                     item.expense
@@ -416,7 +416,7 @@ export default function TrendChart({
                             {title}
                         </h3>
 
-                        <p className="para-tiny text-text-secondary-muter">
+                        <p className="para-small text-text-secondary-muter">
                             Income, expenses & debt
                         </p>
                     </div>
@@ -506,7 +506,7 @@ export default function TrendChart({
                                 )
                             }
                             tick={{
-                                fontSize: 9,
+                                fontSize: 14,
                                 fill: "var(--text-secondary-muter)",
                             }}
                             axisLine={false}
@@ -521,7 +521,7 @@ export default function TrendChart({
                                 )
                             }
                             tick={{
-                                fontSize: 9,
+                                fontSize: 14,
                                 fill: "var(--text-secondary-muter)",
                             }}
                             axisLine={false}
@@ -554,7 +554,7 @@ export default function TrendChart({
                                 border: "1px solid var(--border-clr)",
                                 boxShadow:
                                     "0 8px 24px rgba(0,0,0,0.06)",
-                                fontSize: 10,
+                                fontSize: 14,
                             }}
                         />
 

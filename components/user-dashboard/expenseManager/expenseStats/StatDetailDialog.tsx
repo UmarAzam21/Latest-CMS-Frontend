@@ -51,7 +51,7 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
 
                     <div className="mb-4 flex items-center justify-between">
                         <div>
-                            <p className="para-tiny text-text-secondary-muter">{filtered.length} entries</p>
+                            <p className="para-small text-text-secondary-muter">{filtered.length} entries</p>
                             <p className="heading-h3 text-text-dark">PKR {total.toLocaleString("en-PK")}</p>
                         </div>
                         <div className="flex gap-1">
@@ -59,7 +59,7 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
                                 <button
                                     key={g}
                                     onClick={() => setGranularity(g)}
-                                    className={`rounded-brand-8 px-3 py-1.5 para-tiny font-semibold ${granularity === g ? "bg-primary text-white" : "bg-page-bg text-text-secondary"}`}
+                                    className={`rounded-brand-8 px-3 py-1.5 para-small font-semibold ${granularity === g ? "bg-primary text-white" : "bg-page-bg text-text-secondary"}`}
                                 >
                                     {g[0].toUpperCase() + g.slice(1)}
                                 </button>
@@ -76,8 +76,8 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
                                 </linearGradient>
                             </defs>
                             <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                            <XAxis dataKey="label" tick={{ fontSize: 11, fill: "#9CA3AF" }} />
-                            <YAxis tick={{ fontSize: 11, fill: "#9CA3AF" }} />
+                            <XAxis dataKey="label" tick={{ fontSize: 14, fill: "#9CA3AF" }} />
+                            <YAxis tick={{ fontSize: 14, fill: "#9CA3AF" }} />
                             <Tooltip
                                 formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Amount"]}
                                 contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }}
@@ -92,7 +92,7 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
                             <div key={e.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr px-3 py-2">
                                 <div>
                                     <p className="para-small font-medium text-text-dark">{e.subject}</p>
-                                    <p className="para-tiny text-text-secondary-muter">
+                                    <p className="para-small text-text-secondary-muter">
                                         {catLabel(e.categoryId)} · {new Date(e.date).toLocaleDateString("en-GB")}
                                     </p>
                                 </div>

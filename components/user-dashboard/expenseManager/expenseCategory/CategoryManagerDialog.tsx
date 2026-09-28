@@ -30,7 +30,7 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
     return (
         <Dialog.Root onOpenChange={(o) => !o && setConfirmId(null)}>
             <Dialog.Trigger asChild>
-                <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-brand-8 border border-border-clr px-2.5 py-2 para-tiny font-semibold text-text-secondary default-transition hover:bg-page-bg">
+                <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-brand-8 border border-border-clr px-2.5 py-2 para-small font-semibold text-text-secondary default-transition hover:bg-page-bg">
                     <Settings2 size={14} /> Categories
                 </button>
             </Dialog.Trigger>
@@ -45,7 +45,7 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                     <div className="mb-brand-8 flex gap-1">
                         {KINDS.map((k) => (
                             <button key={k} onClick={() => { setTab(k); setConfirmId(null); }}
-                                className={cn("flex-1 rounded-brand-8 px-2 py-1.5 para-tiny font-semibold default-transition", tab === k ? "bg-primary text-white" : "bg-page-bg text-text-secondary hover:bg-border-clr")}>
+                                className={cn("flex-1 rounded-brand-8 px-2 py-1.5 para-small font-semibold default-transition", tab === k ? "bg-primary text-white" : "bg-page-bg text-text-secondary hover:bg-border-clr")}>
                                 {KHATA_LABELS[k].noun}
                             </button>
                         ))}
@@ -58,15 +58,15 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                                 <div key={c.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2">
                                     <div className="flex items-center gap-2">
                                         <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", SWATCH[c.color])} />
-                                        <span className="para-tiny">{c.label}</span>
+                                        <span className="para-small">{c.label}</span>
                                     </div>
                                     {locked ? (
                                         <Lock size={12} className="text-text-secondary-muter" aria-label="Default category" />
                                     ) : confirmId === c.id ? (
                                         <div className="flex items-center gap-1.5">
-                                            <span className="para-tiny text-text-secondary-muter">Delete?</span>
-                                            <button onClick={() => { onDelete(c.id); setConfirmId(null); }} className="rounded-brand-8 bg-danger px-2 py-1 para-tiny font-semibold text-white">Confirm</button>
-                                            <button onClick={() => setConfirmId(null)} className="rounded-brand-8 border border-border-clr px-2 py-1 para-tiny font-semibold text-text-secondary">Cancel</button>
+                                            <span className="para-small text-text-secondary-muter">Delete?</span>
+                                            <button onClick={() => { onDelete(c.id); setConfirmId(null); }} className="rounded-brand-8 bg-danger px-2 py-1 para-small font-semibold text-white">Confirm</button>
+                                            <button onClick={() => setConfirmId(null)} className="rounded-brand-8 border border-border-clr px-2 py-1 para-small font-semibold text-text-secondary">Cancel</button>
                                         </div>
                                     ) : (
                                         <button onClick={() => setConfirmId(c.id)} className="cursor-pointer text-text-secondary-muter hover:text-danger"><Trash2 size={14} /></button>
@@ -77,7 +77,7 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                     </div>
 
                     {tab === "debt" ? (
-                        <p className="mt-brand-8 border-t border-border-clr pt-brand-8 para-tiny text-text-secondary-muter">Udhaar ki 2 categories fixed hain (Lena / Dena), kyunke card balance inhi se tay hota hai.</p>
+                        <p className="mt-brand-8 border-t border-border-clr pt-brand-8 para-small text-text-secondary-muter">Udhaar ki 2 categories fixed hain (Lena / Dena), kyunke card balance inhi se tay hota hai.</p>
                     ) : (
                         <div className="mt-brand-8 flex flex-col gap-brand-8 border-t border-border-clr pt-brand-8">
                             <input value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Naye category ka naam (jaise: Freelance)"

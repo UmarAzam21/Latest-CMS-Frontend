@@ -114,7 +114,7 @@ export default function DetailedEntryDialog({ kind, categories, cards, editingEn
                         </div>
 
                         {activeKind === "debt" && editingEntry && (
-                            <label className="flex items-center gap-2 para-tiny text-text-secondary">
+                            <label className="flex items-center gap-2 para-small text-text-secondary">
                                 <input type="checkbox" {...register("isSettled")} /> Ada ho gaya (Settled)
                             </label>
                         )}
@@ -136,9 +136,9 @@ export default function DetailedEntryDialog({ kind, categories, cards, editingEn
 function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
     return (
         <div className="flex flex-col gap-1">
-            <label className="para-tiny font-medium text-text-secondary">{label}</label>
+            <label className="para-small font-medium text-text-secondary">{label}</label>
             {children}
-            {error && <span className="para-tiny text-danger">{error}</span>}
+            {error && <span className="para-small text-danger">{error}</span>}
         </div>
     );
 }

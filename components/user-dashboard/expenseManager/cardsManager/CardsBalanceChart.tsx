@@ -24,7 +24,7 @@ export default function CardsBalanceChart({ cards, variant = "radial" }: CardsBa
     return (
         <div className="rounded-brand-16 border border-border-clr bg-white p-3">
             <h3 className="para-small mb-1 font-semibold">Balance Distribution</h3>
-            <p className="para-tiny mb-4 text-text-secondary-muter">Across all linked cards</p>
+            <p className="para-small mb-4 text-text-secondary-muter">Across all linked cards</p>
             <ResponsiveContainer width="100%" height={220}>
                 {variant === "area" ? (
                     <AreaChart data={data}>
@@ -57,7 +57,7 @@ export default function CardsBalanceChart({ cards, variant = "radial" }: CardsBa
             </ResponsiveContainer>
             <div className="mt-3 flex flex-col gap-2">
                 {data.map((d) => (
-                    <div key={d.name} className="flex items-center justify-between para-tiny text-text-secondary">
+                    <div key={d.name} className="flex items-center justify-between para-small text-text-secondary">
                         <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: d.fill }} />{d.name}</span>
                         <span className="font-semibold text-text-dark">PKR {d.value.toLocaleString("en-PK")} ({totalBalance > 0 ? Math.round((d.value / totalBalance) * 100) : 0}%)</span>
                     </div>

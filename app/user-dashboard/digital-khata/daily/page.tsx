@@ -29,10 +29,10 @@ export default function ExpenseManagerPage() {
                 <h1 className="heading-h6">Digital Khatta</h1>
 
                 <div className="flex gap-2">
-                    <div className="flex items-center gap-2 para-tiny text-text-secondary-muter">
+                    <div className="flex items-center gap-2 para-small text-text-secondary-muter">
                         <span>Mode: {store.dataMode === "demo" ? "Demo" : "Blank"}</span>
                         <button onClick={store.dataMode === "demo" ? store.resetToBlank : store.loadDemoData}
-                            className="rounded-brand-8 border border-border-clr px-2.5 py-2 para-tiny font-semibold hover:bg-page-bg">
+                            className="rounded-brand-8 border border-border-clr px-2.5 py-2 para-small font-semibold hover:bg-page-bg">
                             {store.dataMode === "demo" ? "Start Fresh" : "Load Demo Data"}
                         </button>
                     </div>
@@ -74,7 +74,7 @@ export default function ExpenseManagerPage() {
                 onClose={() => setStatDialogKind(null)}
             />
 
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[40%_60%]">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
                 <CardsManager
                     cards={store.cards}
                     onAddCard={store.addCard}
@@ -92,7 +92,7 @@ export default function ExpenseManagerPage() {
                 onSaved={(values) => store.addEntry(values)}
             /> */}
 
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[60%_40%]">
+            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                 <TrendChart
                     title="Activity"
                     dataByGranularity={{

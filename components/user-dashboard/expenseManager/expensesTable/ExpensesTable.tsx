@@ -61,7 +61,7 @@ export default function ExpensesTable({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-clr p-4">
         <div>
           <h3 className="para-small font-semibold text-text-dark">Transactions</h3>
-          <p className="para-tiny text-text-secondary-muter">
+          <p className="para-small text-text-secondary-muter">
             All expenses, income, and debt entries in one place.
           </p>
         </div>
@@ -104,7 +104,7 @@ export default function ExpensesTable({
           {/* Entries Export Dropdown */}
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 py-1.5 para-tiny font-semibold text-text-secondary hover:bg-page-bg">
+              <button className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 py-1.5 para-small font-semibold text-text-secondary hover:bg-page-bg">
                 <Download size={13} /> Export
               </button>
             </DropdownMenu.Trigger>
@@ -150,7 +150,7 @@ export default function ExpensesTable({
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border-clr para-tiny uppercase text-text-secondary-muter">
+              <tr className="border-b border-border-clr para-small uppercase text-text-secondary-muter">
                 <SortableHeader label="Subject" field="subject" active={sortField} direction={sortDirection} onSort={onSort} />
                 <th className="px-4 py-3 text-left font-semibold">Type</th>
                 <th className="px-4 py-3 text-left font-semibold">Category</th>
@@ -165,7 +165,7 @@ export default function ExpensesTable({
                 <tr key={entry.id} className="border-b border-border-clr last:border-0 hover:bg-page-bg">
                   <td className="px-4 py-3 para-small text-text-dark">{entry.subject}</td>
                   <td className="px-4 py-3">
-                    <span className={cn("rounded-full px-2 py-0.5 para-tiny font-semibold capitalize", kindBadgeStyles[entry.kind])}>
+                    <span className={cn("rounded-full px-2 py-0.5 para-small font-semibold capitalize", kindBadgeStyles[entry.kind])}>
                       {entry.kind}
                     </span>
                   </td>
@@ -196,14 +196,14 @@ export default function ExpensesTable({
 
           {filteredEntries.length > PAGE_SIZE && (
             <div className="flex items-center justify-between border-t border-border-clr px-4 py-3">
-              <span className="para-tiny text-text-secondary-muter">
+              <span className="para-small text-text-secondary-muter">
                 Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filteredEntries.length)} of {filteredEntries.length}
               </span>
               <div className="flex gap-1.5">
                 <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}
-                  className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-tiny disabled:opacity-40">Prev</button>
+                  className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-small disabled:opacity-40">Prev</button>
                 <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}
-                  className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-tiny disabled:opacity-40">Next</button>
+                  className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-small disabled:opacity-40">Next</button>
               </div>
             </div>
           )}
@@ -220,12 +220,12 @@ function FilterTabButton({
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 rounded-brand-8 px-3 py-1.5 para-tiny font-semibold default-transition",
+        "flex items-center gap-1.5 rounded-brand-8 px-3 py-1.5 para-small font-semibold default-transition",
         active ? "bg-primary text-white" : "bg-page-bg text-text-secondary hover:bg-border-clr"
       )}
     >
       {label}
-      <span className={cn("rounded-full px-1.5 text-[10px]", active ? "bg-white/25" : "bg-border-clr")}>
+      <span className={cn("rounded-full px-1.5 para-small", active ? "bg-white/25" : "bg-border-clr")}>
         {count}
       </span>
     </button>

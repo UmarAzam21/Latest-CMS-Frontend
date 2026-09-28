@@ -24,7 +24,7 @@ export default function CategoryBreakdown({
             <h3 className="heading-h5 text-text-dark">
               Spending by Category
             </h3>
-            <p className="para-tiny text-text-secondary-muter">
+            <p className="para-small text-text-secondary-muter">
               Expense distribution
             </p>
           </div>
@@ -43,7 +43,7 @@ export default function CategoryBreakdown({
               No expenses yet
             </p>
 
-            <p className="mt-0.5 para-tiny text-text-secondary-muter">
+            <p className="mt-0.5 para-small text-text-secondary-muter">
               Your spending breakdown will appear here.
             </p>
           </div>
@@ -73,18 +73,18 @@ export default function CategoryBreakdown({
               Spending by Category
             </h3>
 
-            <p className="para-tiny text-text-secondary-muter">
+            <p className="para-small text-text-secondary-muter">
               {sorted.length} categories
             </p>
           </div>
         </div>
 
         <div className="text-right">
-          <p className="text-[10px] text-text-secondary-muter">
+          <p className="para-small text-text-secondary-muter">
             Total spending
           </p>
 
-          <p className="mt-0.5 text-sm font-bold text-text-dark">
+          <p className="mt-0.5 para-small font-bold text-text-dark">
             PKR {total.toLocaleString("en-PK")}
           </p>
         </div>
@@ -101,22 +101,22 @@ export default function CategoryBreakdown({
           </div>
 
           <div className="min-w-0">
-            <p className="text-[9px] uppercase tracking-wide text-text-secondary-muter">
+            <p className="para-small uppercase tracking-wide text-text-secondary-muter">
               Highest spending
             </p>
 
-            <p className="truncate text-[11px] font-semibold text-text-dark">
+            <p className="truncate para-small font-semibold text-text-dark">
               {topCategory.category.label}
             </p>
           </div>
         </div>
 
         <div className="shrink-0 text-right">
-          <p className="text-[11px] font-bold text-text-dark">
+          <p className="para-small font-bold text-text-dark">
             PKR {topCategory.amount.toLocaleString("en-PK")}
           </p>
 
-          <p className="text-[9px] font-medium text-primary">
+          <p className="para-small font-medium text-primary">
             {topCategory.percentOfTotal}%
           </p>
         </div>
@@ -140,12 +140,12 @@ export default function CategoryBreakdown({
 
                   {/* Category */}
                   <div className="flex min-w-0 items-center gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-page-bg text-[9px] font-semibold text-text-secondary-muter">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-page-bg para-small font-semibold text-text-secondary-muter">
                       {index + 1}
                     </span>
 
                     <div className="min-w-0">
-                      <p className="truncate text-[12px] font-semibold text-text-dark">
+                      <p className="truncate para-small font-semibold text-text-dark">
                         {item.category.label}
                       </p>
 
@@ -163,11 +163,11 @@ export default function CategoryBreakdown({
                   {/* Amount */}
                   <div className="flex shrink-0 items-center gap-2">
                     <div className="text-right">
-                      <p className="text-[11px] font-semibold text-text-dark">
+                      <p className="para-small font-semibold text-text-dark">
                         PKR {item.amount.toLocaleString("en-PK")}
                       </p>
 
-                      <p className="text-[9px] text-text-secondary-muter">
+                      <p className="para-small text-text-secondary-muter">
                         {item.percentOfTotal}% of total
                       </p>
                     </div>

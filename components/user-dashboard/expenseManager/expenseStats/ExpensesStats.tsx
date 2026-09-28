@@ -151,7 +151,7 @@ export default function ExpensesStats({ entries = [], categories = [], cards = [
                             onClick={() => setCardDialogOpen(true)}
                             disabled={cards.length >= MAX_CARDS}
                             title={cards.length >= MAX_CARDS ? `Max ${MAX_CARDS} cards` : undefined}
-                            className="absolute bottom-3.5 right-brand-12 rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            className="absolute bottom-3.5 right-brand-12 rounded-brand-8 bg-page-bg px-2.5 py-1 para-small font-semibold text-primary hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                         >
                             {/* + Add Card */}
                             <Pencil size={14} />

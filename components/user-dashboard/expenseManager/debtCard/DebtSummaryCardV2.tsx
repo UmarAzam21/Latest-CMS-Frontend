@@ -58,7 +58,7 @@ export default function DebtSummaryCardV2({
                             Outstanding Debt
                         </p>
 
-                        <p className="mt-0.5 para-tiny text-text-secondary-muter">
+                        <p className="mt-0.5 para-small text-text-secondary-muter">
                             PKR {totalDebt.toLocaleString("en-PK")}
                         </p>
                     </div>
@@ -69,7 +69,7 @@ export default function DebtSummaryCardV2({
                         size={11}
                         className="text-success"
                     />
-                    <span className="text-[10px] font-semibold text-success">
+                    <span className="para-small font-semibold text-success">
                         {paidOffPercent}% cleared
                     </span>
                 </div>
@@ -77,7 +77,7 @@ export default function DebtSummaryCardV2({
 
             {/* Progress */}
             <div className="mt-3">
-                <div className="flex items-center justify-between text-[10px] text-text-secondary-muter">
+                <div className="flex items-center justify-between para-small text-text-secondary-muter">
                     <span>
                         {unsettled.length} active
                     </span>
@@ -106,7 +106,7 @@ export default function DebtSummaryCardV2({
                             className="text-success"
                         />
 
-                        <span className="text-[11px] font-semibold text-success">
+                        <span className="para-small font-semibold text-success">
                             Debt free — nice work.
                         </span>
                     </div>
@@ -131,17 +131,17 @@ export default function DebtSummaryCardV2({
                         />
 
                         <div>
-                            <p className="text-[9px] leading-none text-text-secondary-muter">
+                            <p className="para-small leading-none text-text-secondary-muter">
                                 Largest liability
                             </p>
 
-                            <p className="mt-0.5 max-w-[150px] truncate text-[11px] font-semibold text-text-dark">
+                            <p className="mt-0.5 max-w-[150px] truncate para-small font-semibold text-text-dark">
                                 {largest.subject}
                             </p>
                         </div>
                     </div>
 
-                    <span className="text-[11px] font-bold text-danger">
+                    <span className="para-small font-bold text-danger">
                         PKR {largest.amount.toLocaleString("en-PK")}
                     </span>
                 </div>
@@ -186,7 +186,7 @@ function DebtRow({
             {/* Debt info */}
             <div className="flex items-center justify-between gap-3">
                 <div className="min-w-0">
-                    <p className="truncate text-[11px] font-semibold text-text-dark">
+                    <p className="truncate para-small font-semibold text-text-dark">
                         {entry.subject}
                     </p>
 
@@ -200,7 +200,7 @@ function DebtRow({
                     </div>
                 </div>
 
-                <span className="shrink-0 text-[11px] font-bold text-danger">
+                <span className="shrink-0 para-small font-bold text-danger">
                     PKR {entry.amount.toLocaleString("en-PK")}
                 </span>
             </div>
@@ -218,13 +218,13 @@ function DebtRow({
                     type="number"
                     min="0"
                     placeholder="Payment amount"
-                    className="h-7 min-w-0 flex-1 rounded-brand-8 border border-border-clr bg-white px-2 text-[10px] text-text-dark outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/10"
+                    className="h-8 min-w-0 flex-1 rounded-brand-8 border border-border-clr bg-white px-2 para-small text-text-dark outline-none transition focus:border-primary focus:ring-1 focus:ring-primary/10"
                 />
 
                 <button
                     onClick={handlePayment}
                     disabled={!Number(amount)}
-                    className="h-7 rounded-brand-8 bg-primary px-3 text-[10px] font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="h-8 rounded-brand-8 bg-primary px-3 para-small font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     Pay
                 </button>
@@ -233,7 +233,7 @@ function DebtRow({
                     onClick={() =>
                         onMakePayment(entry.id, entry.amount)
                     }
-                    className="h-7 rounded-brand-8 border border-border-clr bg-white px-2.5 text-[10px] font-semibold text-text-secondary transition hover:border-primary hover:text-primary"
+                    className="h-8 rounded-brand-8 border border-border-clr bg-white px-2.5 para-small font-semibold text-text-secondary transition hover:border-primary hover:text-primary"
                 >
                     Settle
                 </button>

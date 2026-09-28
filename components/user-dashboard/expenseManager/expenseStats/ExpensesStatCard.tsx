@@ -34,7 +34,7 @@ export default function ExpenseStatCard({ item, onView, onExport, ctaLabel, onCt
           <span className={cn("flex h-6 w-6 shrink-0 items-center justify-center rounded-brand-8 group-hover:scale-110 default-transition", chipStyles[item.chip])}>
             <Icon size={14} strokeWidth={2} />
           </span>
-          <span className="para-tiny text-text-secondary-muted">{item.title}</span>
+          <span className="para-small text-text-secondary-muted">{item.title}</span>
         </div>
 
         <DropdownMenu.Root>
@@ -86,19 +86,19 @@ export default function ExpenseStatCard({ item, onView, onExport, ctaLabel, onCt
         <div className="flex items-center justify-between gap-brand-8">
           <div className="flex items-center gap-1.5">
             <span className={cn(
-              "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 para-tiny font-medium",
+              "flex items-center gap-0.5 rounded-full px-1.5 py-0.5 para-small font-medium",
               item.isPositive ? "bg-success-bg text-success" : "bg-danger-bg text-danger"
             )}>
               {item.trendDirection === "up" ? <ArrowUp size={11} /> : <ArrowDown size={11} />}
               {item.trendPercent}%
             </span>
-            <span className="para-tiny text-text-secondary-muter">{item.trendLabel}</span>
+            <span className="para-small text-text-secondary-muter">{item.trendLabel}</span>
           </div>
 
           {ctaLabel && (
             <button
               onClick={(e) => { e.stopPropagation(); onCtaClick?.(); }}
-              className="self-end rounded-brand-8 bg-page-bg px-2.5 py-1 para-tiny font-semibold text-primary default-transition hover:bg-primary hover:text-white"
+              className="self-end rounded-brand-8 bg-page-bg px-2.5 py-1 para-small font-semibold text-primary default-transition hover:bg-primary hover:text-white"
             >
               {/* + {ctaLabel} */}
               {/* <Pencil size={14} /> */}

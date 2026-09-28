@@ -243,7 +243,7 @@ function CardForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <label className="flex flex-col gap-1">
-            <span className="para-tiny font-medium text-text-secondary-muter">{label}</span>
+            <span className="para-small font-medium text-text-secondary-muter">{label}</span>
             {children}
         </label>
     );
@@ -282,7 +282,7 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
                         My Cards
                     </h3>
 
-                    <p className="para-tiny text-text-secondary-muter">
+                    <p className="para-small text-text-secondary-muter">
                         Link and manage your payment cards.
                     </p>
                 </div>
@@ -309,7 +309,7 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
                     )}
                 </div>
             ) : (
-                <p className="flex flex-1 items-center justify-center para-tiny text-text-secondary-muter">
+                <p className="flex flex-1 items-center justify-center para-small text-text-secondary-muter">
                     Abhi koi card nahi hai.
                 </p>
             )}
@@ -318,10 +318,10 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
 
             {/* Actions */}
             <div className="flex gap-brand-8">
-                <button type="button" disabled={cards.length === 0} onClick={() => setManageOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 bg-primary para-tiny font-semibold text-white hover:opacity-90 disabled:opacity-40">
+                <button type="button" disabled={cards.length === 0} onClick={() => setManageOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 bg-primary para-small font-semibold text-white hover:opacity-90 disabled:opacity-40">
                     <Settings2 size={13} /> Manage Cards
                 </button>
-                <button type="button" disabled={cards.length < 2} onClick={() => setTransferOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 border border-slate-200 para-tiny font-semibold text-black bg-[#fafafa] ">
+                <button type="button" disabled={cards.length < 2} onClick={() => setTransferOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 border border-slate-200 para-small font-semibold text-black bg-[#fafafa] ">
                     <ArrowLeftRight size={13} /> Transfer
                 </button>
             </div>
@@ -337,8 +337,8 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
                             {cards.map((card) => (
                                 <div key={card.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2">
                                     <div>
-                                        <p className="para-tiny font-semibold text-text-dark">{card.label}</p>
-                                        <p className="para-tiny text-text-secondary-muter">•••• {card.last4} · PKR {card.balance.toLocaleString("en-PK")}</p>
+                                        <p className="para-small font-semibold text-text-dark">{card.label}</p>
+                                        <p className="para-small text-text-secondary-muter">•••• {card.last4} · PKR {card.balance.toLocaleString("en-PK")}</p>
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <button type="button" aria-label={`Edit ${card.label}`} onClick={() => { setManageOpen(false); setEditingCard(card); }} className="text-text-secondary-muter hover:text-primary"><Pencil size={14} /></button>
