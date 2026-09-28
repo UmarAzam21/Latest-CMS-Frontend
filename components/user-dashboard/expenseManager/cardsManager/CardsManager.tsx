@@ -1,11 +1,253 @@
-// components/user-dashboard/expenseManager/CardsManager.tsx
+// components/user-dashboard/expenseManager/CardFormDialog.tsx
 "use client";
 import { useState } from "react";
-import { ArrowLeftRight, Settings2, Trash2, X, Pencil } from "lucide-react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { ArrowLeftRight, Pencil, Plus, Settings2, Trash2, X } from "lucide-react";
 import { ICard, MAX_CARDS } from "@/types/expenseManagerTy";
 import { cn } from "@/lib/cn";
-import CardFormDialog from "./CardFormDialog";
+import ATMCard, { ATMCardData, gradientStyles } from "../expenseStats/ATMCard";
+
+interface CardFormDialogProps {
+    onAdd: (card: Omit<ICard, "id">) => void;
+    onUpdate: (id: string, patch: Partial<ICard>) => void;
+    /** disables the "Add" trigger (e.g. max cards reached) */
+    disabledAdd?: boolean;
+    /** Pass a card (or null) to use the dialog in controlled "edit" mode */
+    editingCard?: ICard | null;
+    onClose?: () => void;
+}
+
+const inputCls =
+    "w-full rounded-brand-8 border border-border-clr px-2.5 py-2 para-small outline-none focus:border-primary";
+const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
+const GRADIENTS: { key: ICard["gradient"]; label: string }[] = [
+    { key: "primary", label: "Red" },
+    { key: "secondary", label: "Green" },
+    { key: "dark", label: "Dark" },
+];
+
+function CardFormDialog({ onAdd, onUpdate, disabledAdd, editingCard, onClose }: CardFormDialogProps) {
+    const controlled = editingCard !== undefined; // edit mode is opened by the parent
+    const [open, setOpen] = useState(false);
+    const isOpen = controlled ? editingCard !== null : open;
+
+    const handleOpenChange = (o: boolean) => {
+        if (controlled) {
+            if (!o) onClose?.();
+        } else {
+            setOpen(o);
+        }
+    };
+
+    return (
+        <Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
+            {!controlled && (
+                <Dialog.Trigger asChild>
+                    <button
+                        disabled={disabledAdd}
+                        className="flex h-8 items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 para-small font-semibold text-text-secondary hover:bg-page-bg disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                        <Plus size={14} /> Add
+                    </button>
+                </Dialog.Trigger>
+            )}
+
+            <Dialog.Portal>
+                <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
+                <Dialog.Content
+                    aria-describedby={undefined}
+                    className="fixed left-1/2 top-1/2 z-modal max-h-[92vh] w-full max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-brand-12 bg-white p-brand-12"
+                >
+                    <div className="mb-brand-8 flex items-center justify-between">
+                        <Dialog.Title className="para-small font-semibold text-text-dark">
+                            {editingCard ? "Card Edit Karein" : "Naya Card Add Karein"}
+                        </Dialog.Title>
+                        <Dialog.Close aria-label="Close">
+                            <X size={16} />
+                        </Dialog.Close>
+                    </div>
+
+                    {/* Mounted only while open, so every open starts with fresh state */}
+                    <CardForm
+                        key={editingCard?.id ?? "new"}
+                        initial={editingCard ?? null}
+                        onCancel={() => handleOpenChange(false)}
+                        onSubmit={(data) => {
+                            if (editingCard) onUpdate(editingCard.id, data);
+                            else onAdd(data);
+                            handleOpenChange(false);
+                        }}
+                    />
+                </Dialog.Content>
+            </Dialog.Portal>
+        </Dialog.Root>
+    );
+}
+
+function CardForm({
+    initial,
+    onSubmit,
+    onCancel,
+}: {
+    initial: ICard | null;
+    onSubmit: (data: Omit<ICard, "id">) => void;
+    onCancel: () => void;
+}) {
+    const [label, setLabel] = useState(initial?.label ?? "");
+    const [balance, setBalance] = useState(initial ? String(initial.balance) : "");
+    const [last4, setLast4] = useState(initial?.last4 ?? "");
+    const [month, setMonth] = useState(initial ? String(initial.expiryMonth) : "");
+    const [year, setYear] = useState(initial ? String(initial.expiryYear) : "");
+    const [gradient, setGradient] = useState<ICard["gradient"]>(initial?.gradient ?? "primary");
+    const [showBack, setShowBack] = useState(false);
+
+    // two-digit years, current year + 12; keep an existing card's year even if it falls outside
+    const currentYY = new Date().getFullYear() % 100;
+    const years = Array.from({ length: 13 }, (_, i) => currentYY + i);
+    if (initial && !years.includes(initial.expiryYear)) years.push(initial.expiryYear);
+    years.sort((a, b) => a - b);
+
+    const balanceNum = balance === "" ? 0 : Number(balance);
+    const valid = label.trim().length > 0 && /^\d{4}$/.test(last4) && month !== "" && year !== "" && balanceNum >= 0;
+
+    // this object is what the live preview renders, so it updates on every keystroke
+    const preview: ATMCardData = {
+        gradient,
+        label,
+        balance: balance === "" ? undefined : balanceNum,
+        last4,
+        expiryMonth: month === "" ? undefined : Number(month),
+        expiryYear: year === "" ? undefined : Number(year),
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!valid) return;
+        onSubmit({
+            label: label.trim(),
+            balance: balanceNum,
+            last4,
+            expiryMonth: Number(month),
+            expiryYear: Number(year),
+            gradient,
+        });
+    };
+
+    return (
+        <form onSubmit={handleSubmit} className="flex flex-col gap-brand-12">
+            {/* LIVE PREVIEW */}
+            <div className="flex justify-center rounded-brand-12 bg-page-bg py-brand-12">
+                <ATMCard card={preview} flipped={showBack} animateIn={false} className="max-w-[290px]" />
+            </div>
+
+            <div className="flex flex-col gap-brand-8">
+                <Field label="Bank / Card ka naam">
+                    <input
+                        value={label}
+                        onChange={(e) => setLabel(e.target.value)}
+                        maxLength={24}
+                        placeholder="jaise: Meezan Bank"
+                        className={inputCls}
+                    />
+                </Field>
+
+                <div className="grid grid-cols-2 gap-brand-8">
+                    <Field label="Balance (PKR)">
+                        <input
+                            value={balance}
+                            onChange={(e) => setBalance(e.target.value)}
+                            onFocus={() => setShowBack(true)}
+                            onBlur={() => setShowBack(false)}
+                            type="number"
+                            min={0}
+                            inputMode="decimal"
+                            placeholder="0"
+                            className={inputCls}
+                        />
+                    </Field>
+                    <Field label="Card ke aakhri 4 digits">
+                        <input
+                            value={last4}
+                            onChange={(e) => setLast4(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                            inputMode="numeric"
+                            maxLength={4}
+                            placeholder="1289"
+                            className={cn(inputCls, "font-mono tracking-widest")}
+                        />
+                    </Field>
+                </div>
+
+                <div className="grid grid-cols-2 gap-brand-8">
+                    <Field label="Expiry Month">
+                        <select value={month} onChange={(e) => setMonth(e.target.value)} className={inputCls}>
+                            <option value="">MM</option>
+                            {MONTHS.map((m) => (
+                                <option key={m} value={m}>
+                                    {String(m).padStart(2, "0")}
+                                </option>
+                            ))}
+                        </select>
+                    </Field>
+                    <Field label="Expiry Year">
+                        <select value={year} onChange={(e) => setYear(e.target.value)} className={inputCls}>
+                            <option value="">YY</option>
+                            {years.map((y) => (
+                                <option key={y} value={y}>
+                                    {String(y).padStart(2, "0")}
+                                </option>
+                            ))}
+                        </select>
+                    </Field>
+                </div>
+
+                <Field label="Card ka color">
+                    <div className="flex gap-2.5">
+                        {GRADIENTS.map((g) => (
+                            <button
+                                key={g.key}
+                                type="button"
+                                onClick={() => setGradient(g.key)}
+                                aria-label={g.label}
+                                aria-pressed={gradient === g.key}
+                                className={cn(
+                                    "h-8 w-12 rounded-brand-8 default-transition",
+                                    gradientStyles[g.key],
+                                    gradient === g.key ? "ring-2 ring-primary ring-offset-2" : "opacity-80 hover:opacity-100"
+                                )}
+                            />
+                        ))}
+                    </div>
+                </Field>
+            </div>
+
+            <div className="mt-auto flex gap-brand-8">
+                <button
+                    type="button"
+                    onClick={onCancel}
+                    className="h-9 flex-1 rounded-brand-8 border border-border-clr para-small font-semibold text-text-secondary hover:bg-page-bg"
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    disabled={!valid}
+                    className="h-9 flex-1 rounded-brand-8 bg-primary para-small font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                    {initial ? "Update Karein" : "Card Add Karein"}
+                </button>
+            </div>
+        </form>
+    );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+    return (
+        <label className="flex flex-col gap-1">
+            <span className="para-tiny font-medium text-text-secondary-muter">{label}</span>
+            {children}
+        </label>
+    );
+}
 
 interface CardsManagerProps {
     cards: ICard[];
@@ -15,175 +257,125 @@ interface CardsManagerProps {
     onTransfer: (fromId: string, toId: string, amount: number) => void;
 }
 
-const fmt = (v: number) => `PKR ${v.toLocaleString("en-PK")}`;
-const expiry = (c: ICard) => `${String(c.expiryMonth).padStart(2, "0")}/${String(c.expiryYear).padStart(2, "0")}`;
-const gradientStyles: Record<ICard["gradient"], string> = {
-    primary: "bg-gradient-wallet-card",
-    secondary: "bg-gradient-to-br from-secondary to-secondary-light",
-    dark: "bg-gradient-to-br from-[#1F2937] to-[#111827]",
-};
-const inputCls = "w-full rounded-brand-8 border border-border-clr px-2.5 py-2 para-small outline-none focus:border-primary";
-
 export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteCard, onTransfer }: CardsManagerProps) {
-    const [activeIndex, setActiveIndex] = useState(0);
-    const total = cards.reduce((s, c) => s + c.balance, 0);
-    const active = cards[activeIndex] ?? cards[0];
+    const [editingCard, setEditingCard] = useState<ICard | null>(null);
+    const [selectedCardId, setSelectedCardId] = useState("");
+    const [transferOpen, setTransferOpen] = useState(false);
+    const [manageOpen, setManageOpen] = useState(false);
+    const [fromId, setFromId] = useState("");
+    const [toId, setToId] = useState("");
+    const [amount, setAmount] = useState("");
     const atMax = cards.length >= MAX_CARDS;
-
-    if (!active) {
-        return (
-            <div className="rounded-brand-12 border border-dashed border-border-clr-dark bg-white p-brand-12 text-center">
-                <p className="para-tiny mb-brand-8 text-text-secondary-muted">Abhi koi card nahi hai.</p>
-                <CardFormDialog onAdd={onAddCard} onUpdate={onUpdateCard} />
-            </div>
-        );
-    }
+    const from = cards.find((card) => card.id === fromId) ?? cards[0];
+    const destinations = cards.filter((card) => card.id !== from?.id);
+    const to = destinations.find((card) => card.id === toId) ?? destinations[0];
+    const activeCard = cards.find((card) => card.id === selectedCardId) ?? cards[cards.length - 1];
+    const transferAmount = Number(amount);
+    const canTransfer = Boolean(from && to) && transferAmount > 0 && transferAmount <= (from?.balance ?? 0);
 
     return (
-        <div className="flex h-full flex-col gap-brand-8 rounded-brand-12 border border-border-clr bg-white p-brand-12">
+        <section className="flex h-full flex-col gap-brand-12 rounded-brand-12 border border-border-clr bg-white p-brand-12">
+            {/* Header */}
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                    <h3 className="para-small font-semibold text-text-dark">My Cards</h3>
-                    <span className="rounded-full bg-page-bg px-2 py-0.5 para-tiny text-text-secondary-muter">{cards.length}/{MAX_CARDS}</span>
+                <div className="flex flex-col gap-0.5">
+                    <h3 className="para-small font-semibold text-text-dark">
+                        My Cards
+                    </h3>
+
+                    <p className="para-tiny text-text-secondary-muter">
+                        Link and manage your payment cards.
+                    </p>
                 </div>
                 <CardFormDialog onAdd={onAddCard} onUpdate={onUpdateCard} disabledAdd={atMax} />
             </div>
 
-            <p className="para-tiny text-text-secondary-muter">Total Balance: <span className="font-semibold text-text-dark">{fmt(total)}</span></p>
+            {/* Card + dots: takes the leftover height and stays centered */}
+            {activeCard ? (
+                <div className="flex flex-1 flex-col items-center justify-center gap-brand-12 py-brand-12">
+                    <ATMCard card={activeCard} className="mx-auto" />
+                    {cards.length > 1 && (
+                        <div className="flex justify-center gap-1.5" aria-label="Choose card">
+                            {cards.map((card) => (
+                                <button
+                                    key={card.id}
+                                    type="button"
+                                    aria-label={`Show ${card.label}`}
+                                    aria-pressed={card.id === activeCard.id}
+                                    onClick={() => setSelectedCardId(card.id)}
+                                    className={`h-1.5 rounded-full default-transition ${card.id === activeCard.id ? "w-5 bg-primary" : "w-1.5 bg-border-clr"}`}
+                                />
+                            ))}
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <p className="flex flex-1 items-center justify-center para-tiny text-text-secondary-muter">
+                    Abhi koi card nahi hai.
+                </p>
+            )}
 
-            <div className={cn("flex flex-col justify-between gap-brand-12 rounded-brand-12 p-brand-12 text-white", gradientStyles[active.gradient])}>
-                <div className="flex items-center justify-between">
-                    <div>
-                        <p className="para-tiny text-white/70">{active.label}</p>
-                        <p className="text-sm font-semibold">{fmt(active.balance)}</p>
-                    </div>
-                    <CardChip />
-                </div>
-                <div className="flex items-center justify-between para-tiny text-white/85">
-                    <span>•••• •••• •••• {active.last4}</span>
-                    <span>Exp {expiry(active)}</span>
-                </div>
+            <CardFormDialog editingCard={editingCard} onClose={() => setEditingCard(null)} onAdd={onAddCard} onUpdate={onUpdateCard} />
+
+            {/* Actions */}
+            <div className="flex gap-brand-8">
+                <button type="button" disabled={cards.length === 0} onClick={() => setManageOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 bg-primary para-tiny font-semibold text-white hover:opacity-90 disabled:opacity-40">
+                    <Settings2 size={13} /> Manage Cards
+                </button>
+                <button type="button" disabled={cards.length < 2} onClick={() => setTransferOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 border border-slate-200 para-tiny font-semibold text-black bg-[#fafafa] ">
+                    <ArrowLeftRight size={13} /> Transfer
+                </button>
             </div>
 
-            {cards.length > 1 && (
-                <div className="flex justify-center gap-1.5">
-                    {cards.map((c, i) => (
-                        <button key={c.id} onClick={() => setActiveIndex(i)} aria-label={c.label}
-                            className={cn("h-1.5 rounded-full default-transition", i === activeIndex ? "w-5 bg-primary" : "w-1.5 bg-border-clr")} />
-                    ))}
+            {manageOpen && (
+                <div role="dialog" aria-modal="true" aria-labelledby="manage-cards-title" className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 p-4">
+                    <div className="w-full max-w-sm rounded-brand-12 bg-white p-brand-12">
+                        <div className="mb-brand-8 flex items-center justify-between">
+                            <h2 id="manage-cards-title" className="para-small font-semibold text-text-dark">Cards Manage Karein</h2>
+                            <button type="button" aria-label="Close manage cards" onClick={() => setManageOpen(false)}><X size={16} /></button>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            {cards.map((card) => (
+                                <div key={card.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2">
+                                    <div>
+                                        <p className="para-tiny font-semibold text-text-dark">{card.label}</p>
+                                        <p className="para-tiny text-text-secondary-muter">•••• {card.last4} · PKR {card.balance.toLocaleString("en-PK")}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <button type="button" aria-label={`Edit ${card.label}`} onClick={() => { setManageOpen(false); setEditingCard(card); }} className="text-text-secondary-muter hover:text-primary"><Pencil size={14} /></button>
+                                        <button type="button" aria-label={`Delete ${card.label}`} onClick={() => onDeleteCard(card.id)} className="text-text-secondary-muter hover:text-danger"><Trash2 size={14} /></button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             )}
 
-            <div className="mt-auto flex gap-brand-8">
-                <ManageCardsDialog cards={cards} onDelete={onDeleteCard} onUpdateCard={onUpdateCard} />
-                <TransferDialog cards={cards} onTransfer={onTransfer} />
-            </div>
-        </div>
-    );
-}
-
-function CardChip() {
-    return (
-        <div className="flex items-center">
-            <span className="h-5 w-5 rounded-full bg-white/85" />
-            <span className="-ml-2 h-5 w-5 rounded-full bg-secondary-light mix-blend-screen" />
-        </div>
-    );
-}
-
-function ManageCardsDialog({ cards, onDelete, onUpdateCard }: { cards: ICard[]; onDelete: (id: string) => void; onUpdateCard: (id: string, patch: Partial<ICard>) => void }) {
-    const [editingCard, setEditingCard] = useState<ICard | null>(null);
-    const [confirmId, setConfirmId] = useState<string | null>(null);
-
-    return (
-        <Dialog.Root onOpenChange={(o) => !o && setConfirmId(null)}>
-            <Dialog.Trigger asChild>
-                <button className="flex flex-1 items-center justify-center gap-1.5 rounded-brand-8 bg-primary py-2 para-tiny font-semibold text-white hover:opacity-90">
-                    <Settings2 size={13} /> Manage Cards
-                </button>
-            </Dialog.Trigger>
-            <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
-                <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-brand-12 bg-white p-brand-12">
-                    <div className="mb-brand-8 flex items-center justify-between">
-                        <Dialog.Title className="para-small font-semibold text-text-dark">Cards Manage Karein</Dialog.Title>
-                        <Dialog.Close><X size={16} /></Dialog.Close>
+            {transferOpen && (
+                <div role="dialog" aria-modal="true" aria-labelledby="transfer-title" className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 p-4">
+                    <div className="w-full max-w-xs rounded-brand-12 bg-white p-brand-12">
+                        <div className="mb-brand-8 flex items-center justify-between">
+                            <h2 id="transfer-title" className="para-small font-semibold text-text-dark">Paisay Transfer Karein</h2>
+                            <button type="button" aria-label="Close transfer" onClick={() => setTransferOpen(false)}><X size={16} /></button>
+                        </div>
+                        <div className="flex flex-col gap-brand-8">
+                            <select aria-label="From card" value={from?.id ?? ""} onChange={(event) => setFromId(event.target.value)} className={inputCls}>
+                                {cards.map((card) => <option key={card.id} value={card.id}>{card.label}</option>)}
+                            </select>
+                            <select aria-label="To card" value={to?.id ?? ""} onChange={(event) => setToId(event.target.value)} className={inputCls}>
+                                {destinations.map((card) => <option key={card.id} value={card.id}>{card.label}</option>)}
+                            </select>
+                            <input aria-label="Transfer amount" type="number" min="1" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="Amount (PKR)" className={inputCls} />
+                            <button type="button" disabled={!canTransfer} onClick={() => {
+                                if (!from || !to) return;
+                                onTransfer(from.id, to.id, transferAmount);
+                                setTransferOpen(false);
+                                setAmount("");
+                            }} className="rounded-brand-8 bg-primary py-2 para-small font-semibold text-white disabled:opacity-40">Transfer Karein</button>
+                        </div>
                     </div>
-                    <div className="flex flex-col gap-1.5">
-                        {cards.map((c) => (
-                            <div key={c.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2">
-                                <div>
-                                    <p className="para-tiny font-semibold text-text-dark">{c.label}</p>
-                                    <p className="para-tiny text-text-secondary-muter">•••• {c.last4} · {fmt(c.balance)} · Exp {expiry(c)}</p>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                    {confirmId === c.id ? (
-                                        <>
-                                            <span className="para-tiny text-text-secondary-muter">Delete?</span>
-                                            <button onClick={() => { onDelete(c.id); setConfirmId(null); }} className="rounded-brand-8 bg-danger px-2 py-1 para-tiny font-semibold text-white">Confirm</button>
-                                            <button onClick={() => setConfirmId(null)} className="rounded-brand-8 border border-border-clr px-2 py-1 para-tiny font-semibold text-text-secondary">Cancel</button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <button onClick={() => setEditingCard(c)} className="text-text-secondary-muter hover:text-primary"><Pencil size={13} /></button>
-                                            <button onClick={() => setConfirmId(c.id)} className="text-text-secondary-muter hover:text-danger"><Trash2 size={13} /></button>
-                                        </>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </Dialog.Content>
-                <CardFormDialog editingCard={editingCard} onClose={() => setEditingCard(null)} onAdd={() => { }} onUpdate={onUpdateCard} />
-            </Dialog.Portal>
-        </Dialog.Root>
-    );
-}
-
-function TransferDialog({ cards, onTransfer }: { cards: ICard[]; onTransfer: (fromId: string, toId: string, amount: number) => void }) {
-    const [open, setOpen] = useState(false);
-    const [fromId, setFromId] = useState("");
-    const [toId, setToId] = useState("");
-    const [amount, setAmount] = useState("");
-
-    // derived, so stale ids or same-card picks are impossible
-    const from = cards.find((c) => c.id === fromId) ?? cards[0];
-    const toOptions = cards.filter((c) => c.id !== from?.id);
-    const to = toOptions.find((c) => c.id === toId) ?? toOptions[0];
-    const value = Number(amount);
-    const insufficient = Boolean(from) && value > from.balance;
-    const valid = Boolean(from && to) && value > 0 && !insufficient;
-
-    return (
-        <Dialog.Root open={open} onOpenChange={(o) => { setOpen(o); if (!o) setAmount(""); }}>
-            <Dialog.Trigger asChild>
-                <button disabled={cards.length < 2} className="flex flex-1 items-center justify-center gap-1.5 rounded-brand-8 border border-border-clr py-2 para-tiny font-semibold text-text-secondary hover:bg-page-bg disabled:opacity-40">
-                    <ArrowLeftRight size={13} /> Transfer
-                </button>
-            </Dialog.Trigger>
-            <Dialog.Portal>
-                <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
-                <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-xs -translate-x-1/2 -translate-y-1/2 rounded-brand-12 bg-white p-brand-12">
-                    <div className="mb-brand-8 flex items-center justify-between">
-                        <Dialog.Title className="para-small font-semibold text-text-dark">Paisay Transfer Karein</Dialog.Title>
-                        <Dialog.Close><X size={16} /></Dialog.Close>
-                    </div>
-                    <div className="flex flex-col gap-brand-8">
-                        <select value={from?.id ?? ""} onChange={(e) => setFromId(e.target.value)} className={inputCls}>
-                            {cards.map((c) => <option key={c.id} value={c.id}>Se: {c.label} ({fmt(c.balance)})</option>)}
-                        </select>
-                        <select value={to?.id ?? ""} onChange={(e) => setToId(e.target.value)} className={inputCls}>
-                            {toOptions.map((c) => <option key={c.id} value={c.id}>Me: {c.label}</option>)}
-                        </select>
-                        <input value={amount} onChange={(e) => setAmount(e.target.value)} type="number" placeholder="Raqam (jaise: 5000)" className={inputCls} />
-                        {insufficient && <span className="para-tiny text-danger">{from.label} me itna balance nahi hai</span>}
-                        <button disabled={!valid} onClick={() => { onTransfer(from.id, to.id, value); setOpen(false); setAmount(""); }}
-                            className="rounded-brand-8 bg-primary py-2 para-small font-semibold text-white disabled:opacity-40">
-                            Transfer Karein
-                        </button>
-                    </div>
-                </Dialog.Content>
-            </Dialog.Portal>
-        </Dialog.Root>
+                </div>
+            )}
+        </section>
     );
 }

@@ -60,7 +60,7 @@ export default function ExpensesTable({
     <div className="rounded-brand-16 border border-border-clr bg-card-bg-clrx bg-white">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-clr p-4">
         <div>
-          <h3 className="heading-h5 text-text-dark">Transactions</h3>
+          <h3 className="para-small font-semibold text-text-dark">Transactions</h3>
           <p className="para-tiny text-text-secondary-muter">
             All expenses, income, and debt entries in one place.
           </p>
@@ -241,8 +241,7 @@ function SortableHeader({
   return (
     <th
       onClick={() => onSort(field)}
-      className={cn(
-        "cursor-pointer select-none px-4 py-3 font-semibold default-transition hover:text-text-secondary",
+      className={cn("cursor-pointer select-none px-4 py-3 font-semibold default-transition hover:text-text-secondary",
         align === "right" ? "text-right" : "text-left"
       )}
     >

@@ -1,137 +1,593 @@
-// components/user-dashboard/expenseManager/TrendChart.tsx
 "use client";
+
 import { useState } from "react";
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
-import { ChevronDown } from "lucide-react";
+import {
+    BarChart,
+    Bar,
+    PieChart,
+    Pie,
+    Cell,
+    XAxis,
+    YAxis,
+    Tooltip,
+    ResponsiveContainer,
+    CartesianGrid,
+} from "recharts";
+import {
+    BarChart3,
+    ChevronDown,
+    TrendingDown,
+    TrendingUp,
+    CircleDollarSign,
+} from "lucide-react";
 import { EntryKind } from "@/types/expenseManagerTy";
 
-interface TrendDatum { label: string; expense: number; income: number; debt: number }
+interface TrendDatum {
+    label: string;
+    expense: number;
+    income: number;
+    debt: number;
+}
+
 type Granularity = "day" | "week" | "month";
 type KindFilter = "all" | EntryKind;
 
 interface TrendChartProps {
-  title: string;
-  dataByGranularity: Record<Granularity, TrendDatum[]>;
-  variant?: "bar" | "pie";
+    title: string;
+    dataByGranularity: Record<Granularity, TrendDatum[]>;
+    variant?: "bar" | "pie";
 }
 
-const KIND_META: Record<EntryKind, { label: string; color: string }> = {
-  expense: { label: "Expenses", color: "var(--brand-primary)" },
-  income: { label: "Income", color: "var(--brand-secondary)" },
-  debt: { label: "Debt", color: "var(--status-warning)" },
+const KIND_META: Record<
+    EntryKind,
+    {
+        label: string;
+        color: string;
+        icon: typeof TrendingUp;
+    }
+> = {
+    expense: {
+        label: "Expenses",
+        color: "var(--brand-primary)",
+        icon: TrendingDown,
+    },
+    income: {
+        label: "Income",
+        color: "var(--brand-secondary)",
+        icon: TrendingUp,
+    },
+    debt: {
+        label: "Debt",
+        color: "var(--status-warning)",
+        icon: CircleDollarSign,
+    },
 };
 
-// Minimal, on-brand palette — tints of brand-primary/secondary, no arbitrary hex.
 const PIE_PALETTE = [
-  "var(--brand-primary)",
-  "color-mix(in srgb, var(--brand-primary) 65%, white)",
-  "var(--brand-secondary)",
-  "color-mix(in srgb, var(--brand-secondary) 60%, white)",
-  "color-mix(in srgb, var(--text-secondary-muter) 55%, white)",
+    "var(--brand-primary)",
+    "color-mix(in srgb, var(--brand-primary) 65%, white)",
+    "var(--brand-secondary)",
+    "color-mix(in srgb, var(--brand-secondary) 60%, white)",
+    "color-mix(in srgb, var(--text-secondary-muter) 55%, white)",
 ];
 
-function formatTick(label: string, g: Granularity) {
-  if (g === "month") { const [y, m] = label.split("-"); return new Date(Number(y), Number(m) - 1).toLocaleDateString("en-GB", { month: "short" }); }
-  if (g === "week") return label; // "2026-W37" is already compact
-  return new Date(label).toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+function formatTick(label: string, granularity: Granularity) {
+    if (granularity === "month") {
+        const [year, month] = label.split("-");
+
+        return new Date(
+            Number(year),
+            Number(month) - 1
+        ).toLocaleDateString("en-GB", {
+            month: "short",
+        });
+    }
+
+    if (granularity === "week") {
+        return label;
+    }
+
+    return new Date(label).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+    });
 }
 
-function GranularitySelect({ value, onChange }: { value: Granularity; onChange: (g: Granularity) => void }) {
-  return (
-    <div className="relative">
-      <select value={value} onChange={(e) => onChange(e.target.value as Granularity)}
-        className="appearance-none rounded-brand-8 border border-border-clr bg-white px-3 py-1.5 pr-7 para-tiny font-semibold text-text-secondary outline-none focus:border-primary">
-        <option value="day">Daily</option>
-        <option value="week">Weekly</option>
-        <option value="month">Monthly</option>
-      </select>
-      <ChevronDown size={12} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary-muter" />
-    </div>
-  );
+function formatAmount(value: number) {
+    if (value >= 1_000_000) {
+        return `${(value / 1_000_000).toFixed(1)}M`;
+    }
+
+    if (value >= 1_000) {
+        return `${(value / 1_000).toFixed(0)}K`;
+    }
+
+    return value.toString();
 }
 
-export default function TrendChart({ title, dataByGranularity, variant = "bar" }: TrendChartProps) {
-  const [granularity, setGranularity] = useState<Granularity>("day");
-  const [kindFilter, setKindFilter] = useState<KindFilter>("all");
-  const data = dataByGranularity[granularity];
-
-  if (!data || data.length === 0) {
+function CompactSelect({
+    value,
+    onChange,
+    options,
+}: {
+    value: string;
+    onChange: (value: string) => void;
+    options: { value: string; label: string }[];
+}) {
     return (
-      <div className="rounded-brand-16 border border-dashed border-border-clr-dark bg-white p-5">
-        <h3 className="heading-h5 mb-4 text-text-dark">{title}</h3>
-        <p className="para-small text-text-secondary-muted">No entries recorded yet for this period.</p>
-      </div>
-    );
-  }
-
-  if (variant === "pie") {
-    const total = data.reduce((s, d) => s + d.expense, 0);
-    return (
-      <div className="rounded-brand-16 border border-border-clr bg-white p-5">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="heading-h5 text-text-dark">{title}</h3>
-          <GranularitySelect value={granularity} onChange={setGranularity} />
-        </div>
         <div className="relative">
-          <ResponsiveContainer width="100%" height={280}>
-            <PieChart>
-              <Pie data={data} dataKey="expense" nameKey="label" cx="50%" cy="50%" innerRadius={70} outerRadius={100} paddingAngle={3} cornerRadius={6} stroke="none">
-                {data.map((_, i) => <Cell key={i} fill={PIE_PALETTE[i % PIE_PALETTE.length]} />)}
-              </Pie>
-              <Tooltip formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Spent"]} labelFormatter={(v) => formatTick(v as string, granularity)}
-                contentStyle={{ borderRadius: 12, border: "1px solid var(--border-clr)" }} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="para-tiny text-text-secondary-muter">Total</span>
-            <span className="heading-h5 text-text-dark">PKR {total.toLocaleString("en-PK")}</span>
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
-          {data.map((d, i) => (
-            <div key={d.label} className="flex items-center gap-1.5 para-tiny text-text-secondary">
-              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: PIE_PALETTE[i % PIE_PALETTE.length] }} />
-              <span>{formatTick(d.label, granularity)}</span>
-              <span className="ml-auto font-semibold text-text-dark">PKR {d.expense.toLocaleString("en-PK")}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  const kindsToShow: EntryKind[] = kindFilter === "all" ? ["expense", "income", "debt"] : [kindFilter];
-  return (
-    <div className="rounded-brand-16 border border-border-clr bg-white p-5">
-      <div className="mb-4 flex items-center justify-between gap-2">
-        <h3 className="heading-h5 text-text-dark">{title}</h3>
-        <div className="flex gap-2">
-          <GranularitySelect value={granularity} onChange={setGranularity} />
-          <div className="relative">
-            <select value={kindFilter} onChange={(e) => setKindFilter(e.target.value as KindFilter)}
-              className="appearance-none rounded-brand-8 border border-border-clr bg-white px-3 py-1.5 pr-7 para-tiny font-semibold text-text-secondary outline-none focus:border-primary">
-              <option value="all">All</option><option value="expense">Expenses</option><option value="income">Income</option><option value="debt">Debt</option>
+            <select
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="
+                    h-7
+                    appearance-none
+                    rounded-brand-8
+                    border border-border-clr
+                    bg-page-bg
+                    pl-2.5 pr-7
+                    text-[10px]
+                    font-semibold
+                    text-text-secondary
+                    outline-none
+                    transition
+                    focus:border-primary
+                "
+            >
+                {options.map((option) => (
+                    <option
+                        key={option.value}
+                        value={option.value}
+                    >
+                        {option.label}
+                    </option>
+                ))}
             </select>
-            <ChevronDown size={12} className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary-muter" />
-          </div>
+
+            <ChevronDown
+                size={11}
+                className="
+                    pointer-events-none
+                    absolute right-2 top-1/2
+                    -translate-y-1/2
+                    text-text-secondary-muter
+                "
+            />
         </div>
-      </div>
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="var(--border-clr)" />
-          <XAxis dataKey="label" tickFormatter={(v) => formatTick(v, granularity)} tick={{ fontSize: 11, fill: "var(--text-secondary-muter)" }} />
-          <YAxis tick={{ fontSize: 11, fill: "var(--text-secondary-muter)" }} />
-          <Tooltip labelFormatter={(v) => formatTick(v as string, granularity)}
-            formatter={(v, n) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, KIND_META[n as EntryKind]?.label ?? n]}
-            contentStyle={{ borderRadius: 12, border: "1px solid var(--border-clr)" }} />
-          {kindsToShow.map((k) => <Bar key={k} dataKey={k} fill={KIND_META[k].color} radius={[6, 6, 0, 0]} name={k} />)}
-        </BarChart>
-      </ResponsiveContainer>
-      {kindFilter === "all" && (
-        <div className="mt-3 flex justify-center gap-4">
-          {kindsToShow.map((k) => <span key={k} className="flex items-center gap-1.5 para-tiny text-text-secondary"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: KIND_META[k].color }} />{KIND_META[k].label}</span>)}
+    );
+}
+
+function ChartLegend({
+    kinds,
+}: {
+    kinds: EntryKind[];
+}) {
+    return (
+        <div className="flex items-center gap-4">
+            {kinds.map((kind) => {
+                const Icon = KIND_META[kind].icon;
+
+                return (
+                    <span
+                        key={kind}
+                        className="flex items-center gap-1.5 text-[10px] font-medium text-text-secondary"
+                    >
+                        <span
+                            className="h-2 w-2 rounded-full"
+                            style={{
+                                backgroundColor:
+                                    KIND_META[kind].color,
+                            }}
+                        />
+
+                        {KIND_META[kind].label}
+                    </span>
+                );
+            })}
         </div>
-      )}
-    </div>
-  );
+    );
+}
+
+export default function TrendChart({
+    title,
+    dataByGranularity,
+    variant = "bar",
+}: TrendChartProps) {
+    const [granularity, setGranularity] =
+        useState<Granularity>("day");
+
+    const [kindFilter, setKindFilter] =
+        useState<KindFilter>("all");
+
+    const data = dataByGranularity[granularity];
+
+    /*
+     * Empty state
+     */
+    if (!data || data.length === 0) {
+        return (
+            <div className="flex h-full min-h-[300px] flex-col rounded-brand-16 border border-border-clr bg-white p-4">
+                <div className="flex items-center gap-2.5">
+                   
+                    <div>
+                        <h3 className="para-small font-semibold text-text-dark">
+                            {title}
+                        </h3>
+
+                        <p className="para-tiny text-text-secondary-muter">
+                            Spending activity
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex flex-1 items-center justify-center">
+                    <div className="text-center">
+                        <div className="mx-auto mb-2 flex h-10 w-10 items-center justify-center rounded-full bg-page-bg">
+                            <BarChart3
+                                size={18}
+                                className="text-text-secondary-muter"
+                            />
+                        </div>
+
+                        <p className="para-small font-medium text-text-secondary">
+                            No activity yet
+                        </p>
+
+                        <p className="mt-0.5 para-tiny text-text-secondary-muter">
+                            Your financial activity will appear here.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    /*
+     * PIE
+     */
+    if (variant === "pie") {
+        const total = data.reduce(
+            (sum, item) => sum + item.expense,
+            0
+        );
+
+        return (
+            <div className="flex h-full flex-col rounded-brand-16 border border-border-clr bg-white p-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      
+                        <div>
+                            <h3 className="para-small font-semibold text-text-dark">
+                                {title}
+                            </h3>
+
+                            <p className="para-tiny text-text-secondary-muter">
+                                Expense distribution
+                            </p>
+                        </div>
+                    </div>
+
+                    <CompactSelect
+                        value={granularity}
+                        onChange={(value) =>
+                            setGranularity(
+                                value as Granularity
+                            )
+                        }
+                        options={[
+                            {
+                                value: "day",
+                                label: "Daily",
+                            },
+                            {
+                                value: "week",
+                                label: "Weekly",
+                            },
+                            {
+                                value: "month",
+                                label: "Monthly",
+                            },
+                        ]}
+                    />
+                </div>
+
+                <div className="relative flex-1">
+                    <ResponsiveContainer
+                        width="100%"
+                        height={280}
+                    >
+                        <PieChart>
+                            <Pie
+                                data={data}
+                                dataKey="expense"
+                                nameKey="label"
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={80}
+                                outerRadius={120}
+                                paddingAngle={3}
+                                cornerRadius={5}
+                                stroke="none"
+                            >
+                                {data.map((_, index) => (
+                                    <Cell
+                                        key={index}
+                                        fill={
+                                            PIE_PALETTE[
+                                                index %
+                                                    PIE_PALETTE.length
+                                            ]
+                                        }
+                                    />
+                                ))}
+                            </Pie>
+
+                            <Tooltip
+                                formatter={(value) => [
+                                    `PKR ${Number(
+                                        value ?? 0
+                                    ).toLocaleString(
+                                        "en-PK"
+                                    )}`,
+                                    "Spent",
+                                ]}
+                                labelFormatter={(value) =>
+                                    formatTick(
+                                        value as string,
+                                        granularity
+                                    )
+                                }
+                                contentStyle={{
+                                    borderRadius: 10,
+                                    border: "1px solid var(--border-clr)",
+                                    boxShadow:
+                                        "0 8px 24px rgba(0,0,0,0.06)",
+                                    fontSize: 11,
+                                }}
+                            />
+                        </PieChart>
+                    </ResponsiveContainer>
+
+                    <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-[10px] text-text-secondary-muter">
+                            Total
+                        </span>
+
+                        <span className="text-base font-bold text-text-dark">
+                            PKR {formatAmount(total)}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                    {data.map((item, index) => (
+                        <div
+                            key={item.label}
+                            className="flex items-center gap-1.5"
+                        >
+                            <span
+                                className="h-1.5 w-1.5 shrink-0 rounded-full"
+                                style={{
+                                    backgroundColor:
+                                        PIE_PALETTE[
+                                            index %
+                                                PIE_PALETTE.length
+                                        ],
+                                }}
+                            />
+
+                            <span className="truncate text-[10px] text-text-secondary">
+                                {formatTick(
+                                    item.label,
+                                    granularity
+                                )}
+                            </span>
+
+                            <span className="ml-auto text-[10px] font-semibold text-text-dark">
+                                PKR{" "}
+                                {formatAmount(
+                                    item.expense
+                                )}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+
+    /*
+     * BAR
+     */
+    const kindsToShow: EntryKind[] =
+        kindFilter === "all"
+            ? ["expense", "income", "debt"]
+            : [kindFilter];
+
+    return (
+        <div className="flex h-full min-h-0 flex-col rounded-brand-16 border border-border-clr bg-white p-4">
+
+            {/* Header */}
+            <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5">
+
+                    <div>
+                        <h3 className="para-small font-semibold text-text-dark">
+                            {title}
+                        </h3>
+
+                        <p className="para-tiny text-text-secondary-muter">
+                            Income, expenses & debt
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-1.5">
+                    <CompactSelect
+                        value={granularity}
+                        onChange={(value) =>
+                            setGranularity(
+                                value as Granularity
+                            )
+                        }
+                        options={[
+                            {
+                                value: "day",
+                                label: "Daily",
+                            },
+                            {
+                                value: "week",
+                                label: "Weekly",
+                            },
+                            {
+                                value: "month",
+                                label: "Monthly",
+                            },
+                        ]}
+                    />
+
+                    <CompactSelect
+                        value={kindFilter}
+                        onChange={(value) =>
+                            setKindFilter(
+                                value as KindFilter
+                            )
+                        }
+                        options={[
+                            {
+                                value: "all",
+                                label: "All",
+                            },
+                            {
+                                value: "expense",
+                                label: "Expenses",
+                            },
+                            {
+                                value: "income",
+                                label: "Income",
+                            },
+                            {
+                                value: "debt",
+                                label: "Debt",
+                            },
+                        ]}
+                    />
+                </div>
+            </div>
+
+            {/* Chart */}
+            <div className="mt-2 flex-1">
+                <ResponsiveContainer
+                    width="100%"
+                    height={220}
+                >
+                    <BarChart
+                        data={data}
+                        margin={{
+                            top: 8,
+                            right: 4,
+                            left: -20,
+                            bottom: 0,
+                        }}
+                        barGap={3}
+                    >
+                        <CartesianGrid
+                            vertical={false}
+                            strokeDasharray="3 3"
+                            stroke="var(--border-clr)"
+                        />
+
+                        <XAxis
+                            dataKey="label"
+                            tickFormatter={(value) =>
+                                formatTick(
+                                    value,
+                                    granularity
+                                )
+                            }
+                            tick={{
+                                fontSize: 9,
+                                fill: "var(--text-secondary-muter)",
+                            }}
+                            axisLine={false}
+                            tickLine={false}
+                            dy={6}
+                        />
+
+                        <YAxis
+                            tickFormatter={(value) =>
+                                formatAmount(
+                                    Number(value)
+                                )
+                            }
+                            tick={{
+                                fontSize: 9,
+                                fill: "var(--text-secondary-muter)",
+                            }}
+                            axisLine={false}
+                            tickLine={false}
+                            width={38}
+                        />
+
+                        <Tooltip
+                            cursor={{
+                                fill: "var(--page-bg-clr)",
+                            }}
+                            labelFormatter={(value) =>
+                                formatTick(
+                                    value as string,
+                                    granularity
+                                )
+                            }
+                            formatter={(value, name) => [
+                                `PKR ${Number(
+                                    value ?? 0
+                                ).toLocaleString(
+                                    "en-PK"
+                                )}`,
+                                KIND_META[
+                                    name as EntryKind
+                                ]?.label ?? name,
+                            ]}
+                            contentStyle={{
+                                borderRadius: 10,
+                                border: "1px solid var(--border-clr)",
+                                boxShadow:
+                                    "0 8px 24px rgba(0,0,0,0.06)",
+                                fontSize: 10,
+                            }}
+                        />
+
+                        {kindsToShow.map((kind) => (
+                            <Bar
+                                key={kind}
+                                dataKey={kind}
+                                fill={
+                                    KIND_META[kind]
+                                        .color
+                                }
+                                radius={[
+                                    4,
+                                    4,
+                                    0,
+                                    0,
+                                ]}
+                                name={kind}
+                                maxBarSize={24}
+                            />
+                        ))}
+                    </BarChart>
+                </ResponsiveContainer>
+            </div>
+
+            {/* Legend */}
+            {kindFilter === "all" && (
+                <div className="flex justify-center border-t border-border-clr pt-2.5">
+                    <ChartLegend
+                        kinds={kindsToShow}
+                    />
+                </div>
+            )}
+        </div>
+    );
 }

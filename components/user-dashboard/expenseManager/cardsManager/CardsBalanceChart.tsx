@@ -22,8 +22,8 @@ export default function CardsBalanceChart({ cards, variant = "radial" }: CardsBa
     const data = cards.map((c, i) => ({ name: c.label, value: c.balance, fill: CARD_COLORS[i % CARD_COLORS.length] }));
 
     return (
-        <div className="rounded-brand-16 border border-border-clr bg-white p-5">
-            <h3 className="heading-h5 mb-1 text-text-dark">Balance Distribution</h3>
+        <div className="rounded-brand-16 border border-border-clr bg-white p-3">
+            <h3 className="para-small mb-1 font-semibold">Balance Distribution</h3>
             <p className="para-tiny mb-4 text-text-secondary-muter">Across all linked cards</p>
             <ResponsiveContainer width="100%" height={220}>
                 {variant === "area" ? (

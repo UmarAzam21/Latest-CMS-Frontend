@@ -77,7 +77,7 @@ export default function DetailedEntryDialog({ kind, categories, cards, editingEn
         <Dialog.Root open onOpenChange={(o) => !o && onClose()}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
-                <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-brand-12 bg-white p-brand-12 shadow-card-hover">
+                <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-brand-12 bg-white p-5 shadow-card-hover">
                     <div className="mb-brand-8 flex items-center justify-between border-b border-border-clr pb-brand-8">
                         <Dialog.Title className="para-small font-semibold text-text-dark">
                             {editingEntry ? `${labels.noun} Edit Karein` : labels.verb}
