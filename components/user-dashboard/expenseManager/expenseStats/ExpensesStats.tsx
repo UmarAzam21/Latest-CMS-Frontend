@@ -72,7 +72,7 @@ export default function ExpensesStats({ entries = [], categories = [], cards = [
         .filter((e) => e.kind === "debt" && !e.isSettled)
         .reduce((s, e) => s + e.amount, 0);
 
-    const balance = totalIncome - totalExpenses;
+    // const balance = totalIncome - totalExpenses;
 
     const bal = monthlyDelta(entries, "net");
     const inc = monthlyDelta(entries, "income");
@@ -139,22 +139,24 @@ export default function ExpensesStats({ entries = [], categories = [], cards = [
 
     return (
         <>
-            <div className="grid grid-cols-1 gap-brand-8 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-brand-12 sm:grid-cols-2 lg:grid-cols-4">
                 {items.map((item) => item.id === "cardBalance" ? (
-                    <div key={item.id} className="relative">
+                    <div key={item.id} className="relative group">
                         <ExpenseStatCard
                             item={item}
                             onView={() => onViewKind("all")}
                             onExport={() => exportEntriesToCsv(entries, categories, "all-export.csv")}
+                            ctaLabel="Add Card"
+                            onCtaClick={() => setCardDialogOpen(true)}
                         />
                         <button
                             onClick={() => setCardDialogOpen(true)}
                             disabled={cards.length >= MAX_CARDS}
                             title={cards.length >= MAX_CARDS ? `Max ${MAX_CARDS} cards` : undefined}
-                            className="absolute bottom-3.5 right-brand-12 rounded-brand-8 bg-page-bg px-2.5 py-1 para-small font-semibold text-primary hover:bg-primary hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
+                            className="absolute bottom-3.5 right-brand-12 rounded-brand-8 bg-page-bg px-2 py-1.5 para-tiny font-medium text-primary hover:bg-primary default-transition hover:text-white disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                            {/* + Add Card */}
-                            <Pencil size={14} />
+                            + Add Card
+                            {/* <Pencil size={14} /> */}
                         </button>
                     </div>
                 ) : (

@@ -19,12 +19,17 @@ export default function CardsBalanceChart({ cards, variant = "radial" }: CardsBa
     // area/line plot CURRENT balance per card (categorical axis), not a time
     // trend — no historical balance snapshots are persisted yet; that needs
     // a backend snapshot table, not something to fake client-side.
-    const data = cards.map((c, i) => ({ name: c.label, value: c.balance, fill: CARD_COLORS[i % CARD_COLORS.length] }));
+    const data = cards.map((c, i) => ({
+        name: c.label,
+        value: c.balance,
+        fill: CARD_COLORS[i % CARD_COLORS.length]
+    }));
 
     return (
         <div className="rounded-brand-16 border border-border-clr bg-white p-3">
             <h3 className="para-small mb-1 font-semibold">Balance Distribution</h3>
-            <p className="para-small mb-4 text-text-secondary-muter">Across all linked cards</p>
+            <p className="para-tiny mb-brand-12 text-text-secondary-muter">Across all linked cards</p>
+
             <ResponsiveContainer width="100%" height={220}>
                 {variant === "area" ? (
                     <AreaChart data={data}>
@@ -36,30 +41,64 @@ export default function CardsBalanceChart({ cards, variant = "radial" }: CardsBa
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                         <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9CA3AF" }} />
-                        <YAxis tick={{ fontSize: 11, fill: "#9CA3AF" }} />
-                        <Tooltip formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Balance"]} contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }} />
-                        <Area type="monotone" dataKey="value" stroke="#C8102E" strokeWidth={2} fill="url(#cardsAreaFill)" />
+                        <YAxis tick={{ fontSize: 10, fill: "#9CA3AF" }} />
+                        <Tooltip
+                            formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Balance"]}
+                            contentStyle={{ borderRadius: 10, border: "1px solid #E5E7EB" }}
+                        />
+                        <Area
+                            type="monotone"
+                            dataKey="value"
+                            stroke="#C8102E"
+                            strokeWidth={2}
+                            fill="url(#cardsAreaFill)"
+                        />
                     </AreaChart>
                 ) : variant === "line" ? (
                     <LineChart data={data}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
                         <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#9CA3AF" }} />
                         <YAxis tick={{ fontSize: 11, fill: "#9CA3AF" }} />
-                        <Tooltip formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Balance"]} contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }} />
-                        <Line type="monotone" dataKey="value" stroke="#C8102E" strokeWidth={2.5} dot={{ r: 4, fill: "#C8102E" }} />
+                        <Tooltip
+                            formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Balance"]}
+                            contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }}
+                        />
+                        <Line
+                            type="monotone"
+                            dataKey="value"
+                            stroke="#C8102E"
+                            strokeWidth={2.5}
+                            dot={{ r: 4, fill: "#C8102E" }}
+                        />
                     </LineChart>
                 ) : (
-                    <RadialBarChart data={data} innerRadius="35%" outerRadius="100%" startAngle={90} endAngle={-270}>
+                    <RadialBarChart
+                        data={data}
+                        innerRadius="35%"
+                        outerRadius="100%"
+                        startAngle={90}
+                        endAngle={-270}
+                    >
                         <RadialBar background dataKey="value" cornerRadius={8} />
-                        <Tooltip formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Balance"]} contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }} />
+                        <Tooltip
+                            formatter={(v) => [`PKR ${Number(v ?? 0).toLocaleString("en-PK")}`, "Balance"]}
+                            contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }}
+                        />
                     </RadialBarChart>
                 )}
             </ResponsiveContainer>
-            <div className="mt-3 flex flex-col gap-2">
+
+            <div className="mt-brand-8x flex flex-col gap-2">
                 {data.map((d) => (
-                    <div key={d.name} className="flex items-center justify-between para-small text-text-secondary">
-                        <span className="flex items-center gap-1.5"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: d.fill }} />{d.name}</span>
-                        <span className="font-semibold text-text-dark">PKR {d.value.toLocaleString("en-PK")} ({totalBalance > 0 ? Math.round((d.value / totalBalance) * 100) : 0}%)</span>
+                    <div key={d.name} className="flex items-center justify-between para-tiny text-text-secondary">
+                        <span className="flex items-center gap-1.5">
+                            <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: d.fill }} />
+                            {d.name}
+                        </span>
+                        <span className="font-semibold text-text-dark">
+                            PKR {d.value.toLocaleString("en-PK")}{" "}
+                            ({totalBalance > 0 ? Math.round((d.value / totalBalance) * 100) : 0}%)
+                        </span>
                     </div>
                 ))}
             </div>
