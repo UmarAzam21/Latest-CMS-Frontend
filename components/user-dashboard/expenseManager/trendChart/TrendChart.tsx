@@ -2,23 +2,10 @@
 
 import { useState } from "react";
 import {
-    BarChart,
-    Bar,
-    PieChart,
-    Pie,
-    Cell,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    CartesianGrid,
+    BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 import {
-    BarChart3,
-    ChevronDown,
-    TrendingDown,
-    TrendingUp,
-    CircleDollarSign,
+    BarChart3, ChevronDown, TrendingDown, TrendingUp, CircleDollarSign,
 } from "lucide-react";
 import { EntryKind } from "@/types/expenseManagerTy";
 
@@ -119,20 +106,7 @@ function CompactSelect({
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="
-                    h-7
-                    appearance-none
-                    rounded-brand-8
-                    border border-border-clr
-                    bg-page-bg
-                    pl-2.5 pr-7
-                    para-tiny
-                    font-semibold
-                    text-text-secondary
-                    outline-none
-                    transition
-                    focus:border-primary
-                "
+                className="h-7 appearance-none rounded-brand-8 border border-border-clr bg-page-bg pl-2.5 pr-7 para-tiny font-semibold text-text-secondary outline-none transition focus:border-primary"
             >
                 {options.map((option) => (
                     <option
@@ -146,12 +120,7 @@ function CompactSelect({
 
             <ChevronDown
                 size={11}
-                className="
-                    pointer-events-none
-                    absolute right-2 top-1/2
-                    -translate-y-1/2
-                    text-text-secondary-muter
-                "
+                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary-muter"
             />
         </div>
     );
@@ -163,17 +132,17 @@ function ChartLegend({
     kinds: EntryKind[];
 }) {
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-brand-12">
             {kinds.map((kind) => {
                 const Icon = KIND_META[kind].icon;
 
                 return (
                     <span
                         key={kind}
-                        className="flex items-center gap-1.5 para-tiny font-medium text-text-secondary"
+                        className="flex items-center gap-1.5 para-tiny font-medium text-text-secondary-muted"
                     >
                         <span
-                            className="h-2 w-2 rounded-full"
+                            className="h-1.5 w-1.5 rounded-full"
                             style={{
                                 backgroundColor:
                                     KIND_META[kind].color,
@@ -201,11 +170,11 @@ export default function TrendChart({
     // Empty State
     if (!data || data.length === 0) {
         return (
-            <div className="flex h-full min-h-[285px] flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
+            <div className="flex h-full min-h-[255px] flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
                 <div className="flex items-center gap-2.5">
 
                     <div>
-                        <h3 className="para-tiny font-semibold text-text-dark">
+                        <h3 className="para-small font-semibold text-text-dark">
                             {title}
                         </h3>
 
@@ -402,8 +371,8 @@ export default function TrendChart({
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
 
-                    <div>
-                        <h3 className="para-tiny font-semibold text-text-dark">
+                    <div className="flex flex-col gap-1">
+                        <h3 className="para-small font-semibold text-text-dark">
                             {title}
                         </h3>
 
@@ -466,11 +435,11 @@ export default function TrendChart({
                 </div>
             </div>
 
-            {/* Chart */}
+            {/* Bar Chart */}
             <div className="mt-2 flex-1">
                 <ResponsiveContainer
                     width="100%"
-                    height={220}
+                    height={200}
                 >
                     <BarChart
                         data={data}
@@ -497,7 +466,7 @@ export default function TrendChart({
                                 )
                             }
                             tick={{
-                                fontSize: 14,
+                                fontSize: 11,
                                 fill: "var(--text-secondary-muter)",
                             }}
                             axisLine={false}
@@ -512,7 +481,7 @@ export default function TrendChart({
                                 )
                             }
                             tick={{
-                                fontSize: 14,
+                                fontSize: 11,
                                 fill: "var(--text-secondary-muter)",
                             }}
                             axisLine={false}
@@ -545,7 +514,7 @@ export default function TrendChart({
                                 border: "1px solid var(--border-clr)",
                                 boxShadow:
                                     "0 8px 24px rgba(0,0,0,0.06)",
-                                fontSize: 14,
+                                fontSize: 12,
                             }}
                         />
 
@@ -573,7 +542,7 @@ export default function TrendChart({
 
             {/* Legend */}
             {kindFilter === "all" && (
-                <div className="flex justify-center border-t border-border-clr pt-2.5">
+                <div className="flex justify-center border-t border-border-clr/85 pt-brand-8">
                     <ChartLegend
                         kinds={kindsToShow}
                     />

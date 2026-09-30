@@ -9,22 +9,21 @@ interface CategoryBreakdownProps {
   data: ICategoryBreakdownItem[];
 }
 
-export default function CategoryBreakdown({
-  data,
-}: CategoryBreakdownProps) {
+export default function CategoryBreakdown({ data }: CategoryBreakdownProps) {
+
   if (data.length === 0) {
     return (
-      <div className="flex h-full min-h-[300px] flex-col rounded-brand-16 border border-border-clr bg-white p-4">
+      <div className="flex h-full min-h-[220px] flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
         <div className="flex items-center gap-2">
           <div className="flex h-8 w-8 items-center justify-center rounded-brand-8 bg-page-bg">
             <BarChart3 size={16} className="text-text-secondary" />
           </div>
 
           <div>
-            <h3 className="heading-h5 text-text-dark">
+            <h3 className="heading-h6 text-sm text-text-dark">
               Spending by Category
             </h3>
-            <p className="para-small text-text-secondary-muter">
+            <p className="para-tiny text-text-secondary-muter">
               Expense distribution
             </p>
           </div>
@@ -39,11 +38,11 @@ export default function CategoryBreakdown({
               />
             </div>
 
-            <p className="para-small font-medium text-text-secondary">
+            <p className="para-tiny font-medium text-text-secondary">
               No expenses yet
             </p>
 
-            <p className="mt-0.5 para-small text-text-secondary-muter">
+            <p className="mt-0.5 para-tiny text-text-secondary-muter">
               Your spending breakdown will appear here.
             </p>
           </div>
@@ -55,43 +54,41 @@ export default function CategoryBreakdown({
   const sorted = [...data].sort((a, b) => b.amount - a.amount);
 
   const total = sorted.reduce(
-    (sum, item) => sum + item.amount,
-    0
+    (sum, item) => sum + item.amount, 0
   );
 
   const topCategory = sorted[0];
 
   return (
-    <div className="flex h-full min-h-0 flex-col rounded-brand-16 border border-border-clr bg-white p-3">
+    <div className="flex h-full min-h-0 flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
 
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
-
           <div>
-            <h3 className="para-small font-semibold text-text-dark">
+            <h3 className="para-small font-semibold mb-0.5">
               Spending by Category
             </h3>
 
-            <p className="para-small text-text-secondary-muter">
+            <p className="para-tiny text-text-secondary-muter">
               {sorted.length} categories
             </p>
           </div>
         </div>
 
         <div className="text-right">
-          <p className="para-small text-text-secondary-muter">
+          <p className="para-tiny text-text-secondary-muter mb-0.5">
             Total spending
           </p>
 
-          <p className="mt-0.5 para-small font-bold text-text-dark">
+          <h3 className="mt-0.5 para-small font-bold text-text-dark">
             PKR {total.toLocaleString("en-PK")}
-          </p>
+          </h3>
         </div>
       </div>
 
       {/* Top category highlight */}
-      <div className="mt-3 flex items-center justify-between rounded-brand-10 bg-page-bg px-3 py-2.5">
+      <div className="mt-3 flex items-center justify-between rounded-brand-10 bg-page-bg px-3 py-2.5 rounded-brand-8">
         <div className="flex min-w-0 items-center gap-2">
           <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white">
             <ArrowUpRight
