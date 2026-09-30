@@ -1,9 +1,14 @@
+// dashboard\components\user-dashboard\expenseManager\expenseCategory\CategoryBreakdown.tsx
+
 import { ICategoryBreakdownItem } from "@/types/expenseManagerTy";
 import {
   ArrowUpRight,
   BarChart3,
   ChevronRight,
 } from "lucide-react";
+import CategoryRow from "./CategoryRow";
+import AllCategoriesDialog from "./AllCategoriesDialog";
+import { useState } from "react";
 
 interface CategoryBreakdownProps {
   data: ICategoryBreakdownItem[];
@@ -20,7 +25,7 @@ export default function CategoryBreakdown({ data }: CategoryBreakdownProps) {
           </div>
 
           <div>
-            <h3 className="heading-h6 text-sm text-text-dark">
+            <h3 className="heading-h6 text-sm text-text-secondary">
               Spending by Category
             </h3>
             <p className="para-tiny text-text-secondary-muter">
@@ -58,6 +63,7 @@ export default function CategoryBreakdown({ data }: CategoryBreakdownProps) {
   );
 
   const topCategory = sorted[0];
+  const [showAll, setShowAll] = useState(false);
 
   return (
     <div className="flex h-full min-h-0 flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
@@ -81,105 +87,71 @@ export default function CategoryBreakdown({ data }: CategoryBreakdownProps) {
             Total spending
           </p>
 
-          <h3 className="mt-0.5 para-small font-bold text-text-dark">
+          <h3 className="mt-0.5 para-small font-bold text-text-secondary">
             PKR {total.toLocaleString("en-PK")}
           </h3>
         </div>
       </div>
 
       {/* Top category highlight */}
-      <div className="mt-3 flex items-center justify-between rounded-brand-10 bg-page-bg px-3 py-2.5 rounded-brand-8">
+      <div className="mt-3 flex items-center justify-between rounded-brand-10 bg-page-bg p-2 rounded-brand-8">
         <div className="flex min-w-0 items-center gap-2">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white">
+          <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white">
             <ArrowUpRight
-              size={14}
+              size={13}
               className="text-primary"
             />
           </div>
 
           <div className="min-w-0">
-            <p className="para-small uppercase tracking-wide text-text-secondary-muter">
+            <p className="para-tiny text-[11px] uppercase tracking-wide text-text-secondary-muter">
               Highest spending
             </p>
 
-            <p className="truncate para-small font-semibold text-text-dark">
+            <p className="truncate para-tiny font-semibold text-text-secondary mt-0.5">
               {topCategory.category.label}
             </p>
           </div>
         </div>
 
         <div className="shrink-0 text-right">
-          <p className="para-small font-bold text-text-dark">
+          <p className="para-tiny font-bold text-text-secondary">
             PKR {topCategory.amount.toLocaleString("en-PK")}
           </p>
 
-          <p className="para-small font-medium text-primary">
+          <p className="para-tiny font-medium text-primary mt-0.5">
             {topCategory.percentOfTotal}%
           </p>
         </div>
       </div>
 
-      {/* Categories */}
-      <div className="mt-3 min-h-0 flex-1 overflow-y-auto pr-1">
-        <div className="flex flex-col">
-          {sorted.map((item, index) => {
-            const percentage = Math.min(
-              100,
-              item.percentOfTotal
-            );
-
-            return (
-              <div
-                key={item.category.id}
-                className="group border-b border-border-clr py-2.5 first:pt-0 last:border-b-0 last:pb-0"
-              >
-                <div className="flex items-center justify-between gap-3">
-
-                  {/* Category */}
-                  <div className="flex min-w-0 items-center gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-page-bg para-small font-semibold text-text-secondary-muter">
-                      {index + 1}
-                    </span>
-
-                    <div className="min-w-0">
-                      <p className="truncate para-small font-semibold text-text-dark">
-                        {item.category.label}
-                      </p>
-
-                      <div className="mt-1 h-1 w-24 overflow-hidden rounded-full bg-page-bg">
-                        <div
-                          className="h-full rounded-full bg-primary transition-all duration-300"
-                          style={{
-                            width: `${percentage}%`,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Amount */}
-                  <div className="flex shrink-0 items-center gap-2">
-                    <div className="text-right">
-                      <p className="para-small font-semibold text-text-dark">
-                        PKR {item.amount.toLocaleString("en-PK")}
-                      </p>
-
-                      <p className="para-small text-text-secondary-muter">
-                        {item.percentOfTotal}% of total
-                      </p>
-                    </div>
-
-                    <ChevronRight
-                      size={13}
-                      className="text-text-secondary-muter opacity-0 transition-opacity group-hover:opacity-100"
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      {/* Categories lists */}
+      <div className="mt-brand-12 flex flex-col">
+        {sorted.slice(0, 4).map((item, index) => (
+          <CategoryRow
+            key={item.category.id}
+            item={item}
+            index={index}
+          />
+        ))}
       </div>
+
+      {sorted.length > 3 && (
+        <button
+          onClick={() => setShowAll(true)}
+          className="mt-2 self-center para-tiny font-semibold text-primary hover:underline cursor-pointer"
+        >
+          See more ({sorted.length - 3} more)
+        </button>
+      )}
+
+      <AllCategoriesDialog
+        open={showAll}
+        onOpenChange={setShowAll}
+        sorted={sorted}
+        total={total}
+      />
+
     </div>
   );
 }
