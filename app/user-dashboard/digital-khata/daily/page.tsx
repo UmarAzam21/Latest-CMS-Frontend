@@ -29,10 +29,10 @@ export default function ExpenseManagerPage() {
                 <h1 className="heading-h6">Digital Khatta</h1>
 
                 <div className="flex gap-2">
-                    <div className="flex items-center gap-2 para-small text-text-secondary-muter">
+                    <div className="flex items-center gap-2 para-tiny text-text-secondary-muter">
                         <span>Mode: {store.dataMode === "demo" ? "Demo" : "Blank"}</span>
                         <button onClick={store.dataMode === "demo" ? store.resetToBlank : store.loadDemoData}
-                            className="rounded-brand-8 border border-border-clr px-2.5 py-2 para-small font-semibold hover:bg-page-bg">
+                            className="rounded-brand-8 border border-border-clr px-2.5 py-2 para-tiny font-semibold hover:bg-page-bg">
                             {store.dataMode === "demo" ? "Start Fresh" : "Load Demo Data"}
                         </button>
                     </div>
@@ -61,7 +61,7 @@ export default function ExpenseManagerPage() {
             <ExpensesStats
                 entries={store.entries}
                 categories={store.categories}
-                cards={store.cards}  // NEW
+                cards={store.cards}
                 onViewKind={setStatDialogKind}
                 onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })}
                 onAddCard={store.addCard}

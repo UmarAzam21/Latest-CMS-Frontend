@@ -77,29 +77,6 @@ export interface ICard {
 
 export type FilterTab = "all" | EntryKind;
 
-// export const KHATA_LABELS: Record<EntryKind, { title: string; verb: string; noun: string; subjectLabel: string; cardLabel?: string }> = {
-//   income: {
-//     title: "Total Aamdani",
-//     verb: "Add Aamdani",
-//     noun: "Aamdani",
-//     subjectLabel: "Kis se aamdani? (jaise: Salary, Sales)",
-//     cardLabel: "Kis card me jama karein (optional)"
-//   },
-//   expense: {
-//     title: "Total Kharcha",
-//     verb: "Add Kharcha",
-//     noun: "Kharcha",
-//     subjectLabel: "Kis cheez ka kharcha? (jaise: Bijli, Grocery)",
-//     cardLabel: "Kis card se kharcha karein (optional)"
-//   },
-//   debt: {
-//     title: "Total Udhaar",
-//     verb: "Add Udhaar",
-//     noun: "Udhaar",
-//     subjectLabel: "Kis ka udhaar? (jaise: Ali Bhai, Bank Loan)"
-//   },
-// };
-
 export const KHATA_LABELS: Record<EntryKind, {
   title: string;
   verb: string;
@@ -136,19 +113,6 @@ export const KHATA_LABELS: Record<EntryKind, {
     categoryHint: "Lena ya Dena"
   },
 };
-
-
-// export type DebtDirection = "lena" | "dena";
-// export const MAX_CARDS = 3;
-// export const DEBT_CATEGORY_DIRECTION: Record<string, DebtDirection> = {
-//   "cat-udhaar-lena": "lena",
-//   "cat-udhaar-dena": "dena",
-// };
-// export const DEBT_CARD_LABELS: Record<DebtDirection, string> = {
-//   lena: "Udhaar kis card me aaya? (card me jama hoga, optional)",
-//   dena: "Udhaar kis card se diya? (card se kam hoga, optional)",
-// };
-
 
 export type DebtDirection = "liya" | "diya";
 export const MAX_CARDS = 3;

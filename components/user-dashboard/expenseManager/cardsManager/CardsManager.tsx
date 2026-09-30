@@ -17,8 +17,7 @@ interface CardFormDialogProps {
     onClose?: () => void;
 }
 
-const inputCls =
-    "w-full rounded-brand-8 border border-border-clr px-2.5 py-2 para-small outline-none focus:border-primary";
+const inputCls = "w-full rounded-brand-8 border border-border-clr px-2.5 py-2 para-tiny outline-none focus:border-primary";
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
 const GRADIENTS: { key: ICard["gradient"]; label: string }[] = [
     { key: "primary", label: "Red" },
@@ -45,7 +44,7 @@ function CardFormDialog({ onAdd, onUpdate, disabledAdd, editingCard, onClose }: 
                 <Dialog.Trigger asChild>
                     <button
                         disabled={disabledAdd}
-                        className="flex h-8 items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 para-small font-semibold text-text-secondary hover:bg-page-bg disabled:cursor-not-allowed disabled:opacity-40"
+                        className="flex items-center gap-1 rounded-brand-8 border border-border-clr px-brand-8 py-1.5 para-tiny font-semibold text-text-secondary cursor-pointer hover:bg-page-bg disabled:cursor-not-allowed disabled:opacity-40"
                     >
                         <Plus size={14} /> Add
                     </button>
@@ -56,7 +55,7 @@ function CardFormDialog({ onAdd, onUpdate, disabledAdd, editingCard, onClose }: 
                 <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
                 <Dialog.Content
                     aria-describedby={undefined}
-                    className="fixed left-1/2 top-1/2 z-modal max-h-[92vh] w-full max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-brand-12 bg-white p-brand-12"
+                    className="fixed left-1/2 top-1/2 z-modal max-h-[92vh] w-full max-w-md -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-brand-12 bg-white p-brand"
                 >
                     <div className="mb-brand-8 flex items-center justify-between">
                         <Dialog.Title className="para-small font-semibold text-text-dark">
@@ -104,11 +103,21 @@ function CardForm({
     // two-digit years, current year + 12; keep an existing card's year even if it falls outside
     const currentYY = new Date().getFullYear() % 100;
     const years = Array.from({ length: 13 }, (_, i) => currentYY + i);
-    if (initial && !years.includes(initial.expiryYear)) years.push(initial.expiryYear);
+
+    if (initial && !years.includes(initial.expiryYear)) {
+        years.push(initial.expiryYear);
+    }
+
     years.sort((a, b) => a - b);
 
     const balanceNum = balance === "" ? 0 : Number(balance);
-    const valid = label.trim().length > 0 && /^\d{4}$/.test(last4) && month !== "" && year !== "" && balanceNum >= 0;
+
+    const valid =
+        label.trim().length > 0 &&
+        /^\d{4}$/.test(last4) &&
+        month !== "" &&
+        year !== "" &&
+        balanceNum >= 0;
 
     // this object is what the live preview renders, so it updates on every keystroke
     const preview: ATMCardData = {
@@ -137,7 +146,7 @@ function CardForm({
         <form onSubmit={handleSubmit} className="flex flex-col gap-brand-12">
             {/* LIVE PREVIEW */}
             <div className="flex justify-center rounded-brand-12 bg-page-bg py-brand-12">
-                <ATMCard card={preview} flipped={showBack} animateIn={false} className="max-w-[290px]" />
+                <ATMCard card={preview} flipped={showBack} animateIn={true} className="max-w-[270px]" />
             </div>
 
             <div className="flex flex-col gap-brand-8">
@@ -210,9 +219,9 @@ function CardForm({
                                 aria-label={g.label}
                                 aria-pressed={gradient === g.key}
                                 className={cn(
-                                    "h-8 w-12 rounded-brand-8 default-transition",
+                                    "h-8 w-12 rounded-brand-8 default-transition cursor-pointer",
                                     gradientStyles[g.key],
-                                    gradient === g.key ? "ring-2 ring-primary ring-offset-2" : "opacity-80 hover:opacity-100"
+                                    gradient === g.key ? "ring-1 ring-primary ring-offset-1" : "opacity-80 hover:opacity-100"
                                 )}
                             />
                         ))}
@@ -224,14 +233,14 @@ function CardForm({
                 <button
                     type="button"
                     onClick={onCancel}
-                    className="h-9 flex-1 rounded-brand-8 border border-border-clr para-small font-semibold text-text-secondary hover:bg-page-bg"
+                    className="h-8 flex-1 rounded-brand-8 border border-border-clr para-tiny font-semibold text-text-secondary cursor-pointer hover:bg-page-bg"
                 >
                     Cancel
                 </button>
                 <button
                     type="submit"
                     disabled={!valid}
-                    className="h-9 flex-1 rounded-brand-8 bg-primary para-small font-semibold text-white hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="h-8 flex-1 rounded-brand-8 bg-primary para-tiny font-semibold text-white cursor-pointer hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
                 >
                     {initial ? "Update Karein" : "Card Add Karein"}
                 </button>
@@ -243,7 +252,7 @@ function CardForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
     return (
         <label className="flex flex-col gap-1">
-            <span className="para-small font-medium text-text-secondary-muter">{label}</span>
+            <span className="para-tiny font-medium text-text-secondary-muter">{label}</span>
             {children}
         </label>
     );
@@ -265,6 +274,9 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
     const [fromId, setFromId] = useState("");
     const [toId, setToId] = useState("");
     const [amount, setAmount] = useState("");
+    // confirm before card delete
+    const [confirmId, setConfirmId] = useState<string | null>(null);
+
     const atMax = cards.length >= MAX_CARDS;
     const from = cards.find((card) => card.id === fromId) ?? cards[0];
     const destinations = cards.filter((card) => card.id !== from?.id);
@@ -282,7 +294,7 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
                         My Cards
                     </h3>
 
-                    <p className="para-small text-text-secondary-muter">
+                    <p className="para-tiny text-text-secondary-muter">
                         Link and manage your payment cards.
                     </p>
                 </div>
@@ -291,8 +303,9 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
 
             {/* Card + dots: takes the leftover height and stays centered */}
             {activeCard ? (
-                <div className="flex flex-1 flex-col items-center justify-center gap-brand-12 py-brand-12">
+                <div className="flex flex-1 flex-col items-center justify-center gap-brand-12 py-brand-12x">
                     <ATMCard card={activeCard} className="mx-auto" />
+
                     {cards.length > 1 && (
                         <div className="flex justify-center gap-1.5" aria-label="Choose card">
                             {cards.map((card) => (
@@ -302,14 +315,17 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
                                     aria-label={`Show ${card.label}`}
                                     aria-pressed={card.id === activeCard.id}
                                     onClick={() => setSelectedCardId(card.id)}
-                                    className={`h-1.5 rounded-full default-transition ${card.id === activeCard.id ? "w-5 bg-primary" : "w-1.5 bg-border-clr"}`}
+                                    className={`h-2 rounded-full cursor-pointer default-transition ${card.id === activeCard.id
+                                        ? "w-5 bg-primary"
+                                        : "w-2 bg-border-clr hover:bg-primary"
+                                        }`}
                                 />
                             ))}
                         </div>
                     )}
                 </div>
             ) : (
-                <p className="flex flex-1 items-center justify-center para-small text-text-secondary-muter">
+                <p className="flex flex-1 items-center justify-center para-tiny text-text-secondary-muter">
                     Abhi koi card nahi hai.
                 </p>
             )}
@@ -318,31 +334,105 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
 
             {/* Actions */}
             <div className="flex gap-brand-8">
-                <button type="button" disabled={cards.length === 0} onClick={() => setManageOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 bg-primary para-small font-semibold text-white hover:opacity-90 disabled:opacity-40">
+                <button
+                    type="button"
+                    disabled={cards.length === 0}
+                    onClick={() => setManageOpen(true)}
+                    className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 bg-primary para-tiny font-semibold text-white hover:opacity-90 disabled:opacity-40"
+                >
                     <Settings2 size={13} /> Manage Cards
                 </button>
-                <button type="button" disabled={cards.length < 2} onClick={() => setTransferOpen(true)} className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 border border-slate-200 para-small font-semibold text-black bg-[#fafafa] ">
+
+                <button
+                    type="button"
+                    disabled={cards.length < 2}
+                    onClick={() => setTransferOpen(true)}
+                    className="flex h-9 flex-1 items-center justify-center gap-1.5 rounded-brand-8 border border-slate-200 para-tiny font-semibold text-black bg-[#fafafa]"
+                >
                     <ArrowLeftRight size={13} /> Transfer
                 </button>
             </div>
 
             {manageOpen && (
-                <div role="dialog" aria-modal="true" aria-labelledby="manage-cards-title" className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 p-4">
-                    <div className="w-full max-w-sm rounded-brand-12 bg-white p-brand-12">
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="manage-cards-title"
+                    className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 p-4"
+                >
+                    <div className="w-full max-w-sm rounded-brand-12 bg-white p-brand">
                         <div className="mb-brand-8 flex items-center justify-between">
-                            <h2 id="manage-cards-title" className="para-small font-semibold text-text-dark">Cards Manage Karein</h2>
-                            <button type="button" aria-label="Close manage cards" onClick={() => setManageOpen(false)}><X size={16} /></button>
+                            <h2 id="manage-cards-title" className="para-small font-semibold text-text-dark">
+                                Cards Manage Karein
+                            </h2>
+                            <button
+                                type="button"
+                                aria-label="Close manage cards"
+                                onClick={() => setManageOpen(false)}
+                            >
+                                <X size={16} />
+                            </button>
                         </div>
+
                         <div className="flex flex-col gap-1.5">
                             {cards.map((card) => (
-                                <div key={card.id} className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2">
+                                <div
+                                    key={card.id}
+                                    className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2"
+                                >
                                     <div>
-                                        <p className="para-small font-semibold text-text-dark">{card.label}</p>
-                                        <p className="para-small text-text-secondary-muter">•••• {card.last4} · PKR {card.balance.toLocaleString("en-PK")}</p>
+                                        <p className="para-tiny font-semibold text-text-dark">
+                                            {card.label}
+                                        </p>
+                                        <p className="para-tiny text-text-secondary-muter">
+                                            •••• {card.last4} · PKR {card.balance.toLocaleString("en-PK")}
+                                        </p>
                                     </div>
+
                                     <div className="flex items-center gap-2">
-                                        <button type="button" aria-label={`Edit ${card.label}`} onClick={() => { setManageOpen(false); setEditingCard(card); }} className="text-text-secondary-muter hover:text-primary"><Pencil size={14} /></button>
-                                        <button type="button" aria-label={`Delete ${card.label}`} onClick={() => onDeleteCard(card.id)} className="text-text-secondary-muter hover:text-danger"><Trash2 size={14} /></button>
+                                        <button
+                                            type="button"
+                                            aria-label={`Edit ${card.label}`}
+                                            onClick={() => {
+                                                setManageOpen(false);
+                                                setEditingCard(card);
+                                            }}
+                                            className="text-text-secondary-muter hover:text-primary"
+                                        >
+                                            <Pencil size={14} />
+                                        </button>
+                                        {
+                                            confirmId === card.id ? (
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="para-tiny text-text-secondary-muter">Delete?</span>
+                                                    <button
+                                                        type="button"
+                                                        aria-label={`Delete ${card.label}`}
+                                                        onClick={() => {
+                                                            onDeleteCard(card.id);
+                                                            setConfirmId(null);
+                                                        }}
+                                                        className="rounded-brand-8 bg-danger px-2 py-1 para-tiny font-semibold text-white"
+                                                    >
+                                                        Confirm
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setConfirmId(null)}
+                                                        className="rounded-brand-8 border border-border-clr px-2 py-1 para-tiny font-semibold text-text-secondary"
+                                                    >
+                                                        Cancel
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    type="button"
+                                                    aria-label={`Delete ${card.label}`}
+                                                    onClick={() => setConfirmId(card.id)}
+                                                    className="cursor-pointer text-text-secondary-muter hover:text-danger"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            )}
                                     </div>
                                 </div>
                             ))}
@@ -352,26 +442,76 @@ export default function CardsManager({ cards, onAddCard, onUpdateCard, onDeleteC
             )}
 
             {transferOpen && (
-                <div role="dialog" aria-modal="true" aria-labelledby="transfer-title" className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 p-4">
-                    <div className="w-full max-w-xs rounded-brand-12 bg-white p-brand-12">
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="transfer-title"
+                    className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 p-4"
+                >
+                    <div className="w-full max-w-xs rounded-brand-12 bg-white p-brand">
                         <div className="mb-brand-8 flex items-center justify-between">
-                            <h2 id="transfer-title" className="para-small font-semibold text-text-dark">Paisay Transfer Karein</h2>
-                            <button type="button" aria-label="Close transfer" onClick={() => setTransferOpen(false)}><X size={16} /></button>
+                            <h2 id="transfer-title" className="para-small font-semibold text-text-dark">
+                                Paisay Transfer Karein
+                            </h2>
+                            <button
+                                type="button"
+                                aria-label="Close transfer"
+                                onClick={() => setTransferOpen(false)}
+                            >
+                                <X size={16} />
+                            </button>
                         </div>
+
                         <div className="flex flex-col gap-brand-8">
-                            <select aria-label="From card" value={from?.id ?? ""} onChange={(event) => setFromId(event.target.value)} className={inputCls}>
-                                {cards.map((card) => <option key={card.id} value={card.id}>{card.label}</option>)}
+                            <select
+                                aria-label="From card"
+                                value={from?.id ?? ""}
+                                onChange={(event) => setFromId(event.target.value)}
+                                className={inputCls}
+                            >
+                                {cards.map((card) => (
+                                    <option key={card.id} value={card.id}>
+                                        {card.label}
+                                    </option>
+                                ))}
                             </select>
-                            <select aria-label="To card" value={to?.id ?? ""} onChange={(event) => setToId(event.target.value)} className={inputCls}>
-                                {destinations.map((card) => <option key={card.id} value={card.id}>{card.label}</option>)}
+
+                            <select
+                                aria-label="To card"
+                                value={to?.id ?? ""}
+                                onChange={(event) => setToId(event.target.value)}
+                                className={inputCls}
+                            >
+                                {destinations.map((card) => (
+                                    <option key={card.id} value={card.id}>
+                                        {card.label}
+                                    </option>
+                                ))}
                             </select>
-                            <input aria-label="Transfer amount" type="number" min="1" value={amount} onChange={(event) => setAmount(event.target.value)} placeholder="Amount (PKR)" className={inputCls} />
-                            <button type="button" disabled={!canTransfer} onClick={() => {
-                                if (!from || !to) return;
-                                onTransfer(from.id, to.id, transferAmount);
-                                setTransferOpen(false);
-                                setAmount("");
-                            }} className="rounded-brand-8 bg-primary py-2 para-small font-semibold text-white disabled:opacity-40">Transfer Karein</button>
+
+                            <input
+                                aria-label="Transfer amount"
+                                type="number"
+                                min="1"
+                                value={amount}
+                                onChange={(event) => setAmount(event.target.value)}
+                                placeholder="Amount (PKR)"
+                                className={inputCls}
+                            />
+
+                            <button
+                                type="button"
+                                disabled={!canTransfer}
+                                onClick={() => {
+                                    if (!from || !to) return;
+                                    onTransfer(from.id, to.id, transferAmount);
+                                    setTransferOpen(false);
+                                    setAmount("");
+                                }}
+                                className="rounded-brand-8 bg-primary py-2 para-tiny font-semibold text-white disabled:opacity-40"
+                            >
+                                Transfer Karein
+                            </button>
                         </div>
                     </div>
                 </div>

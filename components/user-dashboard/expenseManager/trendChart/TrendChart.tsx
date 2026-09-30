@@ -2,23 +2,10 @@
 
 import { useState } from "react";
 import {
-    BarChart,
-    Bar,
-    PieChart,
-    Pie,
-    Cell,
-    XAxis,
-    YAxis,
-    Tooltip,
-    ResponsiveContainer,
-    CartesianGrid,
+    BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
 import {
-    BarChart3,
-    ChevronDown,
-    TrendingDown,
-    TrendingUp,
-    CircleDollarSign,
+    BarChart3, ChevronDown, TrendingDown, TrendingUp, CircleDollarSign,
 } from "lucide-react";
 import { EntryKind } from "@/types/expenseManagerTy";
 
@@ -119,20 +106,7 @@ function CompactSelect({
             <select
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="
-                    h-7
-                    appearance-none
-                    rounded-brand-8
-                    border border-border-clr
-                    bg-page-bg
-                    pl-2.5 pr-7
-                    para-small
-                    font-semibold
-                    text-text-secondary
-                    outline-none
-                    transition
-                    focus:border-primary
-                "
+                className="h-7 appearance-none rounded-brand-8 border border-border-clr bg-page-bg pl-2.5 pr-7 para-tiny font-semibold text-text-secondary outline-none transition focus:border-primary"
             >
                 {options.map((option) => (
                     <option
@@ -146,12 +120,7 @@ function CompactSelect({
 
             <ChevronDown
                 size={11}
-                className="
-                    pointer-events-none
-                    absolute right-2 top-1/2
-                    -translate-y-1/2
-                    text-text-secondary-muter
-                "
+                className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-text-secondary-muter"
             />
         </div>
     );
@@ -163,17 +132,17 @@ function ChartLegend({
     kinds: EntryKind[];
 }) {
     return (
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-brand-12">
             {kinds.map((kind) => {
                 const Icon = KIND_META[kind].icon;
 
                 return (
                     <span
                         key={kind}
-                        className="flex items-center gap-1.5 para-small font-medium text-text-secondary"
+                        className="flex items-center gap-1.5 para-tiny font-medium text-text-secondary-muted"
                     >
                         <span
-                            className="h-2 w-2 rounded-full"
+                            className="h-1.5 w-1.5 rounded-full"
                             style={{
                                 backgroundColor:
                                     KIND_META[kind].color,
@@ -193,28 +162,23 @@ export default function TrendChart({
     dataByGranularity,
     variant = "bar",
 }: TrendChartProps) {
-    const [granularity, setGranularity] =
-        useState<Granularity>("day");
-
-    const [kindFilter, setKindFilter] =
-        useState<KindFilter>("all");
+    const [granularity, setGranularity] = useState<Granularity>("day");
+    const [kindFilter, setKindFilter] = useState<KindFilter>("all");
 
     const data = dataByGranularity[granularity];
 
-    /*
-     * Empty state
-     */
+    // Empty State
     if (!data || data.length === 0) {
         return (
-            <div className="flex h-full min-h-[300px] flex-col rounded-brand-16 border border-border-clr bg-white p-4">
+            <div className="flex h-full min-h-[255px] flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
                 <div className="flex items-center gap-2.5">
-                   
+
                     <div>
                         <h3 className="para-small font-semibold text-text-dark">
                             {title}
                         </h3>
 
-                        <p className="para-small text-text-secondary-muter">
+                        <p className="para-tiny text-text-secondary-muter">
                             Spending activity
                         </p>
                     </div>
@@ -229,11 +193,11 @@ export default function TrendChart({
                             />
                         </div>
 
-                        <p className="para-small font-medium text-text-secondary">
+                        <p className="para-tiny font-medium text-text-secondary">
                             No activity yet
                         </p>
 
-                        <p className="mt-0.5 para-small text-text-secondary-muter">
+                        <p className="mt-0.5 para-tiny text-text-secondary-muter">
                             Your financial activity will appear here.
                         </p>
                     </div>
@@ -242,9 +206,7 @@ export default function TrendChart({
         );
     }
 
-    /*
-     * PIE
-     */
+    // PIE
     if (variant === "pie") {
         const total = data.reduce(
             (sum, item) => sum + item.expense,
@@ -252,16 +214,16 @@ export default function TrendChart({
         );
 
         return (
-            <div className="flex h-full flex-col rounded-brand-16 border border-border-clr bg-white p-4">
+            <div className="flex h-full flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-                      
+
                         <div>
                             <h3 className="para-small font-semibold text-text-dark">
                                 {title}
                             </h3>
 
-                            <p className="para-small text-text-secondary-muter">
+                            <p className="para-tiny text-text-secondary-muter">
                                 Expense distribution
                             </p>
                         </div>
@@ -314,8 +276,8 @@ export default function TrendChart({
                                         key={index}
                                         fill={
                                             PIE_PALETTE[
-                                                index %
-                                                    PIE_PALETTE.length
+                                            index %
+                                            PIE_PALETTE.length
                                             ]
                                         }
                                     />
@@ -349,7 +311,7 @@ export default function TrendChart({
                     </ResponsiveContainer>
 
                     <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="para-small text-text-secondary-muter">
+                        <span className="para-tiny text-text-secondary-muter">
                             Total
                         </span>
 
@@ -370,20 +332,20 @@ export default function TrendChart({
                                 style={{
                                     backgroundColor:
                                         PIE_PALETTE[
-                                            index %
-                                                PIE_PALETTE.length
+                                        index %
+                                        PIE_PALETTE.length
                                         ],
                                 }}
                             />
 
-                            <span className="truncate para-small text-text-secondary">
+                            <span className="truncate para-tiny text-text-secondary">
                                 {formatTick(
                                     item.label,
                                     granularity
                                 )}
                             </span>
 
-                            <span className="ml-auto para-small font-semibold text-text-dark">
+                            <span className="ml-auto para-tiny font-semibold text-text-dark">
                                 PKR{" "}
                                 {formatAmount(
                                     item.expense
@@ -396,27 +358,25 @@ export default function TrendChart({
         );
     }
 
-    /*
-     * BAR
-     */
+    // BAR
     const kindsToShow: EntryKind[] =
         kindFilter === "all"
             ? ["expense", "income", "debt"]
             : [kindFilter];
 
     return (
-        <div className="flex h-full min-h-0 flex-col rounded-brand-16 border border-border-clr bg-white p-4">
+        <div className="flex h-full min-h-0 flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
 
             {/* Header */}
             <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5">
 
-                    <div>
+                    <div className="flex flex-col gap-1">
                         <h3 className="para-small font-semibold text-text-dark">
                             {title}
                         </h3>
 
-                        <p className="para-small text-text-secondary-muter">
+                        <p className="para-tiny text-text-secondary-muter">
                             Income, expenses & debt
                         </p>
                     </div>
@@ -475,11 +435,11 @@ export default function TrendChart({
                 </div>
             </div>
 
-            {/* Chart */}
+            {/* Bar Chart */}
             <div className="mt-2 flex-1">
                 <ResponsiveContainer
                     width="100%"
-                    height={220}
+                    height={200}
                 >
                     <BarChart
                         data={data}
@@ -506,7 +466,7 @@ export default function TrendChart({
                                 )
                             }
                             tick={{
-                                fontSize: 14,
+                                fontSize: 11,
                                 fill: "var(--text-secondary-muter)",
                             }}
                             axisLine={false}
@@ -521,7 +481,7 @@ export default function TrendChart({
                                 )
                             }
                             tick={{
-                                fontSize: 14,
+                                fontSize: 11,
                                 fill: "var(--text-secondary-muter)",
                             }}
                             axisLine={false}
@@ -554,7 +514,7 @@ export default function TrendChart({
                                 border: "1px solid var(--border-clr)",
                                 boxShadow:
                                     "0 8px 24px rgba(0,0,0,0.06)",
-                                fontSize: 14,
+                                fontSize: 12,
                             }}
                         />
 
@@ -582,7 +542,7 @@ export default function TrendChart({
 
             {/* Legend */}
             {kindFilter === "all" && (
-                <div className="flex justify-center border-t border-border-clr pt-2.5">
+                <div className="flex justify-center border-t border-border-clr/85 pt-brand-8">
                     <ChartLegend
                         kinds={kindsToShow}
                     />

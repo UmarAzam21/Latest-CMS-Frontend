@@ -82,7 +82,7 @@ export default function ATMCard({ card, flipped: flippedProp, animateIn = true, 
             `}</style>
 
             <div
-                className={cn(animateIn && "atm-card-in", "aspect-[85.6/54] w-full max-w-[320px]", className)}
+                className={cn(animateIn && "atm-card-in", "aspect-[85.6/54]x aspect-[100/55] w-full max-w-[400px]x max-w-[355px]", className)}
                 style={{ perspective: "1000px" }}
             >
                 {/* TILT LAYER */}
