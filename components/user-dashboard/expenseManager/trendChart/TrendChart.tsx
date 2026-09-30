@@ -23,6 +23,7 @@ interface TrendChartProps {
     title: string;
     dataByGranularity: Record<Granularity, TrendDatum[]>;
     variant?: "bar" | "pie";
+    defaultGranularity?: Granularity;
 }
 
 const KIND_META: Record<
@@ -161,8 +162,10 @@ export default function TrendChart({
     title,
     dataByGranularity,
     variant = "bar",
+    defaultGranularity,
 }: TrendChartProps) {
-    const [granularity, setGranularity] = useState<Granularity>("day");
+    // const [granularity, setGranularity] = useState<Granularity>("day");
+    const [granularity, setGranularity] = useState<Granularity>(defaultGranularity ?? "day");
     const [kindFilter, setKindFilter] = useState<KindFilter>("all");
 
     const data = dataByGranularity[granularity];
@@ -217,7 +220,6 @@ export default function TrendChart({
             <div className="flex h-full flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
-
                         <div>
                             <h3 className="para-small font-semibold text-text-dark">
                                 {title}
@@ -253,10 +255,10 @@ export default function TrendChart({
                     />
                 </div>
 
-                <div className="relative flex-1">
+                <div className="relative flex-1 max-h-min my-brand-12">
                     <ResponsiveContainer
                         width="100%"
-                        height={280}
+                        height={205}
                     >
                         <PieChart>
                             <Pie
@@ -265,8 +267,10 @@ export default function TrendChart({
                                 nameKey="label"
                                 cx="50%"
                                 cy="50%"
-                                innerRadius={80}
-                                outerRadius={120}
+                                // innerRadius={80}
+                                innerRadius={60}
+                                // outerRadius={120}
+                                outerRadius={95}
                                 paddingAngle={3}
                                 cornerRadius={5}
                                 stroke="none"
@@ -321,7 +325,8 @@ export default function TrendChart({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                {/* footer description */}
+                <div className="grid grid-cols-2 gap-x-30 gap-y-1.5">
                     {data.map((item, index) => (
                         <div
                             key={item.label}
@@ -338,14 +343,14 @@ export default function TrendChart({
                                 }}
                             />
 
-                            <span className="truncate para-tiny text-text-secondary">
+                            <span className="truncate para-tiny text-text-secondary-muted">
                                 {formatTick(
                                     item.label,
                                     granularity
                                 )}
                             </span>
 
-                            <span className="ml-auto para-tiny font-semibold text-text-dark">
+                            <span className="ml-auto para-tiny font-semibold text-text-secondary">
                                 PKR{" "}
                                 {formatAmount(
                                     item.expense
@@ -439,7 +444,7 @@ export default function TrendChart({
             <div className="mt-2 flex-1">
                 <ResponsiveContainer
                     width="100%"
-                    height={200}
+                    height={225}
                 >
                     <BarChart
                         data={data}

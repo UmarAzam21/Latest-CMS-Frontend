@@ -3,11 +3,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowUpDown, Download, Pencil, Trash2 } from "lucide-react";
+import { ArrowUpDown, Download, Pencil, Trash2, X, AlertTriangle } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { IExpenseEntry, ICategory, SortField, SortDirection, EntryKind, KHATA_LABELS } from "@/types/expenseManagerTy";
 import { cn } from "@/lib/cn";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { exportToCsv, exportToPdf, exportToXlsx } from "@/lib/utils/exportTransactionsData";
+
+type FilterTab = "all" | EntryKind;
 
 interface ExpensesTableProps {
   entries: IExpenseEntry[];
@@ -21,8 +24,6 @@ interface ExpensesTableProps {
   onFilterChange: (f: FilterTab) => void;
   showTypeFilters?: boolean;
 }
-
-type FilterTab = "all" | EntryKind;
 
 const kindBadgeStyles: Record<EntryKind, string> = {
   expense: "bg-danger-bg text-danger",
@@ -39,6 +40,7 @@ export default function ExpensesTable({
 }: ExpensesTableProps) {
   const PAGE_SIZE = 8;
   const [page, setPage] = useState(1);
+  const [deleteTarget, setDeleteTarget] = useState<IExpenseEntry | null>(null);
 
   const getCategoryLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? "Uncategorized";
 
@@ -51,90 +53,48 @@ export default function ExpensesTable({
 
   const filteredEntries = activeFilter === "all" ? entries : entries.filter((e) => e.kind === activeFilter);
 
-  useEffect(() => setPage(1), [activeFilter]);
   const totalPages = Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE));
   const paginatedEntries = filteredEntries.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  useEffect(() => { setPage(1); setDeleteTarget(null); }, [activeFilter]);
+
+  const confirmDelete = () => {
+    if (deleteTarget) onDelete(deleteTarget.id);
+    setDeleteTarget(null);
+  };
 
   return (
-    <div className="rounded-brand-16 border border-border-clr bg-card-bg-clrx bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-clr p-4">
+    <div className="rounded-brand-16 border border-border-clr bg-white">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-clr px-brand-12 py-brand-8">
         <div>
           <h3 className="para-small font-semibold text-text-dark">Transactions</h3>
-          <p className="para-small text-text-secondary-muter">
+          <p className="para-tiny text-text-secondary-muter">
             All expenses, income, and debt entries in one place.
           </p>
         </div>
 
-        {/* Entries Filters Tabs */}
-        <div className="flex gap-8">
-          <div className="flex gap-1.5">
+        <div className="flex gap-6">
+          <div className="flex gap-brand-8">
             {showTypeFilters && (<>
-              <FilterTabButton
-                label="All"
-                count={counts.all}
-                active={activeFilter === "all"}
-                onClick={() => onFilterChange("all")}
-              />
-              <FilterTabButton
-                // label="Expenses"
-                label={KHATA_LABELS.expense.noun}
-                count={counts.expense}
-                active={activeFilter === "expense"}
-                onClick={() => onFilterChange("expense")}
-              />
-              <FilterTabButton
-                // label="Income"
-                label={KHATA_LABELS.income.noun}
-                count={counts.income}
-                active={activeFilter === "income"}
-                onClick={() => onFilterChange("income")}
-              />
-              <FilterTabButton
-                // label="Debt"
-                label={KHATA_LABELS.debt.noun}
-                count={counts.debt}
-                active={activeFilter === "debt"}
-                onClick={() => onFilterChange("debt")}
-              />
+              <FilterTabButton label="All" count={counts.all} active={activeFilter === "all"} onClick={() => onFilterChange("all")} />
+              <FilterTabButton label={KHATA_LABELS.expense.noun} count={counts.expense} active={activeFilter === "expense"} onClick={() => onFilterChange("expense")} />
+              <FilterTabButton label={KHATA_LABELS.income.noun} count={counts.income} active={activeFilter === "income"} onClick={() => onFilterChange("income")} />
+              <FilterTabButton label={KHATA_LABELS.debt.noun} count={counts.debt} active={activeFilter === "debt"} onClick={() => onFilterChange("debt")} />
             </>)}
-
           </div>
 
-          {/* Entries Export Dropdown */}
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 py-1.5 para-small font-semibold text-text-secondary hover:bg-page-bg">
+              <button className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 py-1.5 para-tiny font-semibold text-text-secondary hover:bg-page-bg">
                 <Download size={13} /> Export
               </button>
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
-              <DropdownMenu.Content
-                align="end"
-                className="z-dropdown w-40 rounded-brand-8 border border-border-clr bg-white p-1 shadow-card-hover"
-              >
-                <DropdownMenu.Item
-                  onClick={() => exportToCsv(filteredEntries, categories, "transactions.csv")}
-                  className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-small text-text-secondary hover:bg-page-bg outline-none"
-                >
-                  CSV
-                </DropdownMenu.Item>
-
-                <DropdownMenu.Item
-                  onClick={() => exportToXlsx(filteredEntries, categories, "transactions.xlsx")}
-                  className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-small text-text-secondary hover:bg-page-bg outline-none"
-                >
-                  Excel (.xlsx)
-                </DropdownMenu.Item>
-
-                <DropdownMenu.Item
-                  onClick={() => exportToPdf(filteredEntries, categories, "transactions.pdf")}
-                  className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-small text-text-secondary hover:bg-page-bg outline-none"
-                >
-                  PDF
-                </DropdownMenu.Item>
+              <DropdownMenu.Content align="end" className="z-dropdown w-40 rounded-brand-8 border border-border-clr bg-white p-1 shadow-card-hover">
+                <DropdownMenu.Item onClick={() => exportToCsv(filteredEntries, categories, "transactions.csv")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">CSV</DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => exportToXlsx(filteredEntries, categories, "transactions.xlsx")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">Excel (.xlsx)</DropdownMenu.Item>
+                <DropdownMenu.Item onClick={() => exportToPdf(filteredEntries, categories, "transactions.pdf")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">PDF</DropdownMenu.Item>
               </DropdownMenu.Content>
-
             </DropdownMenu.Portal>
           </DropdownMenu.Root>
         </div>
@@ -142,49 +102,42 @@ export default function ExpensesTable({
 
       {filteredEntries.length === 0 ? (
         <div className="p-10 text-center">
-          <p className="para-small text-text-secondary-muted">
-            No {activeFilter === "all" ? "entries" : activeFilter} yet.
-          </p>
+          <p className="para-small text-text-secondary-muted">No {activeFilter === "all" ? "entries" : activeFilter} yet.</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border-clr para-small uppercase text-text-secondary-muter">
+              <tr className="border-b border-border-clr para-tiny uppercase text-text-secondary-muter">
                 <SortableHeader label="Subject" field="subject" active={sortField} direction={sortDirection} onSort={onSort} />
-                <th className="px-4 py-3 text-left font-semibold">Type</th>
-                <th className="px-4 py-3 text-left font-semibold">Category</th>
+                <th className="px-brand-12 py-brand-8 text-left font-semibold">Type</th>
+                <th className="px-brand-12 py-brand-8 text-left font-semibold">Category</th>
                 <SortableHeader label="Date" field="date" active={sortField} direction={sortDirection} onSort={onSort} />
                 <SortableHeader label="Amount" field="amount" active={sortField} direction={sortDirection} onSort={onSort} align="right" />
-                <th className="px-4 py-3 text-right font-semibold">Actions</th>
+                <th className="px-brand-12 py-brand-8 text-right font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {/* {filteredEntries.map((entry) => ( */}
               {paginatedEntries.map((entry) => (
                 <tr key={entry.id} className="border-b border-border-clr last:border-0 hover:bg-page-bg">
-                  <td className="px-4 py-3 para-small text-text-dark">{entry.subject}</td>
-                  <td className="px-4 py-3">
-                    <span className={cn("rounded-full px-2 py-0.5 para-small font-semibold capitalize", kindBadgeStyles[entry.kind])}>
+                  <td className="px-brand-12 py-brand-8 para-tiny text-text-dark">{entry.subject}</td>
+                  <td className="px-brand-12 py-brand-8">
+                    <span className={cn("rounded-full px-2 py-0.5 para-tiny text-[11px] font-semibold capitalize", kindBadgeStyles[entry.kind])}>
                       {entry.kind}
                     </span>
                   </td>
-                  <td className="px-4 py-3 para-small text-text-secondary">{getCategoryLabel(entry.categoryId)}</td>
-                  <td className="px-4 py-3 para-small text-text-secondary-muted">
-                    {new Date(entry.date).toLocaleDateString("en-GB")}
-                  </td>
-                  <td className={cn(
-                    "px-4 py-3 text-right para-small font-semibold",
-                    entry.kind === "income" ? "text-success" : "text-text-dark"
-                  )}>
+                  <td className="px-brand-12 py-brand-8 para-tiny text-text-secondary">{getCategoryLabel(entry.categoryId)}</td>
+                  <td className="px-brand-12 py-brand-8 para-tiny text-text-secondary-muted">{new Date(entry.date).toLocaleDateString("en-GB")}</td>
+                  <td className={cn("px-brand-12 py-brand-8 text-right para-tiny font-semibold", entry.kind === "income" ? "text-success" : "text-text-secondary")}>
                     {entry.kind === "income" ? "+" : "-"}{formatCurrency(entry.amount)}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-brand-12 py-brand-8">
+                    {/* Row is now static — no inline confirm state, so it never resizes */}
                     <div className="flex items-center justify-end gap-2">
                       <button onClick={() => onEdit(entry)} className="text-text-secondary-muter hover:text-primary">
                         <Pencil size={14} />
                       </button>
-                      <button onClick={() => onDelete(entry.id)} className="text-text-secondary-muter hover:text-danger">
+                      <button onClick={() => setDeleteTarget(entry)} className="text-text-secondary-muter hover:text-danger">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -194,57 +147,92 @@ export default function ExpensesTable({
             </tbody>
           </table>
 
+          {/* footer */}
           {filteredEntries.length > PAGE_SIZE && (
-            <div className="flex items-center justify-between border-t border-border-clr px-4 py-3">
-              <span className="para-small text-text-secondary-muter">
+            <div className="flex items-center justify-between border-t border-border-clr px-brand-12 py-brand-8">
+              <span className="para-tiny text-text-secondary-muter">
                 Showing {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filteredEntries.length)} of {filteredEntries.length}
               </span>
               <div className="flex gap-1.5">
-                <button disabled={page === 1} onClick={() => setPage((p) => p - 1)}
-                  className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-small disabled:opacity-40">Prev</button>
-                <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}
-                  className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-small disabled:opacity-40">Next</button>
+                <button disabled={page === 1} onClick={() => setPage((p) => p - 1)} className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-tiny cursor-pointer disabled:opacity-40 hover:bg-page-bg default-transition">Prev</button>
+                <button disabled={page === totalPages} onClick={() => setPage((p) => p + 1)} className="rounded-brand-8 border border-border-clr px-2.5 py-1 para-tiny cursor-pointer disabled:opacity-40 hover:bg-page-bg default-transition">Next</button>
               </div>
             </div>
           )}
         </div>
       )}
+
+      {/* Single shared confirm-delete dialog, not one per row */}
+      <Dialog.Root open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-brand-16 bg-white p-5 shadow-card-hover">
+            <div className="mb-3 flex items-center justify-between">
+              <Dialog.Title className="heading-h6 flex items-center gap-2 text-text-dark">
+                <AlertTriangle size={17} className="text-danger" /> Delete entry?
+              </Dialog.Title>
+              <Dialog.Close className="text-text-secondary-muter hover:text-text-secondary">
+                <X size={16} />
+              </Dialog.Close>
+            </div>
+
+            <p className="para-small mb-4 text-text-secondary">
+              {deleteTarget && (
+                <>
+                  This will permanently delete{" "}
+                  <span className="font-semibold text-text-dark">
+                    {deleteTarget.subject}
+                  </span>{" "}
+                  ({formatCurrency(deleteTarget.amount)}). This can't be undone.
+                </>
+              )}
+            </p>
+
+            <div className="flex justify-end gap-2">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="rounded-brand-8 border border-border-clr px-3 py-2 para-small font-semibold text-text-secondary hover:bg-page-bg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="rounded-brand-8 bg-danger px-3 py-2 para-small font-semibold text-white hover:opacity-90"
+              >
+                Delete
+              </button>
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+
     </div>
   );
 }
 
-function FilterTabButton({
-  label, count, active, onClick,
-}: { label: string; count: number; active: boolean; onClick: () => void }) {
+function FilterTabButton({ label, count, active, onClick }: { label: string; count: number; active: boolean; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 rounded-brand-8 px-3 py-1.5 para-small font-semibold default-transition",
-        active ? "bg-primary text-white" : "bg-page-bg text-text-secondary hover:bg-border-clr"
+        "flex items-center gap-1.5 rounded-brand-8 px-3 py-1.5 para-tiny font-semibold text-text-secondary default-transition cursor-pointer",
+        active ? "border border-border-clr bg-text-tertiary" : "border border-border-clr/50 hover:bg-page-bg"
       )}
     >
       {label}
-      <span className={cn("rounded-full px-1.5 para-small", active ? "bg-white/25" : "bg-border-clr")}>
+      <span className={cn("rounded-full w-5 h-5 flex items-center justify-center para-tiny text-[11px]", active ? "bg-border-clr" : "bg-border-card-clr/65")}>
         {count}
       </span>
     </button>
   );
 }
 
-function SortableHeader({
-  label, field, active, direction, onSort, align = "left",
-}: {
+function SortableHeader({ label, field, active, direction, onSort, align = "left" }: {
   label: string; field: SortField; active: SortField; direction: SortDirection;
   onSort: (f: SortField) => void; align?: "left" | "right";
 }) {
   return (
-    <th
-      onClick={() => onSort(field)}
-      className={cn("cursor-pointer select-none px-4 py-3 font-semibold default-transition hover:text-text-secondary",
-        align === "right" ? "text-right" : "text-left"
-      )}
-    >
+    <th onClick={() => onSort(field)} className={cn("cursor-pointer select-none px-brand-12 py-brand-8 font-semibold default-transition hover:text-text-secondary", align === "right" ? "text-right" : "text-left")}>
       <span className={cn("inline-flex items-center gap-1", align === "right" && "flex-row-reverse")}>
         {label}
         <ArrowUpDown size={11} className={active === field ? "text-primary" : "opacity-40"} />

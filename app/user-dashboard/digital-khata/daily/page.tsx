@@ -100,6 +100,7 @@ export default function ExpenseManagerPage() {
                         week: store.stats.weeklyTrend,
                         month: store.stats.monthlyTrend
                     }}
+                    defaultGranularity="week"
                 />
                 <DebtSummaryCardV2
                     debtEntries={debtEntries}
@@ -117,6 +118,7 @@ export default function ExpenseManagerPage() {
                         month: store.stats.monthlyTrend
                     }}
                     variant="pie"
+                    defaultGranularity="month"
                 />
             </div>
 
