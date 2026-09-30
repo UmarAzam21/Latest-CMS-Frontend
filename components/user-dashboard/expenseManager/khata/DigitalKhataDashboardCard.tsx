@@ -53,10 +53,10 @@ export default function DigitalKhataDashboardCard({ entries, categories, cards, 
                 <div className="expense-card-face flex h-full flex-col gap-brand-8 rounded-brand-16 bg-gradient-wallet-card p-brand-12 text-white shadow-card-hover">
                     <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-brand-8">
                         <div className="flex items-center gap-2">
-                            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-brand-8 bg-white/80 p-1.5">
+                            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-brand-8 bg-white/80 p-1.5">
                                 <img src="/filernow-wellness-icon-01.png" alt="Filernow logo" className="h-full w-full object-contain" />
                             </span>
-                            <span className="para-small font-medium">Digital Khatta</span>
+                            <span className="text-[16px] font-medium">Digital Khatta</span>
                         </div>
                         <span className="para-tiny text-white/85 font-semiboldx">Manage your money</span>
                     </div>
@@ -107,7 +107,7 @@ export default function DigitalKhataDashboardCard({ entries, categories, cards, 
                 {/* ---------- BACK ------------- */}
                 <div className="expense-card-face expense-card-back flex h-full flex-col gap-brand-8 rounded-brand-16 bg-gradient-wallet-card p-brand-12 text-white shadow-card-hover">
                     <div className="flex items-center justify-between border-b border-white/15 pb-brand-8">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-brand-8 bg-white/80 p-1.5">
+                        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-brand-8 bg-white/80 p-1.5">
                             <img src="/filernow-wellness-icon-01.png" alt="Filernow logo" className="h-full w-full object-contain" />
                         </span>
                         <Link

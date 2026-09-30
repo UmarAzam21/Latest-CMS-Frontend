@@ -24,6 +24,7 @@ import {
 import Image from "next/image";
 import { ASSETS } from "@/lib/assets";
 import NotificationModal from "../ui/NotificationModal";
+import CalculatorButton from "@/components/user-dashboard/expenseManager/Calculator";
 
 type AdminProfile = {
     name?: string;
@@ -140,10 +141,10 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
     }
 
     const navItemClass =
-        "flex items-center gap-1 whitespace-nowrap rounded-brand-8 px-3 py-2 para-tiny font-medium text-text-secondary default-transition hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+        "flex items-center gap-1 whitespace-nowrap rounded-full px-3 py-1.5 para-tiny font-medium text-text-secondary default-transition hover:text-primary hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
 
     const ctaItemClass =
-        "flex items-center gap-1 whitespace-nowrap rounded-brand-8 border border-primary/20 px-3 py-2 para-tiny font-medium text-primary default-transition hover:bg-primary/5 hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
+        "flex h-[27px] items-center gap-1 whitespace-nowrap rounded-full border border-primary bg-primary px-1.5 py-0 para-tiny font-medium text-white default-transition hover:border-primary-light hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
 
     return (
         <header className="flex h-13 items-center justify-between gap-4 border-b border-slate-200 bg-white px-brand py-2">
@@ -162,13 +163,13 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
                     <input
                         type="text"
                         placeholder={isUser ? "Search your workspace..." : "Search pages, messages, media..."}
-                        className="h-[35px] w-[300px] rounded-lg border border-slate-200 bg-[#F9FAFB] py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0"
+                        className="h-[35px] w-[300px] rounded-full border border-slate-200 bg-[#F9FAFB] py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0"
                     />
                 </div>
 
                 {/* NAVIGATION */}
                 <nav
-                    className="flex min-w-0 items-center gap-1"
+                    className="flex h-[35px] min-w-0 items-center gap-1 rounded-full border border-slate-200 bg-[#F9FAFB] px-1.5"
                     aria-label="Dashboard navigation"
                 >
                     <a href="#" className={navItemClass}>
@@ -201,16 +202,8 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
                         Support
                     </a>
 
-                    {/* Divider separates info links from conversion actions */}
-                    <div className="mx-2 h-5 w-px shrink-0 bg-slate-200" aria-hidden="true" />
-
-                    <a href="#" className={ctaItemClass}>
-                        Become a Filer
-                    </a>
-
-                    <a href="#" className={ctaItemClass}>
-                        Register Business
-                    </a>
+                    {/* Primary action */}
+                    <CalculatorButton label="Calculator" className={ctaItemClass} />
                 </nav>
             </div>
 
@@ -220,7 +213,6 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
                 {/* NOTIFICATIONS */}
                 <NotificationModal userId={admin?.email} />
 
-                <div className="h-6 w-px bg-slate-200" aria-hidden="true" />
 
                 {/* ACCOUNT */}
                 <Dropdown

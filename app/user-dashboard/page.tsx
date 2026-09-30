@@ -10,6 +10,9 @@ import AdvancedExpenseWorkspaceV2 from '@/components/user-dashboard/expenseManag
 import PromoBanner from '@/components/user-dashboard/expenseManager/promoBanner/PromoBanner';
 import DigitalKhataDashboardCard from '@/components/user-dashboard/expenseManager/khata/DigitalKhataDashboardCard';
 import FbrTaskBoard from '@/components/user-dashboard/FbrTaskBoard/FbrTaskBoard';
+import QuickGrids from '@/components/user-dashboard/expenseManager/QuickGrids/page';
+import PromoBannerV2 from "@/components/user-dashboard/expenseManager/promoBannerv2/page"
+import PromoBannerV3 from "@/components/user-dashboard/expenseManager/promoBannerv3/page"
 import { Filter } from 'lucide-react';
 
 type DashboardTab = 'inbox' | 'draft' | 'outbox' | 'completed';
@@ -60,7 +63,7 @@ function DashboardOverviewContent() {
   return (
     <div>
       <div className="mb-3 ">
-        <h1 className="heading-h6 text-sm leading-tight">
+        <h1 className="heading-h6 leading-tight">
           Welcome Back, <span className="text-primary">User!</span>
         </h1>
       </div>
@@ -72,7 +75,7 @@ function DashboardOverviewContent() {
       )}
 
       <div className="py-2x">
-        <PromoBanner />
+        <PromoBannerV2 />
       </div>
 
       <div className="w-full grid grid-cols-1 gap-brand-12 sm:grid-cols-2 lg:grid-cols-3 mt-brand-12">
@@ -85,6 +88,7 @@ function DashboardOverviewContent() {
           cards={store.cards}
           onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })}
         />
+        {/* <QuickGrids /> */}
       </div>
 
       {/* Inbox Draft Tabs */}
