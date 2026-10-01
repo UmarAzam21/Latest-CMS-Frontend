@@ -85,7 +85,7 @@ export default function ExpensesTable({
 
           <DropdownMenu.Root>
             <DropdownMenu.Trigger asChild>
-              <button className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3 py-1.5 para-tiny font-semibold text-text-secondary hover:bg-page-bg">
+              <button className="flex items-center gap-1.5 rounded-brand-8 border border-border-clr px-3.5 py-1.5 para-tiny text-[11px] font-semibold text-text-secondary-muted hover:bg-page-bg cursor-pointer default-transition">
                 <Download size={13} /> Export
               </button>
             </DropdownMenu.Trigger>
@@ -134,10 +134,10 @@ export default function ExpensesTable({
                   <td className="px-brand-12 py-brand-8">
                     {/* Row is now static — no inline confirm state, so it never resizes */}
                     <div className="flex items-center justify-end gap-2">
-                      <button onClick={() => onEdit(entry)} className="text-text-secondary-muter hover:text-primary">
+                      <button onClick={() => onEdit(entry)} className="text-text-secondary-muter hover:text-primary cursor-pointer default-transition">
                         <Pencil size={14} />
                       </button>
-                      <button onClick={() => setDeleteTarget(entry)} className="text-text-secondary-muter hover:text-danger">
+                      <button onClick={() => setDeleteTarget(entry)} className="text-text-secondary-muter hover:text-danger cursor-pointer default-transition">
                         <Trash2 size={14} />
                       </button>
                     </div>
@@ -166,17 +166,17 @@ export default function ExpensesTable({
       <Dialog.Root open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-brand-16 bg-white p-5 shadow-card-hover">
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-brand-16 bg-white p-brand shadow-card-hover">
             <div className="mb-3 flex items-center justify-between">
-              <Dialog.Title className="heading-h6 flex items-center gap-2 text-text-dark">
-                <AlertTriangle size={17} className="text-danger" /> Delete entry?
+              <Dialog.Title className="heading-h6 text-sm font-semibold flex items-center gap-2 text-text-dark">
+                <AlertTriangle size={13} className="text-danger" /> Delete entry?
               </Dialog.Title>
-              <Dialog.Close className="text-text-secondary-muter hover:text-text-secondary">
+              <Dialog.Close className="text-text-secondary-muter hover:text-text-secondary cursor-pointer default-transition">
                 <X size={16} />
               </Dialog.Close>
             </div>
 
-            <p className="para-small mb-4 text-text-secondary">
+            <p className="para-tiny text-text-secondary leading-normal mb-brand-12">
               {deleteTarget && (
                 <>
                   This will permanently delete{" "}
@@ -191,13 +191,13 @@ export default function ExpensesTable({
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="rounded-brand-8 border border-border-clr px-3 py-2 para-small font-semibold text-text-secondary hover:bg-page-bg"
+                className="rounded-brand-8 border border-border-clr px-3.5 py-2 para-tiny font-semibold text-text-secondary hover:bg-page-bg cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmDelete}
-                className="rounded-brand-8 bg-danger px-3 py-2 para-small font-semibold text-white hover:opacity-90"
+                className="rounded-brand-8 bg-danger px-3.5 py-2 para-tiny font-semibold text-white hover:opacity-90 cursor-pointer"
               >
                 Delete
               </button>
@@ -215,12 +215,12 @@ function FilterTabButton({ label, count, active, onClick }: { label: string; cou
     <button
       onClick={onClick}
       className={cn(
-        "flex items-center gap-1.5 rounded-brand-8 px-3 py-1.5 para-tiny font-semibold text-text-secondary default-transition cursor-pointer",
-        active ? "border border-border-clr bg-text-tertiary" : "border border-border-clr/50 hover:bg-page-bg"
+        "flex items-center gap-1.5 rounded-brand-8 px-3.5 py-1.25 para-tiny text-[11px] font-semibold text-text-secondary-muted default-transition cursor-pointer",
+        active ? "border border-border-clr/45 bg-card-bg-clr" : "border border-border-clr/50 hover:bg-page-bg"
       )}
     >
       {label}
-      <span className={cn("rounded-full w-5 h-5 flex items-center justify-center para-tiny text-[11px]", active ? "bg-border-clr" : "bg-border-card-clr/65")}>
+      <span className={cn("rounded-full w-5 h-5 flex items-center justify-center para-tiny text-[10px]", active ? "bg-border-clr" : "bg-border-card-clr/65")}>
         {count}
       </span>
     </button>

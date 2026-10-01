@@ -27,7 +27,7 @@ export type EntryKind = "expense" | "income" | "debt";
 export interface ICategory {
   id: string;
   label: string;
-  kind: EntryKind; // NEW
+  kind: EntryKind;
   color: "primary" | "secondary" | "warning" | "info" | "danger" | "neutral";
 }
 
@@ -110,7 +110,7 @@ export const KHATA_LABELS: Record<EntryKind, {
     noun: "Udhaar",
     subjectLabel: "Kis ka udhaar? (jaise: Ali Bhai, Bank Loan)",
     subjectPlaceholder: "Ali Bhai",
-    categoryHint: "Lena ya Dena"
+    categoryHint: "Liya ya Diya?",
   },
 };
 

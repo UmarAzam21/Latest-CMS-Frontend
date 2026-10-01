@@ -25,3 +25,19 @@ export function weekKey(dateStr: string) {
 
     return `${d.getFullYear()}-W${String(week).padStart(2, "0")}`;
 }
+
+export function buildDebtTrend(
+    entries: { kind: string; date: string; amount: number; debtDirection?: "liya" | "diya" }[],
+    keyFn: (d: string) => string,
+    limit: number
+) {
+    const map = new Map<string, { liya: number; diya: number }>();
+    entries.filter((e) => e.kind === "debt").forEach((e) => {
+        const key = keyFn(e.date);
+        const b = map.get(key) ?? { liya: 0, diya: 0 };
+        if (e.debtDirection === "liya") b.liya += e.amount;
+        else if (e.debtDirection === "diya") b.diya += e.amount;
+        map.set(key, b);
+    });
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b)).slice(-limit).map(([label, v]) => ({ label, ...v }));
+}

@@ -1,3 +1,5 @@
+// dashboard\app\user-dashboard\layout.tsx
+
 "use client";
 
 import { ReactNode } from "react";

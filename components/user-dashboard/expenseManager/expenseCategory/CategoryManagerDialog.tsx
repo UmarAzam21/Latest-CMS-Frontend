@@ -79,8 +79,7 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                             return (
                                 <div
                                     key={c.id}
-                                    className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2"
-                                    strategy="scannable">
+                                    className="flex items-center justify-between rounded-brand-8 border border-border-clr px-2.5 py-2">
                                     <div className="flex items-center gap-2">
                                         <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", SWATCH[c.color])} />
                                         <span className="para-tiny">{c.label}</span>
