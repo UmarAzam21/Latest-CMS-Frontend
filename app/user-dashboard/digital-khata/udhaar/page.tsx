@@ -43,10 +43,10 @@ export default function UdhaarKhataPage() {
                 onCtaClick={() => setAddOpen(true)}
             />
 
-            <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+            {/* <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
                 <CardsManager cards={store.cards} onAddCard={store.addCard} onUpdateCard={store.updateCard} onDeleteCard={store.deleteCard} onTransfer={store.transferBetweenCards} />
                 <CardsBalanceChart cards={store.cards} variant="area" />
-            </div>
+            </div> */}
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                 <DebtActivityChart entries={debtEntries} />
@@ -58,7 +58,16 @@ export default function UdhaarKhataPage() {
                 categories={store.categories}
                 sortField={store.sortField}
                 sortDirection={store.sortDirection}
-                onSort={(field) => { if (field === store.sortField) store.setSortDirection(store.sortDirection === "asc" ? "desc" : "asc"); else { store.setSortField(field); store.setSortDirection("desc"); } }}
+                onSort={(field) => {
+                    if (field === store.sortField) {
+                        store.setSortDirection(
+                            store.sortDirection === "asc" ? "desc" : "asc"
+                        );
+                    } else {
+                        store.setSortField(field);
+                        store.setSortDirection("desc");
+                    }
+                }}
                 onDelete={store.deleteEntry}
                 onEdit={setEditingEntry}
                 activeFilter="debt"

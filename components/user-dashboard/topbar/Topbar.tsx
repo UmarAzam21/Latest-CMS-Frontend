@@ -14,7 +14,7 @@ import {
 } from "@/lib/auth";
 import Image from "next/image";
 import { ASSETS } from "@/lib/assets";
-import NotificationModal from "../ui/NotificationModal";
+import NotificationModal from "../../ui/NotificationModal";
 import CalculatorButton from "@/components/user-dashboard/expenseManager/Calculator";
 
 type AdminProfile = {

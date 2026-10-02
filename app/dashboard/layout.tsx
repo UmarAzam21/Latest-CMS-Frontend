@@ -1,8 +1,8 @@
 // dashboard\app\dashboard\layout.tsx
 
 "use client";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Topbar from "@/components/dashboard/Topbar";
+import Sidebar from "@/components/dashboard/sidebar/Sidebar";
+import Topbar from "@/components/dashboard/topbar/Topbar";
 import { ReactNode } from "react";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
