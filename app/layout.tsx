@@ -3,6 +3,7 @@ import { Inter, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/cn";
 import { Toaster } from "sonner";
+import { SidebarProvider } from "@/components/dashboard/sidebar/SidebarContext";
 
 const plusJakarta = Plus_Jakarta_Sans({
   variable: "--font-plus-jakarta",
@@ -33,8 +34,10 @@ export default function RootLayout({
         className="min-h-full flex flex-col text-text-dark bg-page-bg default-transition"
         suppressHydrationWarning
       >
-        {children}
-        <Toaster richColors position="top-right" />
+        <SidebarProvider>
+          {children}
+          <Toaster richColors position="top-right" />
+        </SidebarProvider>
       </body>
     </html>
   );

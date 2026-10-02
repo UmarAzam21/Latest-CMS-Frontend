@@ -1,3 +1,5 @@
+// dashboard\data\dashboard\data.ts
+
 import { ServicesSectionForm } from "@/components/dashboard/content/sections/ServicesSectionForm";
 import {
   BadgeCheck, BellRing, Building2, Calculator, Clock, CreditCard, Ellipsis, FileCheck2, FileClock, FileHeadphone, FileText, Globe, Globe2, Headset, ImageIcon, KeyRound, Landmark, LayoutDashboard, LifeBuoy, LucideIcon, Mail, Pencil, Plus, ReceiptText, Scale, Search, Settings, ShieldCheck, ShoppingCart, Stamp, TrendingUp, Upload, User, Users, UsersRound,
@@ -238,16 +240,16 @@ export function getUserNavData(): NavItem[] {
       href: "/user-dashboard",
       icon: LayoutDashboard
     },
-    {
-      label: "Enroll Service",
-      href: "/user-dashboard/enroll-service",
-      icon: FileText
-    },
-    {
-      label: "My Enroled Services",
-      href: "/user-dashboard/my-services",
-      icon: FileHeadphone
-    },
+    // {
+    //   label: "Enroll Service",
+    //   href: "/user-dashboard/enroll-service",
+    //   icon: FileText
+    // },
+    // {
+    //   label: "My Enroled Services",
+    //   href: "/user-dashboard/my-services",
+    //   icon: FileHeadphone
+    // },
     // {
     //   label: "Expense Manager",
     //   href: "/user-dashboard/expense-manager",

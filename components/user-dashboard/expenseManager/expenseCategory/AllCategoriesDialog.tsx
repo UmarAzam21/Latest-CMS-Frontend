@@ -22,7 +22,7 @@ export default function AllCategoriesDialog({ open, onOpenChange, sorted, total 
                             <Dialog.Title className="para-small font-semibold text-text-dark">
                                 Spending by Category
                             </Dialog.Title>
-                            <p className="para-tiny text-text-secondary-muter">
+                            <p className="para-tiny text-[11px] text-text-secondary-muter pt-0.5">
                                 {sorted.length} categories · PKR {total.toLocaleString("en-PK")}
                             </p>
                         </div>

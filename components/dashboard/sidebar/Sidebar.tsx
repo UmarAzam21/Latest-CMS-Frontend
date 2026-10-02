@@ -1,3 +1,5 @@
+// dashboard\components\dashboard\Sidebar.tsx
+
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -12,6 +14,7 @@ import {
   setStoredAdminToken,
   setStoredAdminUser,
 } from "@/lib/auth";
+import { useSidebar } from "./SidebarContext";
 
 type SidebarProps = {
   variant?: "admin" | "user";
@@ -38,6 +41,17 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
   const [profileVersion, setProfileVersion] = useState(0);
   // digital-khata subMenus
   const [openSubmenus, setOpenSubmenus] = useState<Record<string, boolean>>({});
+
+  // On mobile there's no hover — the drawer is "expanded" whenever it's open,
+  const { mobileOpen, closeMobile } = useSidebar();
+  // regardless of the desktop hover-driven `collapsed` state.
+  const isExpanded = mobileOpen || !collapsed;
+
+  // Auto-close the mobile drawer on navigation (covers every Link click and
+  // back/forward nav without wiring onClick onto every single nav item).
+  useEffect(() => {
+    closeMobile();
+  }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const visibleNavItems = NAV_ITEMS.filter((item) => {
     const hasAccess = item.superAdminOnly
@@ -108,13 +122,22 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
   return (
     <>
       {/* Placeholder — reserves space so page content never shifts */}
-      <div className="h-screen w-[76px] shrink-0" />
+      {/* <div className="h-screen w-[76px] shrink-0" /> */}
+      <div className="hidden lg:block h-screen w-[76px] shrink-0" />
+
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-[65] bg-black/40 lg:hidden"
+          onClick={closeMobile}
+        />
+      )}
 
       <aside
         onMouseEnter={() => setCollapsed(false)}
         onMouseLeave={() => setCollapsed(true)}
-        className={`fixed left-0 top-0 z-[60] flex h-screen flex-col bg-white justify-between text-black border-r border-slate-200 transition-[width,box-shadow] duration-300 ease-in-out overflow-hidden ${collapsed ? "w-[76px] shadow-none" : "w-[225px]"
-          }`}
+        className={`fixed left-0 top-0 z-[70] flex h-screen w-[260px] flex-col justify-between overflow-hidden border-r border-slate-200 bg-white text-black transition-[transform,width,box-shadow] duration-300 ease-in-out
+        ${mobileOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"}
+        lg:translate-x-0 lg:shadow-none ${collapsed ? "lg:w-[76px]" : "lg:w-[225px]"}`}
       >
         <div className="flex min-h-0 flex-1 flex-col">
           {/* Header — icon slot is fixed, label fades in beside it */}
@@ -198,8 +221,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                             key={child.href}
                             href={child.href}
                             className={`flex items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-colors ${childActive
-                                ? "bg-danger-bg text-primary"
-                                : "text-[#4B5563] hover:bg-danger-bg hover:text-primary"
+                              ? "bg-danger-bg text-primary"
+                              : "text-[#4B5563] hover:bg-danger-bg hover:text-primary"
                               }`}
                           >
                             <ChildIcon size={14} strokeWidth={1.8} className="shrink-0" />
@@ -331,7 +354,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
             </button>
           </div>
         </div>
-      </aside>
+      </aside >
     </>
   );
 }

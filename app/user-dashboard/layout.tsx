@@ -1,10 +1,12 @@
+// dashboard\app\user-dashboard\layout.tsx
+
 "use client";
 
 import { ReactNode } from "react";
 import { useState } from "react";
-import Sidebar from "@/components/dashboard/Sidebar";
-import Topbar from "@/components/user-dashboard/Topbar";
+import Topbar from "@/components/user-dashboard/topbar/Topbar";
 import NoticeModel from "@/components/user-dashboard/NoticeModel/NoticeModel";
+import Sidebar from "@/components/dashboard/sidebar/Sidebar";
 
 export default function UserDashboardLayout({ children }: { children: ReactNode }) {
 	const [isNoticeOpen, setIsNoticeOpen] = useState(true);

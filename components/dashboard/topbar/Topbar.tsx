@@ -1,14 +1,11 @@
+// dashboard\components\dashboard\Topbar.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
-  Search,
-  ExternalLink,
-  ChevronDown,
-  Globe,
-  User,
-  LogOut,
+  Search, ExternalLink, ChevronDown, Globe, User, LogOut,
 } from "lucide-react";
 
 import { ASSETS } from "@/lib/assets";
@@ -130,7 +127,7 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
         // Clear stored credentials
         setStoredAdminToken(null);
         setStoredAdminUser(null);
-        
+
         // Redirect to login
         window.location.href = "/login";
       } else {

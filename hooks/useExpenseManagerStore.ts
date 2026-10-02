@@ -15,7 +15,7 @@ import { EntryKind, MAX_CARDS } from "@/types/expenseManagerTy"; // merge into y
 // Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
 // RENAMED or REMOVED. Adding a new OPTIONAL field does NOT require a bump —
 // old stored JSON simply parses with that field undefined, which is valid.
-const SCHEMA_VERSION = "v6";
+const SCHEMA_VERSION = "v2";
 const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
 const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
@@ -75,9 +75,15 @@ export function useExpenseManagerStore() {
     setCards(readLocalT(STORAGE_KEY_CARDS, dummyCards));
     // setCategories(readLocalT(STORAGE_KEY_CATEGORIES, defaultCategories));
     const rawCats = readLocalT<ICategory[]>(STORAGE_KEY_CATEGORIES, defaultCategories);
-    setCategories(Array.isArray(rawCats) && rawCats.every((c) => typeof c.kind === "string") ? rawCats : defaultCategories);
+
+    setCategories(
+      Array.isArray(rawCats) && rawCats.every((c) => typeof c.kind === "string")
+        ? rawCats
+        : defaultCategories
+    );
+
     setHasLoaded(true);
-    setDataMode((readLocalT(STORAGE_KEY_MODE, "demo") as "demo" | "blank"));
+    setDataMode(readLocalT(STORAGE_KEY_MODE, "demo") as "demo" | "blank");
   }, []);
 
   // Guarded: never persist before the load-effect has actually run, so we
@@ -112,32 +118,54 @@ export function useExpenseManagerStore() {
   const applyCardDeltas = useCallback((deltas: Record<string, number>) => {
     const touched = Object.entries(deltas).filter(([, d]) => d !== 0);
     if (touched.length === 0) return;
-    setCards((prev) => prev.map((c) => (deltas[c.id] ? { ...c, balance: c.balance + deltas[c.id] } : c)));
+
+    setCards((prev) =>
+      prev.map((c) => (deltas[c.id] ? { ...c, balance: c.balance + deltas[c.id] } : c))
+    );
+
     touched.forEach(([id, d]) => {
       const card = cards.find((c) => c.id === id);
-      if (card) toast.success(`${card.label}: ${d > 0 ? "+" : "-"}PKR ${Math.abs(d).toLocaleString("en-PK")} (naya balance PKR ${(card.balance + d).toLocaleString("en-PK")})`);
+      if (card) {
+        toast.success(
+          `${card.label}: ${d > 0 ? "+" : "-"}PKR ${Math.abs(d).toLocaleString("en-PK")} (naya balance PKR ${(card.balance + d).toLocaleString("en-PK")})`
+        );
+      }
     });
   }, [cards]);
 
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-    const withBaseline = entry.kind === "debt" ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount } : entry;
+    const withBaseline = entry.kind === "debt"
+      ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount }
+      : entry;
+
     setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
     toast.success(`${entry.subject} save ho gaya`);
-    if (entry.cardId) applyCardDeltas({ [entry.cardId]: cardDelta(entry) });
+
+    if (entry.cardId) {
+      applyCardDeltas({ [entry.cardId]: cardDelta(entry) });
+    }
   }, [applyCardDeltas]);
 
   const updateEntry = useCallback((id: string, patch: Partial<IExpenseEntry>) => {
     const old = entries.find((e) => e.id === id);
     if (!old) return;
+
     const updated = { ...old, ...patch };
     setEntries((prev) => prev.map((e) => (e.id === id ? updated : e)));
     toast.success(`${updated.subject} update ho gaya`);
+
     // Debt card effects are ledger-style (applied at creation + each payment),
     // never re-computed on edit. Income/expense are reconciled here.
     if (updated.kind !== "debt") {
       const deltas: Record<string, number> = {};
-      if (old.cardId) deltas[old.cardId] = (deltas[old.cardId] ?? 0) - cardDelta(old);
-      if (updated.cardId) deltas[updated.cardId] = (deltas[updated.cardId] ?? 0) + cardDelta(updated);
+
+      if (old.cardId) {
+        deltas[old.cardId] = (deltas[old.cardId] ?? 0) - cardDelta(old);
+      }
+      if (updated.cardId) {
+        deltas[updated.cardId] = (deltas[updated.cardId] ?? 0) + cardDelta(updated);
+      }
+
       applyCardDeltas(deltas);
     }
   }, [entries, applyCardDeltas]);
@@ -145,27 +173,46 @@ export function useExpenseManagerStore() {
   const deleteEntry = useCallback((id: string) => {
     const target = entries.find((e) => e.id === id);
     if (!target) return;
+
     setEntries((prev) => prev.filter((e) => e.id !== id));
     toast.success(`${target.subject} delete ho gaya`);
-    if (target.cardId && target.kind !== "debt") applyCardDeltas({ [target.cardId]: -cardDelta(target) });
+
+    if (target.cardId && target.kind !== "debt") {
+      applyCardDeltas({ [target.cardId]: -cardDelta(target) });
+    }
   }, [entries, applyCardDeltas]);
 
   const makeDebtPayment = useCallback((id: string, paymentAmount: number) => {
     const target = entries.find((e) => e.id === id);
     if (!target || paymentAmount <= 0) return;
+
     const paid = Math.min(paymentAmount, target.amount);
     const remaining = target.amount - paid;
-    setEntries((prev) => prev.map((e) => (e.id === id ? { ...e, amount: remaining, isSettled: remaining === 0 } : e)));
-    toast.success(remaining === 0 ? `${target.subject} settle ho gaya` : `${target.subject}: PKR ${paid.toLocaleString("en-PK")} ada, baaki PKR ${remaining.toLocaleString("en-PK")}`);
+
+    setEntries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, amount: remaining, isSettled: remaining === 0 } : e))
+    );
+
+    toast.success(
+      remaining === 0
+        ? `${target.subject} settle ho gaya`
+        : `${target.subject}: PKR ${paid.toLocaleString("en-PK")} ada, baaki PKR ${remaining.toLocaleString("en-PK")}`
+    );
+
     // lena = I owe -> paying reduces my card; dena = they owe me -> receiving increases it
-    if (target.cardId && target.debtDirection) applyCardDeltas({ [target.cardId]: target.debtDirection === "liya" ? -paid : paid });
+    if (target.cardId && target.debtDirection) {
+      applyCardDeltas({ [target.cardId]: target.debtDirection === "liya" ? -paid : paid });
+    }
   }, [entries, applyCardDeltas]);
 
   const addCategory = useCallback((label: string, color: ICategory["color"], kind: EntryKind) => {
     const clean = label.trim();
+
     if (categories.some((c) => c.kind === kind && c.label.toLowerCase() === clean.toLowerCase())) {
-      toast.error(`"${clean}" pehle se maujood hai`); return;
+      toast.error(`"${clean}" pehle se maujood hai`);
+      return;
     }
+
     setCategories((prev) => [...prev, { id: crypto.randomUUID(), label: clean, color, kind }]);
     toast.success(`${clean} category add ho gayi`);
   }, [categories]);
@@ -177,16 +224,29 @@ export function useExpenseManagerStore() {
   const deleteCategory = useCallback((id: string) => {
     const target = categories.find((c) => c.id === id);
     if (!target) return;
-    if (target.kind === "debt") { toast.error("Udhaar categories delete nahi ho sakti"); return; }
+
+    if (target.kind === "debt") {
+      toast.error("Udhaar categories delete nahi ho sakti");
+      return;
+    }
+
     const fallback = categories.find((c) => c.kind === target.kind && c.label === "Other" && c.id !== id);
-    if (!fallback) { toast.error(`"Other" category delete nahi ho sakti`); return; }
+    if (!fallback) {
+      toast.error(`"Other" category delete nahi ho sakti`);
+      return;
+    }
+
     setEntries((prev) => prev.map((e) => (e.categoryId === id ? { ...e, categoryId: fallback.id } : e)));
     setCategories((prev) => prev.filter((c) => c.id !== id));
     toast.success(`${target.label} delete ho gayi (entries "Other" me chali gayin)`);
   }, [categories]);
 
   const addCard = useCallback((card: Omit<ICard, "id">) => {
-    if (cards.length >= MAX_CARDS) { toast.error(`Sirf ${MAX_CARDS} cards add ho sakte hain`); return; }
+    if (cards.length >= MAX_CARDS) {
+      toast.error(`Sirf ${MAX_CARDS} cards add ho sakte hain`);
+      return;
+    }
+
     setCards((prev) => [...prev, { ...card, id: crypto.randomUUID() }]);
     toast.success(`${card.label} add ho gaya`);
   }, [cards.length]);
@@ -198,9 +258,13 @@ export function useExpenseManagerStore() {
 
   const deleteCard = useCallback((id: string) => {
     const target = cards.find((c) => c.id === id);
+
     setCards((prev) => prev.filter((c) => c.id !== id));
     setEntries((prev) => prev.map((e) => (e.cardId === id ? { ...e, cardId: undefined } : e)));
-    if (target) toast.success(`${target.label} delete ho gaya`);
+
+    if (target) {
+      toast.success(`${target.label} delete ho gaya`);
+    }
   }, [cards]);
 
   // new persist effect
@@ -210,16 +274,40 @@ export function useExpenseManagerStore() {
   }, [cards, hasLoaded]);
 
   const adjustCardBalance = useCallback((id: string, delta: number) => {
-    setCards((prev) => prev.map((c) => (c.id === id ? { ...c, balance: c.balance + delta } : c)));
+    setCards((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, balance: c.balance + delta } : c))
+    );
   }, []);
 
   const transferBetweenCards = useCallback((fromId: string, toId: string, amount: number) => {
     const from = cards.find((c) => c.id === fromId);
     const to = cards.find((c) => c.id === toId);
-    if (!from || !to || fromId === toId || amount <= 0) { toast.error("Alag alag cards chunein"); return; }
-    if (from.balance < amount) { toast.error(`${from.label} me itna balance nahi hai`); return; }
-    setCards((prev) => prev.map((c) => (c.id === fromId ? { ...c, balance: c.balance - amount } : c.id === toId ? { ...c, balance: c.balance + amount } : c)));
-    toast.success(`PKR ${amount.toLocaleString("en-PK")} ${from.label} se ${to.label} me transfer hue`);
+
+    if (!from || !to || fromId === toId || amount <= 0) {
+      toast.error("Alag alag cards chunein");
+      return;
+    }
+
+    if (from.balance < amount) {
+      toast.error(`${from.label} me itna balance nahi hai`);
+      return;
+    }
+
+    setCards((prev) =>
+      prev.map((c) => {
+        if (c.id === fromId) {
+          return { ...c, balance: c.balance - amount };
+        }
+        if (c.id === toId) {
+          return { ...c, balance: c.balance + amount };
+        }
+        return c;
+      })
+    );
+
+    toast.success(
+      `PKR ${amount.toLocaleString("en-PK")} ${from.label} se ${to.label} me transfer hue`
+    );
   }, [cards]);
 
   const sortedEntries = useMemo(() => {

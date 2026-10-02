@@ -14,6 +14,7 @@ import ExpensesStats from "@/components/user-dashboard/expenseManager/expenseSta
 import DebtSummaryCardV2 from "@/components/user-dashboard/expenseManager/debtCard/DebtSummaryCardV2";
 import NewEntryMenu from "@/components/user-dashboard/expenseManager/expenseStats/NewEntryMenu";
 import AdvancedExpenseWorkspaceV2 from "@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2";
+import DataModeToggler from "@/components/user-dashboard/expenseManager/modeToggler/DataModeToggler";
 
 export default function ExpenseManagerPage() {
     const store = useExpenseManagerStore();
@@ -29,13 +30,7 @@ export default function ExpenseManagerPage() {
                 <h1 className="heading-h6">Digital Khatta</h1>
 
                 <div className="flex gap-2">
-                    <div className="flex items-center gap-2 para-tiny text-text-secondary-muter">
-                        <span>Mode: {store.dataMode === "demo" ? "Demo" : "Blank"}</span>
-                        <button onClick={store.dataMode === "demo" ? store.resetToBlank : store.loadDemoData}
-                            className="rounded-brand-8 border border-border-clr px-2.5 py-2 para-tiny font-semibold hover:bg-page-bg">
-                            {store.dataMode === "demo" ? "Start Fresh" : "Load Demo Data"}
-                        </button>
-                    </div>
+                    <DataModeToggler store={store} />
 
                     <div className="flex items-center gap-brand-8">
                         <CategoryManagerDialog

@@ -2,16 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
-    ChevronDown,
-    FileCheck2,
-    Calculator,
-    Building2,
-    ReceiptText,
-    Landmark,
-    BriefcaseBusiness,
-    User,
-    LogOut,
-    Search,
+    ChevronDown, FileCheck2, Calculator, Building2, ReceiptText, Landmark, BriefcaseBusiness, User, LogOut, Search,
 } from "lucide-react";
 
 import Dropdown from "@/components/ui/Dropdown";
@@ -23,7 +14,7 @@ import {
 } from "@/lib/auth";
 import Image from "next/image";
 import { ASSETS } from "@/lib/assets";
-import NotificationModal from "../ui/NotificationModal";
+import NotificationModal from "../../ui/NotificationModal";
 import CalculatorButton from "@/components/user-dashboard/expenseManager/Calculator";
 
 type AdminProfile = {
