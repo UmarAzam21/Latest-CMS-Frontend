@@ -349,78 +349,78 @@ function PromoBanner() {
             {/* ------------------------------------------------------------ */}
 
             <div className="absolute inset-y-0 right-0 z-20 flex w-[32%] items-center justify-center px-5 lg:px-7">
-              <div
-                dir="rtl"
-                className="flex w-full max-w-[315px] flex-col items-start text-right"
-                style={{
-                  fontFamily: "var(--font-noto-nastaliq-urdu), serif",
-                }}
-              >
-                {/* Eyebrow */}
-                <div className="mb-1 text-[13px] font-bold tracking-wide text-[var(--brand-primary)]">
-                  اب Filernow کے ساتھ مزید آسانی
-                </div>
+             <div
+  dir="rtl"
+  className="flex w-full max-w-[315px] flex-col items-start text-right"
+  style={{
+    fontFamily: "var(--font-noto-nastaliq-urdu), serif",
+  }}
+>
+  {/* Eyebrow */}
+  <div className="mb-1 text-[13px] font-bold tracking-wide text-[var(--brand-primary)]">
+    کاروبار کا حساب، اب اور بھی آسان
+  </div>
 
-                {/* Main copy */}
-                <h2 className="text-[15px] font-bold leading-[1.65] tracking-[-0.2px] text-[var(--text-dark)]">
-                  اب صرف آپ کی ٹیکسیشن میں مدد نہیں کرے گا،
-                  <br />
-                  بلکہ اب آپ Filernow سے اپنا{" "}
-                  <span className="text-[var(--brand-primary)]">
-                    ڈیجیٹل کھاتا
-                  </span>{" "}
-                  بھی مینج کر سکتے ہیں۔
-                </h2>
+  {/* Main copy */}
+  <h2 className="text-[15px] font-bold leading-[1.65] tracking-[-0.2px] text-[var(--text-dark)]">
+    اب کاروبار کے حساب کتاب کی جھنجھٹ سے جان چھڑائیں،
+    <br />
+    خرچ اور آمدنی کا ریکارڈ رکھیں اور اپنا{" "}
+    <span className="text-primary font-semibold">
+      Digital Khata{" "}
+    </span>{" "}
+    آسانی سے مینج کریں۔
+  </h2>
 
-                {/* CTA */}
-                <button
-                  type="button"
-                  dir="rtl"
-                  className="
-                    group
-                    mt-2.5
-                    flex
-                    items-center
-                    gap-2
-                    rounded-full
-                    bg-[var(--brand-primary)]
-                    py-1.5
-                    ps-4
-                    pe-1.5
-                    text-[11px]
-                    font-bold
-                    text-white
-                    transition-all
-                    duration-200
-                    hover:-translate-y-0.5
-                    hover:shadow-[0_10px_24px_rgba(200,16,46,0.28)]
-                    active:translate-y-0
-                  "
-                >
-                  <span className="text-[12px] leading-none">
-                    آج ہی شروع کریں
-                  </span>
+  {/* CTA */}
+  <button
+    type="button"
+    dir="rtl"
+    className="
+      group
+      mt-2.5
+      flex
+      items-center
+      gap-2
+      rounded-full
+      bg-[var(--brand-primary)]
+      py-1.5
+      ps-4
+      pe-1.5
+      text-[11px]
+      font-bold
+      text-white
+      transition-all
+      duration-200
+      hover:-translate-y-0.5
+      hover:shadow-[0_10px_24px_rgba(200,16,46,0.28)]
+      active:translate-y-0
+    "
+  >
+    <span className="text-[12px] leading-none">
+      آج ہی شروع کریں
+    </span>
 
-                  <span
-                    className="
-                      flex
-                      h-6
-                      w-6
-                      shrink-0
-                      items-center
-                      justify-center
-                      rounded-full
-                      bg-white
-                      text-[var(--brand-primary)]
-                      transition-transform
-                      duration-200
-                      group-hover:-translate-x-1
-                    "
-                  >
-                    <MoveLeft className="h-3.5 w-3.5" strokeWidth={2.5} />
-                  </span>
-                </button>
-              </div>
+    <span
+      className="
+        flex
+        h-6
+        w-6
+        shrink-0
+        items-center
+        justify-center
+        rounded-full
+        bg-white
+        text-[var(--brand-primary)]
+        transition-transform
+        duration-200
+        group-hover:-translate-x-1
+      "
+    >
+      <MoveLeft className="h-3.5 w-3.5" strokeWidth={2.5} />
+    </span>
+  </button>
+</div>
             </div>
         </div>
 
