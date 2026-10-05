@@ -138,9 +138,8 @@ export default function DetailedEntryDialog({ kind, categories, cards, editingEn
                             />
                         </Field>
 
-                        <Field label={cardLabel ?? "Card (optional)"}>
+                        < Field label={cardLabel ?? "Card (optional)"}>
                             <select {...register("cardId")} className={inputCls}>
-                                {/* <option value="">Sirf record karein (koi card nahi)</option> */}
                                 <option value="">Cash (koi card nahi)</option>
                                 {cards.map((c) => (
                                     <option key={c.id} value={c.id}>
@@ -175,7 +174,7 @@ export default function DetailedEntryDialog({ kind, categories, cards, editingEn
                     </form>
                 </Dialog.Content>
             </Dialog.Portal>
-        </Dialog.Root>
+        </Dialog.Root >
     );
 }
 

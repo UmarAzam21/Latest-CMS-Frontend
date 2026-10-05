@@ -1,8 +1,10 @@
+// dashboard\components\user-dashboard\topbar\Topbar.tsx
+
 "use client";
 
 import { useEffect, useState } from "react";
 import {
-    ChevronDown, FileCheck2, Calculator, Building2, ReceiptText, Landmark, BriefcaseBusiness, User, LogOut, Search,
+    ChevronDown, FileCheck2, Calculator, Building2, ReceiptText, Landmark, BriefcaseBusiness, User, LogOut, Search, Menu,
 } from "lucide-react";
 
 import Dropdown from "@/components/ui/Dropdown";
@@ -16,6 +18,7 @@ import Image from "next/image";
 import { ASSETS } from "@/lib/assets";
 import NotificationModal from "../../ui/NotificationModal";
 import CalculatorButton from "@/components/user-dashboard/expenseManager/Calculator";
+import { useSidebar } from "@/components/dashboard/sidebar/SidebarContext";
 
 type AdminProfile = {
     name?: string;
@@ -31,6 +34,7 @@ type TopbarProps = {
 
 export default function Topbar({ variant = "admin" }: TopbarProps) {
     const isUser = variant === "user";
+    const { toggleMobile } = useSidebar();
 
     const [admin, setAdmin] = useState<AdminProfile | null>(null);
     const [loading, setLoading] = useState(true);
@@ -138,29 +142,45 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
         "flex h-[27px] items-center gap-1 whitespace-nowrap rounded-full border border-primary bg-primary px-1.5 py-0 para-tiny font-medium text-white default-transition hover:border-primary-light hover:bg-primary-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40";
 
     return (
-        <header className="flex h-13 items-center justify-between gap-4 border-b border-slate-200 bg-white px-brand py-2">
+        <header className="flex h-13 items-center justify-between gap-2 border-b border-slate-200 bg-white px-3 py-2 sm:gap-4 sm:px-brand">
 
-            {/* LEFT SIDE: search + nav grouped together so justify-between only splits left vs right */}
-            <div className="flex min-w-0 flex-1 items-center gap-4">
+            {/* LEFT SIDE: hamburger + search + nav */}
+            <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
 
-                {/* SEARCH */}
-                <div className="relative w-full max-w-xs shrink-0">
+                {/* HAMBURGER — mobile only, toggles the shared sidebar context */}
+                <button
+                    type="button"
+                    onClick={toggleMobile}
+                    aria-label="Toggle sidebar"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 lg:hidden"
+                >
+                    <Menu size={18} strokeWidth={1.8} />
+                </button>
+
+                {/* SEARCH — full pill on sm+, icon-only toggle on mobile */}
+                <div className="relative hidden w-full max-w-xs shrink-0 sm:block">
                     <Search
                         size={16}
                         strokeWidth={1.8}
                         className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                     />
-
                     <input
                         type="text"
                         placeholder={isUser ? "Search your workspace..." : "Search pages, messages, media..."}
                         className="h-[35px] w-[300px] rounded-full border border-slate-200 bg-[#F9FAFB] py-2 pl-9 pr-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-0"
                     />
                 </div>
+                <button
+                    type="button"
+                    aria-label="Search"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-600 hover:bg-slate-50 sm:hidden"
+                >
+                    <Search size={16} strokeWidth={1.8} />
+                </button>
 
-                {/* NAVIGATION */}
+                {/* NAVIGATION — horizontally scrollable on mobile instead of hidden, so every item stays reachable */}
                 <nav
-                    className="flex h-[35px] min-w-0 items-center gap-1 rounded-full border border-slate-200 bg-[#F9FAFB] px-1.5"
+                    className="flex h-[35px] min-w-0 items-center gap-1 overflow-x-auto rounded-full border border-slate-200 bg-[#F9FAFB] px-1.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
                     aria-label="Dashboard navigation"
                 >
                     <a href="#" className={navItemClass}>
@@ -193,23 +213,18 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
                         Support
                     </a>
 
-                    {/* Primary action */}
                     <CalculatorButton label="Calculator" className={ctaItemClass} />
                 </nav>
             </div>
 
-            {/* RIGHT SIDE: notifications + account, back as separate items */}
-            <div className="flex shrink-0 items-center gap-3">
+            {/* RIGHT SIDE: notifications + account */}
+            <div className="flex shrink-0 items-center gap-2 sm:gap-3">
 
-                {/* NOTIFICATIONS */}
                 <NotificationModal userId={admin?.email} />
 
-
-                {/* ACCOUNT */}
                 <Dropdown
                     trigger={
-                        <div className="flex cursor-pointer items-center gap-3 rounded-lg py-1 pl-1 pr-2 default-transition hover:bg-slate-50">
-                            {/* Avatar */}
+                        <div className="flex cursor-pointer items-center gap-2 rounded-lg py-1 pl-1 pr-1 default-transition hover:bg-slate-50 sm:gap-3 sm:pr-2">
                             <div className="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full bg-danger-bg text-sm font-semibold text-primary">
                                 {admin?.profile_image ? (
                                     <Image
@@ -230,18 +245,17 @@ export default function Topbar({ variant = "admin" }: TopbarProps) {
                                 )}
                             </div>
 
-                            {/* User Information */}
-                            <div className="flex min-w-0 flex-col items-start">
+                            {/* User info — hidden on mobile, avatar + chevron only */}
+                            <div className="hidden min-w-0 flex-col items-start sm:flex">
                                 <span className="max-w-[140px] truncate text-xs font-medium capitalize text-slate-900">
                                     {loading ? "Loading..." : displayName}
                                 </span>
-
                                 <span className="max-w-[140px] truncate text-[11px] text-[#4B5563]">
                                     {loading ? "..." : role}
                                 </span>
                             </div>
 
-                            <ChevronDown size={15} strokeWidth={1.8} className="shrink-0 text-slate-400" />
+                            <ChevronDown size={15} strokeWidth={1.8} className="hidden shrink-0 text-slate-400 sm:block" />
                         </div>
                     }
                 >

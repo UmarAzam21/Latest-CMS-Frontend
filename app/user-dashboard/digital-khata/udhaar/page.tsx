@@ -27,11 +27,26 @@ export default function UdhaarKhataPage() {
                     <DataModeToggler store={store} />
 
                     <div className="flex items-center gap-brand-8">
-                        <CategoryManagerDialog categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
+                        <CategoryManagerDialog
+                            categories={store.categories}
+                            onAdd={store.addCategory}
+                            onDelete={store.deleteCategory}
+                        />
                         <AddUdhaarButton
-                            categories={store.categories} cards={store.cards} editingEntry={editingEntry}
-                            open={addOpen} onOpenChange={setAddOpen} onCloseEdit={() => setEditingEntry(null)}
-                            onSaved={(v) => { if (editingEntry) store.updateEntry(editingEntry.id, v); else store.addEntry(v); setAddOpen(false); }}
+                            categories={store.categories}
+                            cards={store.cards}
+                            editingEntry={editingEntry}
+                            open={addOpen}
+                            onOpenChange={setAddOpen}
+                            onCloseEdit={() => setEditingEntry(null)}
+                            onSaved={(v) => {
+                                if (editingEntry) {
+                                    store.updateEntry(editingEntry.id, v);
+                                } else {
+                                    store.addEntry(v);
+                                }
+                                setAddOpen(false);
+                            }}
                         />
                     </div>
                 </div>

@@ -17,7 +17,10 @@ export default function AddUdhaarButton({ categories, cards, editingEntry, open,
 
     return (
         <>
-            <button onClick={() => onOpenChange(true)} className="flex items-center gap-1.5 rounded-brand-8 bg-primary px-2.5 py-2 para-tiny font-semibold text-white hover:opacity-90 cursor-pointer">
+            <button
+                onClick={() => onOpenChange(true)}
+                className="flex cursor-pointer items-center gap-1.5 rounded-brand-8 bg-primary px-2.5 py-2 para-tiny font-semibold text-white hover:opacity-90"
+            >
                 <Plus size={14} /> {KHATA_LABELS.debt.verb}
             </button>
             <DetailedEntryDialog
