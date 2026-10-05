@@ -1,6 +1,6 @@
 // dashboard\data\user-dashboard\defaultCategoriesData.ts
 
-import { EntryKind, ICategory } from "@/types/expenseManagerTy";
+import { DEBT_TYPE_META, EntryKind, ICategory } from "@/types/expenseManagerTy";
 
 export const defaultIncomeCategories: ICategory[] = [
     {
@@ -74,20 +74,24 @@ export const defaultExpenseCategories: ICategory[] = [
     },
 ];
 
-export const defaultDebtCategories: ICategory[] = [
-    {
-        id: "cat-udhaar-liya",
-        label: "Udhaar liya",
-        kind: "debt",
-        color: "danger"
-    },
-    {
-        id: "cat-udhaar-diya",
-        label: "Udhaar diya",
-        kind: "debt",
-        color: "info"
-    },
-];
+// export const defaultDebtCategories: ICategory[] = [
+//     {
+//         id: "cat-udhaar-liya",
+//         label: "Udhaar liya",
+//         kind: "debt",
+//         color: "danger"
+//     },
+//     {
+//         id: "cat-udhaar-diya",
+//         label: "Udhaar diya",
+//         kind: "debt",
+//         color: "info"
+//     },
+// ];
+
+export const defaultDebtCategories: ICategory[] = Object.values(DEBT_TYPE_META).map((m) => ({
+    id: m.categoryId, label: m.label, kind: "debt", color: m.color,
+}));
 
 export const defaultCategories: ICategory[] = [
     ...defaultIncomeCategories,

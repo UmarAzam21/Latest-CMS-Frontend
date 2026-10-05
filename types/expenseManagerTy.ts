@@ -42,9 +42,11 @@ export interface IExpenseEntry {
   description?: string;
   receiptImage?: string;    // object URL / base64 for now — see note below
   // debt-specific, optional so expense/income entries ignore it
-  debtDirection?: DebtDirection;
-  isSettled?: boolean;
-  originalAmount?: number;
+  // debtDirection?: DebtDirection;
+  // isSettled?: boolean;
+  // originalAmount?: number;
+  partyId?: string;
+  createdAt?: string; // ISO timestamp, orders same-day entries in ledgers
 }
 
 export type SortField = "date" | "amount" | "subject";
@@ -110,17 +112,45 @@ export const KHATA_LABELS: Record<EntryKind, {
     noun: "Udhaar",
     subjectLabel: "Kis ka udhaar? (jaise: Ali Bhai, Bank Loan)",
     subjectPlaceholder: "Ali Bhai",
-    categoryHint: "Liya ya Diya?",
+    // categoryHint: "Liya ya Diya?",
+    categoryHint: "Udhaar ki qism",
   },
 };
 
-export type DebtDirection = "liya" | "diya";
 export const MAX_CARDS = 3;
-export const DEBT_CATEGORY_DIRECTION: Record<string, DebtDirection> = {
-  "cat-udhaar-liya": "liya",
-  "cat-udhaar-diya": "diya",
+
+// export type DebtDirection = "liya" | "diya";
+// export const DEBT_CATEGORY_DIRECTION: Record<string, DebtDirection> = {
+//   "cat-udhaar-liya": "liya",
+//   "cat-udhaar-diya": "diya",
+// };
+// export const DEBT_CARD_LABELS: Record<DebtDirection, string> = {
+//   liya: "Udhaar kis card me aaya? (card me jama hoga, optional)",
+//   diya: "Udhaar kis card se diya? (card se kam hoga, optional)",
+// };
+
+export type DebtType = "liya" | "diya" | "liya_wapis_diya" | "diya_wapis_liya" | "liya_maaf" | "diya_maaf";
+
+// SINGLE source of truth for debt categories. sign: +1 = party owes me more, -1 = I owe more.
+export const DEBT_TYPE_META: Record<DebtType, { categoryId: string; label: string; sign: 1 | -1; color: ICategory["color"] }> = {
+  liya: { categoryId: "cat-udhaar-liya", label: "Udhaar liya", sign: -1, color: "danger" },
+  diya: { categoryId: "cat-udhaar-diya", label: "Udhaar diya", sign: 1, color: "info" },
+  liya_wapis_diya: { categoryId: "cat-udhaar-liya-wapis-diya", label: "Liya udhaar wapis diya", sign: 1, color: "warning" },
+  diya_wapis_liya: { categoryId: "cat-udhaar-diya-wapis-liya", label: "Diya udhaar wapis liya", sign: -1, color: "secondary" },
+  liya_maaf: { categoryId: "cat-udhaar-liya-maaf", label: "Liya udhaar maaf hua", sign: 1, color: "neutral" },
+  diya_maaf: { categoryId: "cat-udhaar-diya-maaf", label: "Diya udhaar maaf kiya", sign: -1, color: "neutral" },
 };
-export const DEBT_CARD_LABELS: Record<DebtDirection, string> = {
-  liya: "Udhaar kis card me aaya? (card me jama hoga, optional)",
-  diya: "Udhaar kis card se diya? (card se kam hoga, optional)",
-};
+
+export const DEBT_CATEGORY_TYPE: Record<string, DebtType> = Object.fromEntries(
+  (Object.entries(DEBT_TYPE_META) as [DebtType, (typeof DEBT_TYPE_META)[DebtType]][]).map(([t, m]) => [m.categoryId, t])
+);
+
+export type PartyType = "customer" | "supplier" | "bank";
+export interface IParty {
+  id: string;
+  name: string;
+  phone?: string;
+  type: PartyType;
+  createdAt: string;
+  reminderDate?: string; // YYYY-MM-DD
+}
