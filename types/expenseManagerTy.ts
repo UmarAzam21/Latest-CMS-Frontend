@@ -132,20 +132,65 @@ export const MAX_CARDS = 3;
 export type DebtType = "liya" | "diya" | "liya_wapis_diya" | "diya_wapis_liya" | "liya_maaf" | "diya_maaf";
 
 // SINGLE source of truth for debt categories. sign: +1 = party owes me more, -1 = I owe more.
-export const DEBT_TYPE_META: Record<DebtType, { categoryId: string; label: string; sign: 1 | -1; color: ICategory["color"] }> = {
-  liya: { categoryId: "cat-udhaar-liya", label: "Udhaar liya", sign: -1, color: "danger" },
-  diya: { categoryId: "cat-udhaar-diya", label: "Udhaar diya", sign: 1, color: "info" },
-  liya_wapis_diya: { categoryId: "cat-udhaar-liya-wapis-diya", label: "Liya udhaar wapis diya", sign: 1, color: "warning" },
-  diya_wapis_liya: { categoryId: "cat-udhaar-diya-wapis-liya", label: "Diya udhaar wapis liya", sign: -1, color: "secondary" },
-  liya_maaf: { categoryId: "cat-udhaar-liya-maaf", label: "Liya udhaar maaf hua", sign: 1, color: "neutral" },
-  diya_maaf: { categoryId: "cat-udhaar-diya-maaf", label: "Diya udhaar maaf kiya", sign: -1, color: "neutral" },
+// Example: If you borrow money (liya), your balance drops (-1). When you repay them (liya_wapis_diya), your balance goes back up (+1) to neutralise the debt.
+export const DEBT_TYPE_META: Record<
+  DebtType,
+  {
+    categoryId: string;
+    label: string;
+    sign: 1 | -1;
+    color: ICategory["color"];
+  }
+> = {
+  liya: {
+    categoryId: "cat-udhaar-liya",
+    label: "Udhaar liya",
+    sign: -1,
+    color: "danger"
+  },
+  diya: {
+    categoryId: "cat-udhaar-diya",
+    label: "Udhaar diya",
+    sign: 1,
+    color: "info"
+  },
+  liya_wapis_diya: {
+    categoryId: "cat-udhaar-liya-wapis-diya",
+    label: "Liya udhaar wapis diya",
+    sign: 1,
+    color: "warning"
+  },
+  diya_wapis_liya: {
+    categoryId: "cat-udhaar-diya-wapis-liya",
+    label: "Diya udhaar wapis liya",
+    sign: -1,
+    color: "secondary"
+  },
+  liya_maaf: {
+    categoryId: "cat-udhaar-liya-maaf",
+    label: "Liya udhaar maaf hua",
+    sign: 1,
+    color: "neutral"
+  },
+  diya_maaf: {
+    categoryId: "cat-udhaar-diya-maaf",
+    label: "Diya udhaar maaf kiya",
+    sign: -1,
+    color: "neutral"
+  },
 };
 
 export const DEBT_CATEGORY_TYPE: Record<string, DebtType> = Object.fromEntries(
-  (Object.entries(DEBT_TYPE_META) as [DebtType, (typeof DEBT_TYPE_META)[DebtType]][]).map(([t, m]) => [m.categoryId, t])
+  (
+    Object.entries(DEBT_TYPE_META) as [
+      DebtType,
+      (typeof DEBT_TYPE_META)[DebtType]
+    ][]
+  ).map(([t, m]) => [m.categoryId, t])
 );
 
-export type PartyType = "customer" | "supplier" | "bank";
+// export type PartyType = "customer" | "supplier" | "bank";
+export type PartyType = "customer" | "supplier";
 export interface IParty {
   id: string;
   name: string;

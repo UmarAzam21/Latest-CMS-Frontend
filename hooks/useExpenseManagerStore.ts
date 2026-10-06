@@ -1,8 +1,8 @@
-// hooks/useExpenseManagerStore.ts
+// dashboard\hooks\useExpenseManagerStore.ts
 "use client";
 
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { IExpenseEntry, ICategory, SortField, SortDirection, ICard } from "@/types/expenseManagerTy";
+import { IExpenseEntry, ICategory, SortField, SortDirection, ICard, IParty } from "@/types/expenseManagerTy";
 import { defaultCategories } from "@/data/user-dashboard/defaultCategoriesData";
 import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
@@ -10,17 +10,20 @@ import { buildTrend, weekKey } from "@/lib/utils/trend";
 import { toast } from "sonner";
 import { cardDelta } from "@/lib/utils/cardDelta";
 import { EntryKind, MAX_CARDS } from "@/types/expenseManagerTy"; // merge into your existing import
+import { PartyFormValues } from "@/lib/schemas/partySchema";
+import { debtBalances, debtTotals } from "@/lib/utils/debt";
 
 
 // Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
 // RENAMED or REMOVED. Adding a new OPTIONAL field does NOT require a bump —
 // old stored JSON simply parses with that field undefined, which is valid.
-const SCHEMA_VERSION = "v2";
+const SCHEMA_VERSION = "v3";
 const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
 const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CARDS = `filernow_expense_cards_${SCHEMA_VERSION}`;
 const STORAGE_KEY_MODE = `filernow_khata_mode_${SCHEMA_VERSION}`; // "demo" | "blank"
+const STORAGE_KEY_PARTIES = `filernow_expense_parties_${SCHEMA_VERSION}`;
 
 // Safety net for teammates who forget to bump: if stored entries don't match
 // the current required shape (e.g. still using old `category` instead of
@@ -53,7 +56,8 @@ export function useExpenseManagerStore() {
   const [hasLoaded, setHasLoaded] = useState(false);
   const [cards, setCards] = useState<ICard[]>([]);
   const [dataMode, setDataMode] = useState<"demo" | "blank">("demo");
-
+  // parties state
+  const [parties, setParties] = useState<IParty[]>([]);
 
   useEffect(() => {
     // "Seeded" is tracked independently of entries' emptiness, so that a
@@ -73,6 +77,7 @@ export function useExpenseManagerStore() {
     // Cards seed unconditionally, not gated behind entries' seeded flag,
     // since it's an independent dataset with its own storage key.
     setCards(readLocalT(STORAGE_KEY_CARDS, dummyCards));
+    setParties(readLocalT<IParty[]>(STORAGE_KEY_PARTIES, []));
     // setCategories(readLocalT(STORAGE_KEY_CATEGORIES, defaultCategories));
     const rawCats = readLocalT<ICategory[]>(STORAGE_KEY_CATEGORIES, defaultCategories);
 
@@ -98,6 +103,12 @@ export function useExpenseManagerStore() {
     window.localStorage.setItem(STORAGE_KEY_CATEGORIES, JSON.stringify(categories));
   }, [categories, hasLoaded]);
 
+  // persist effect for parties
+  useEffect(() => {
+    if (!hasLoaded) return;
+    window.localStorage.setItem(STORAGE_KEY_PARTIES, JSON.stringify(parties));
+  }, [parties, hasLoaded]);
+
   // load demo data
   const loadDemoData = useCallback(() => {
     setEntries(dummyExpenseEntries);
@@ -112,6 +123,7 @@ export function useExpenseManagerStore() {
     setCards([]);
     window.localStorage.setItem(STORAGE_KEY_MODE, "blank");
     setDataMode("blank");
+    setParties([]);
   }, []);
 
   // ONE place that changes card balances + shows the separate balance toast.
@@ -133,16 +145,37 @@ export function useExpenseManagerStore() {
     });
   }, [cards]);
 
+  // const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
+  //   const withBaseline = entry.kind === "debt"
+  //     ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount }
+  //     : entry;
+
+  //   setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
+  //   toast.success(`${entry.subject} save ho gaya`);
+
+  //   if (entry.cardId) {
+  //     applyCardDeltas({ [entry.cardId]: cardDelta(entry) });
+  //   }
+  // }, [applyCardDeltas]);
+
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-    const withBaseline = entry.kind === "debt"
-      ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount }
+    const clean = entry.kind === "debt"
+      ? { ...entry, cardId: undefined }
       : entry;
 
-    setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
+    setEntries((prev) => [
+      {
+        ...clean,
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString()
+      },
+      ...prev
+    ]);
+
     toast.success(`${entry.subject} save ho gaya`);
 
-    if (entry.cardId) {
-      applyCardDeltas({ [entry.cardId]: cardDelta(entry) });
+    if (clean.cardId) {
+      applyCardDeltas({ [clean.cardId]: cardDelta(clean) });
     }
   }, [applyCardDeltas]);
 
@@ -182,28 +215,47 @@ export function useExpenseManagerStore() {
     }
   }, [entries, applyCardDeltas]);
 
-  const makeDebtPayment = useCallback((id: string, paymentAmount: number) => {
-    const target = entries.find((e) => e.id === id);
-    if (!target || paymentAmount <= 0) return;
+  // const makeDebtPayment = useCallback((id: string, paymentAmount: number) => {
+  //   const target = entries.find((e) => e.id === id);
+  //   if (!target || paymentAmount <= 0) return;
 
-    const paid = Math.min(paymentAmount, target.amount);
-    const remaining = target.amount - paid;
+  //   const paid = Math.min(paymentAmount, target.amount);
+  //   const remaining = target.amount - paid;
 
-    setEntries((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, amount: remaining, isSettled: remaining === 0 } : e))
-    );
+  //   setEntries((prev) =>
+  //     prev.map((e) => (e.id === id ? { ...e, amount: remaining, isSettled: remaining === 0 } : e))
+  //   );
 
-    toast.success(
-      remaining === 0
-        ? `${target.subject} settle ho gaya`
-        : `${target.subject}: PKR ${paid.toLocaleString("en-PK")} ada, baaki PKR ${remaining.toLocaleString("en-PK")}`
-    );
+  //   toast.success(
+  //     remaining === 0
+  //       ? `${target.subject} settle ho gaya`
+  //       : `${target.subject}: PKR ${paid.toLocaleString("en-PK")} ada, baaki PKR ${remaining.toLocaleString("en-PK")}`
+  //   );
 
-    // lena = I owe -> paying reduces my card; dena = they owe me -> receiving increases it
-    if (target.cardId && target.debtDirection) {
-      applyCardDeltas({ [target.cardId]: target.debtDirection === "liya" ? -paid : paid });
+  //   // lena = I owe -> paying reduces my card; dena = they owe me -> receiving increases it
+  //   if (target.cardId && target.debtDirection) {
+  //     applyCardDeltas({ [target.cardId]: target.debtDirection === "liya" ? -paid : paid });
+  //   }
+  // }, [entries, applyCardDeltas]);
+
+  const addParty = useCallback((p: PartyFormValues): IParty => {
+    const party: IParty = { ...p, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+    setParties((prev) => [party, ...prev]);
+    toast.success(`${party.name} add ho gaya`);
+    return party; // lets the entry dialog select it immediately
+  }, []);
+
+  const updateParty = useCallback((id: string, patch: Partial<IParty>) => {
+    setParties((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  }, []);
+
+  const deleteParty = useCallback((id: string) => {
+    if (entries.some((e) => e.partyId === id)) {
+      toast.error("Is party ki entries maujood hain, pehle woh delete karein");
+      return;
     }
-  }, [entries, applyCardDeltas]);
+    setParties((prev) => prev.filter((p) => p.id !== id));
+  }, [entries]);
 
   const addCategory = useCallback((label: string, color: ICategory["color"], kind: EntryKind) => {
     const clean = label.trim();
@@ -337,9 +389,12 @@ export function useExpenseManagerStore() {
       .filter((e) => e.kind === "expense")
       .reduce((s, e) => s + e.amount, 0);
 
-    const totalDebt = entries
-      .filter((e) => e.kind === "debt" && !e.isSettled)
-      .reduce((s, e) => s + e.amount, 0);
+    // const totalDebt = entries
+    //   .filter((e) => e.kind === "debt" && !e.isSettled)
+    //   .reduce((s, e) => s + e.amount, 0);
+
+    const debtNet = debtBalances(entries);
+    const { youWillGet, youWillGive } = debtTotals(debtNet);
 
     const balance = totalIncome - totalExpenses;
     const weeklyTrend = buildTrend(entries, weekKey, 8);
@@ -366,7 +421,10 @@ export function useExpenseManagerStore() {
     return {
       totalIncome,
       totalExpenses,
-      totalDebt,
+      // totalDebt,
+      debtNet,
+      youWillGet,
+      youWillGive,
       balance,
       categoryBreakdown,
       dailyTrend,
@@ -387,7 +445,8 @@ export function useExpenseManagerStore() {
     addEntry,
     updateEntry,
     deleteEntry,
-    makeDebtPayment,
+    // makeDebtPayment,
+    hasLoaded, parties, addParty, updateParty, deleteParty,
     addCategory,
     updateCategory,
     deleteCategory,

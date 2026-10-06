@@ -90,7 +90,10 @@ export const defaultExpenseCategories: ICategory[] = [
 // ];
 
 export const defaultDebtCategories: ICategory[] = Object.values(DEBT_TYPE_META).map((m) => ({
-    id: m.categoryId, label: m.label, kind: "debt", color: m.color,
+    id: m.categoryId,
+    label: m.label,
+    kind: "debt",
+    color: m.color,
 }));
 
 export const defaultCategories: ICategory[] = [

@@ -1,3 +1,5 @@
+// dashboard\app\user-dashboard\digital-khata\udhaar\page.tsx
+
 "use client";
 import { useState } from "react";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
@@ -28,6 +30,7 @@ export default function UdhaarKhataPage() {
 
                     <div className="flex items-center gap-brand-8">
                         <CategoryManagerDialog
+                            kinds={["debt"]}
                             categories={store.categories}
                             onAdd={store.addCategory}
                             onDelete={store.deleteCategory}
@@ -47,6 +50,7 @@ export default function UdhaarKhataPage() {
                                 }
                                 setAddOpen(false);
                             }}
+                            parties={store.parties} onAddParty={store.addParty}
                         />
                     </div>
                 </div>

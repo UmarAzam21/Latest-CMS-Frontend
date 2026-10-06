@@ -1,3 +1,5 @@
+// dashboard\app\user-dashboard\digital-khata\daily\page.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -48,6 +50,7 @@ export default function ExpenseManagerPage() {
                                 if (editingEntry) store.updateEntry(editingEntry.id, values);
                                 else store.addEntry(values);
                             }}
+                            parties={store.parties} onAddParty={store.addParty}
                         />
                     </div>
                 </div>
