@@ -13,6 +13,8 @@ import FbrTaskBoard from '@/components/user-dashboard/FbrTaskBoard/FbrTaskBoard'
 import QuickGrids from '@/components/user-dashboard/expenseManager/QuickGrids/page';
 import PromoBannerV2 from "@/components/user-dashboard/expenseManager/promoBannerv2/page"
 import PromoBannerV3 from "@/components/user-dashboard/expenseManager/promoBannerv3/page"
+import MajorServicesV2 from "@/components/user-dashboard/services/MajorServicesV2"
+import DigitalKhataDashboardCardV2 from "@/components/user-dashboard/expenseManager/khata/DigitalKhataDashboardCardV2"
 import { Filter } from 'lucide-react';
 
 type DashboardTab = 'inbox' | 'draft' | 'outbox' | 'completed';
@@ -80,13 +82,9 @@ function DashboardOverviewContent() {
 
       <div className="w-full grid grid-cols-1 gap-brand-12 sm:grid-cols-2 lg:grid-cols-3 mt-brand-12">
         <div className="h-full lg:col-span-2">
-          <MajorServices />
+          <MajorServicesV2 />
         </div>
-        <DigitalKhataDashboardCard
-          entries={store.entries}
-          categories={store.categories}
-          cards={store.cards}
-          onSaved={(v) => store.addEntry({ ...v, categoryId: v.categoryId || "cat-other" })}
+        <DigitalKhataDashboardCardV2
         />
         {/* <QuickGrids /> */}
       </div>
