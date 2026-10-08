@@ -26,8 +26,14 @@ export const dummyExpenseEntries: IExpenseEntry[] = [
     { id: "i3", kind: "income", subject: "Consulting Fee", categoryId: "cat-business-income", amount: 45000, date: "2026-07-10" },
 
     // Debt
-    { id: "d1", kind: "debt", subject: "Car Loan Installment", categoryId: "cat-udhaar-liya", debtDirection: "liya", amount: 25000, date: "2026-09-01", isSettled: false },
-    { id: "d2", kind: "debt", subject: "Credit Card Balance", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 18000, date: "2026-08-20", isSettled: false },
-    { id: "d3", kind: "debt", subject: "Test Loan", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 15000, date: "2026-08-20", isSettled: false },
-    { id: "d4", kind: "debt", subject: "Personal Loan (Friend)", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 10000, date: "2026-07-05", isSettled: true },
+    // { id: "d1", kind: "debt", subject: "Car Loan Installment", categoryId: "cat-udhaar-liya", debtDirection: "liya", amount: 25000, date: "2026-09-01", isSettled: false },
+    // { id: "d2", kind: "debt", subject: "Credit Card Balance", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 18000, date: "2026-08-20", isSettled: false },
+    // { id: "d3", kind: "debt", subject: "Test Loan", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 15000, date: "2026-08-20", isSettled: false },
+    // { id: "d4", kind: "debt", subject: "Personal Loan (Friend)", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 10000, date: "2026-07-05", isSettled: true },
+
+    { id: "d1", kind: "debt", subject: "Car Loan Installment", categoryId: "cat-udhaar-liya", amount: 25000, date: "2026-09-01" },
+    { id: "d2", kind: "debt", subject: "Credit Card Balance", categoryId: "cat-udhaar-diya", amount: 18000, date: "2026-08-20" },
+    { id: "d3", kind: "debt", subject: "Test Loan", categoryId: "cat-udhaar-diya", amount: 15000, date: "2026-08-20" },
+    { id: "d4", kind: "debt", subject: "Personal Loan (Friend)", categoryId: "cat-udhaar-diya", amount: 10000, date: "2026-07-05" },
+    { id: "d5", kind: "debt", subject: "Personal Loan (Friend)", categoryId: "cat-udhaar-diya-wapis-liya", amount: 10000, date: "2026-07-20" },
 ];

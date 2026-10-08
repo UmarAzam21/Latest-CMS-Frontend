@@ -11,6 +11,7 @@ interface CategoryManagerDialogProps {
     categories: ICategory[];
     onAdd: (label: string, color: ICategory["color"], kind: EntryKind) => void;
     onDelete: (id: string) => void;
+    kinds?: EntryKind[]
 }
 
 const KINDS: EntryKind[] = ["income", "expense", "debt"];
@@ -24,7 +25,7 @@ const SWATCH: Record<ICategory["color"], string> = {
     neutral: "bg-text-secondary-muter",
 };
 
-export default function CategoryManagerDialog({ categories, onAdd, onDelete }: CategoryManagerDialogProps) {
+export default function CategoryManagerDialog({ categories, onAdd, onDelete, kinds = KINDS }: CategoryManagerDialogProps) {
     const [tab, setTab] = useState<EntryKind>("expense");
     const [label, setLabel] = useState("");
     const [color, setColor] = useState<ICategory["color"]>("neutral");
@@ -54,8 +55,10 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                         </Dialog.Close>
                     </div>
 
-                    <div className="mb-brand-8 flex gap-1">
-                        {KINDS.map((k) => (
+                    {/* tab bar: hide when only one kind, and map over `kinds` instead of KINDS */}
+                    {kinds.length > 1 && (<div className="mb-brand-8 flex gap-1">{
+                        // {KINDS.map((k) => (
+                        kinds.map((k) => (
                             <button
                                 key={k}
                                 onClick={() => {
@@ -69,8 +72,8 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
                             >
                                 {KHATA_LABELS[k].noun}
                             </button>
-                        ))}
-                    </div>
+                        ))}</div>)
+                    }
 
                     <div className="flex max-h-56 flex-col gap-1.5 overflow-y-auto">
                         {list.map((c) => {
@@ -125,7 +128,8 @@ export default function CategoryManagerDialog({ categories, onAdd, onDelete }: C
 
                     {tab === "debt" ? (
                         <p className="mt-brand-8 border-t border-border-clr pt-brand-8 para-tiny text-text-secondary-muter/80 text-center">
-                            Udhaar ki 2 categories fixed hain (Liya / Diya), kyunke card balance inhi se tay hota hai.
+                            {/* Udhaar ki 2 categories fixed hain (Liya / Diya), kyunke card balance inhi se tay hota hai. */}
+                            Udhaar ki categories fixed hain, kyunke party ka balance inhi se tay hota hai.
                         </p>
                     ) : (
                         <div className="mt-brand-8 flex flex-col gap-brand-8 border-t border-border-clr pt-brand-8">
