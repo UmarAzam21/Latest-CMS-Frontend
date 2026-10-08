@@ -69,7 +69,8 @@ export default function UdhaarKhataPage() {
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                 <DebtActivityChart entries={debtEntries} />
-                <DebtSummaryCardV2 debtEntries={debtEntries} onMakePayment={store.makeDebtPayment} />
+                {/* <DebtSummaryCardV2 debtEntries={debtEntries} onMakePayment={store.makeDebtPayment} /> */}
+                <DebtSummaryCardV2 debtEntries={debtEntries} parties={store.parties} />
             </div>
 
             <ExpensesTable

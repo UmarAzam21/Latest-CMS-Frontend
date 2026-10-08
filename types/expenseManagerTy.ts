@@ -190,9 +190,12 @@ export const DEBT_CATEGORY_TYPE: Record<string, DebtType> = Object.fromEntries(
 );
 
 // export type PartyType = "customer" | "supplier" | "bank";
-export type PartyType = "customer" | "supplier";
+export const PARTY_TYPES = ["customer", "supplier"] as const;
+export type PartyType = (typeof PARTY_TYPES)[number];
+export const PARTY_TYPE_LABELS: Record<PartyType, string> = { customer: "Customer", supplier: "Supplier" };
 export interface IParty {
   id: string;
+  slug: string; // used in URLs, e.g. "ali-ashraf-3fa9c"
   name: string;
   phone?: string;
   type: PartyType;

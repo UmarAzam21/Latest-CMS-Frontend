@@ -7,22 +7,25 @@ import { useState } from "react";
 import Topbar from "@/components/user-dashboard/topbar/Topbar";
 import NoticeModel from "@/components/user-dashboard/NoticeModel/NoticeModel";
 import Sidebar from "@/components/dashboard/sidebar/Sidebar";
+import { ExpenseManagerProvider } from "@/hooks/useExpenseManagerStore";
 
 export default function UserDashboardLayout({ children }: { children: ReactNode }) {
 	const [isNoticeOpen, setIsNoticeOpen] = useState(true);
 
 	return (
 		<>
-			<div className="fixed inset-0 flex h-dvh min-h-0 overflow-hidden bg-page-bg">
-				<Sidebar variant="user" />
-				<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-					<div className="z-topbar shrink-0 bg-white">
-						<Topbar variant="user" />
+			<ExpenseManagerProvider>
+				<div className="fixed inset-0 flex h-dvh min-h-0 overflow-hidden bg-page-bg">
+					<Sidebar variant="user" />
+					<div className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
+						<div className="z-topbar shrink-0 bg-white">
+							<Topbar variant="user" />
+						</div>
+						<main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-brand-12 px-brand">{children}</main>
 					</div>
-					<main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-brand-12 px-brand">{children}</main>
 				</div>
-			</div>
-			<NoticeModel isOpen={isNoticeOpen} onClose={() => setIsNoticeOpen(false)} />
+				<NoticeModel isOpen={isNoticeOpen} onClose={() => setIsNoticeOpen(false)} />
+			</ExpenseManagerProvider>
 		</>
 	);
 }

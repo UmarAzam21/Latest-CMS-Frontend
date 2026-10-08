@@ -100,10 +100,11 @@ export default function ExpenseManagerPage() {
                     }}
                     defaultGranularity="week"
                 />
-                <DebtSummaryCardV2
+                {/* <DebtSummaryCardV2
                     debtEntries={debtEntries}
                     onMakePayment={store.makeDebtPayment}
-                />
+                /> */}
+                <DebtSummaryCardV2 debtEntries={debtEntries} parties={store.parties} />
             </div>
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">

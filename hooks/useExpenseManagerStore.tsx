@@ -1,8 +1,8 @@
-// dashboard\hooks\useExpenseManagerStore.ts
+// dashboard\hooks\useExpenseManagerStore.tsx
 "use client";
 
-import { useState, useMemo, useCallback, useEffect } from "react";
-import { IExpenseEntry, ICategory, SortField, SortDirection, ICard, IParty } from "@/types/expenseManagerTy";
+import { useState, useMemo, useCallback, useEffect, useContext, createContext, ReactNode } from "react";
+import { IExpenseEntry, ICategory, SortField, SortDirection, ICard, IParty, PARTY_TYPES } from "@/types/expenseManagerTy";
 import { defaultCategories } from "@/data/user-dashboard/defaultCategoriesData";
 import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
@@ -12,6 +12,7 @@ import { cardDelta } from "@/lib/utils/cardDelta";
 import { EntryKind, MAX_CARDS } from "@/types/expenseManagerTy"; // merge into your existing import
 import { PartyFormValues } from "@/lib/schemas/partySchema";
 import { debtBalances, debtTotals } from "@/lib/utils/debt";
+import { makeSlug } from "@/lib/utils/party";
 
 
 // Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
@@ -48,7 +49,8 @@ function readLocalT<T>(key: string, fallback: T): T {
   }
 }
 
-export function useExpenseManagerStore() {
+// export function useExpenseManagerStore() {
+function useExpenseManagerState() {
   const [entries, setEntries] = useState<IExpenseEntry[]>([]);
   const [categories, setCategories] = useState<ICategory[]>(defaultCategories);
   const [sortField, setSortField] = useState<SortField>("date");
@@ -77,7 +79,13 @@ export function useExpenseManagerStore() {
     // Cards seed unconditionally, not gated behind entries' seeded flag,
     // since it's an independent dataset with its own storage key.
     setCards(readLocalT(STORAGE_KEY_CARDS, dummyCards));
-    setParties(readLocalT<IParty[]>(STORAGE_KEY_PARTIES, []));
+    setParties(
+      readLocalT<IParty[]>(STORAGE_KEY_PARTIES, []).map((p) => ({
+        ...p,
+        slug: p.slug ?? makeSlug(p.name),
+        type: (PARTY_TYPES as readonly string[]).includes(p.type) ? p.type : "customer",
+      }))
+    );
     // setCategories(readLocalT(STORAGE_KEY_CATEGORIES, defaultCategories));
     const rawCats = readLocalT<ICategory[]>(STORAGE_KEY_CATEGORIES, defaultCategories);
 
@@ -239,7 +247,7 @@ export function useExpenseManagerStore() {
   // }, [entries, applyCardDeltas]);
 
   const addParty = useCallback((p: PartyFormValues): IParty => {
-    const party: IParty = { ...p, id: crypto.randomUUID(), createdAt: new Date().toISOString() };
+    const party: IParty = { ...p, id: crypto.randomUUID(), slug: makeSlug(p.name), createdAt: new Date().toISOString() };
     setParties((prev) => [party, ...prev]);
     toast.success(`${party.name} add ho gaya`);
     return party; // lets the entry dialog select it immediately
@@ -249,12 +257,14 @@ export function useExpenseManagerStore() {
     setParties((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   }, []);
 
-  const deleteParty = useCallback((id: string) => {
+  const deleteParty = useCallback((id: string): boolean => {
     if (entries.some((e) => e.partyId === id)) {
       toast.error("Is party ki entries maujood hain, pehle woh delete karein");
-      return;
+      return false;
     }
     setParties((prev) => prev.filter((p) => p.id !== id));
+    toast.success("Party delete ho gayi");
+    return true;
   }, [entries]);
 
   const addCategory = useCallback((label: string, color: ICategory["color"], kind: EntryKind) => {
@@ -453,4 +463,19 @@ export function useExpenseManagerStore() {
     cards, addCard, updateCard, deleteCard, adjustCardBalance, transferBetweenCards,
     dataMode, loadDemoData, resetToBlank,
   };
+}
+
+
+type Store = ReturnType<typeof useExpenseManagerState>;
+const StoreContext = createContext<Store | null>(null);
+
+export function ExpenseManagerProvider({ children }: { children: ReactNode }) {
+  const store = useExpenseManagerState(); // the ONLY place the state lives
+  return <StoreContext.Provider value={store}>{children}</StoreContext.Provider>;
+}
+
+export function useExpenseManagerStore(): Store {
+  const store = useContext(StoreContext);
+  if (!store) throw new Error("useExpenseManagerStore must be used inside <ExpenseManagerProvider>");
+  return store;
 }
