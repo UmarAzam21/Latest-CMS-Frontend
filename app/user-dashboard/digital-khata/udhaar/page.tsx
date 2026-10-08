@@ -1,3 +1,5 @@
+// dashboard\app\user-dashboard\digital-khata\udhaar\page.tsx
+
 "use client";
 import { useState } from "react";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
@@ -27,11 +29,28 @@ export default function UdhaarKhataPage() {
                     <DataModeToggler store={store} />
 
                     <div className="flex items-center gap-brand-8">
-                        <CategoryManagerDialog categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
+                        <CategoryManagerDialog
+                            kinds={["debt"]}
+                            categories={store.categories}
+                            onAdd={store.addCategory}
+                            onDelete={store.deleteCategory}
+                        />
                         <AddUdhaarButton
-                            categories={store.categories} cards={store.cards} editingEntry={editingEntry}
-                            open={addOpen} onOpenChange={setAddOpen} onCloseEdit={() => setEditingEntry(null)}
-                            onSaved={(v) => { if (editingEntry) store.updateEntry(editingEntry.id, v); else store.addEntry(v); setAddOpen(false); }}
+                            categories={store.categories}
+                            cards={store.cards}
+                            editingEntry={editingEntry}
+                            open={addOpen}
+                            onOpenChange={setAddOpen}
+                            onCloseEdit={() => setEditingEntry(null)}
+                            onSaved={(v) => {
+                                if (editingEntry) {
+                                    store.updateEntry(editingEntry.id, v);
+                                } else {
+                                    store.addEntry(v);
+                                }
+                                setAddOpen(false);
+                            }}
+                            parties={store.parties} onAddParty={store.addParty}
                         />
                     </div>
                 </div>
@@ -50,7 +69,8 @@ export default function UdhaarKhataPage() {
 
             <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
                 <DebtActivityChart entries={debtEntries} />
-                <DebtSummaryCardV2 debtEntries={debtEntries} onMakePayment={store.makeDebtPayment} />
+                {/* <DebtSummaryCardV2 debtEntries={debtEntries} onMakePayment={store.makeDebtPayment} /> */}
+                <DebtSummaryCardV2 debtEntries={debtEntries} parties={store.parties} />
             </div>
 
             <ExpensesTable

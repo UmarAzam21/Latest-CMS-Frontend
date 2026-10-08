@@ -5,6 +5,7 @@ import {
   BadgeCheck, BellRing, Building2, Calculator, Clock, CreditCard, Ellipsis, FileCheck2, FileClock, FileHeadphone, FileText, Globe, Globe2, Headset, ImageIcon, KeyRound, Landmark, LayoutDashboard, LifeBuoy, LucideIcon, Mail, Pencil, Plus, ReceiptText, Scale, Search, Settings, ShieldCheck, ShoppingCart, Stamp, TrendingUp, Upload, User, Users, UsersRound,
   Wallet
 } from "lucide-react";
+import { DIGITAL_KHATA_NAV_ITEMS } from "../user-dashboard/digitalKhata";
 
 export interface NavItem {
   label: string;
@@ -259,11 +260,12 @@ export function getUserNavData(): NavItem[] {
       label: "Digital Khata",
       href: "/user-dashboard/digital-khata/daily",
       icon: CreditCard,
-      children: [
-        { label: "Daily Khata", href: "/user-dashboard/digital-khata/daily", icon: Wallet },
-        { label: "Business Khata", href: "/user-dashboard/digital-khata/business", icon: Building2 },
-        { label: "Udhaar Khata", href: "/user-dashboard/digital-khata/udhaar", icon: Landmark },
-      ],
+      // children: [
+      //   { label: "Daily Khata", href: "/user-dashboard/digital-khata/daily", icon: Wallet },
+      //   { label: "Business Khata", href: "/user-dashboard/digital-khata/business", icon: Building2 },
+      //   { label: "Udhaar Khata", href: "/user-dashboard/digital-khata/udhaar", icon: Landmark },
+      // ],
+      children: DIGITAL_KHATA_NAV_ITEMS,
     },
     {
       label: "Legal Consultation",

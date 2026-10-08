@@ -1,166 +1,52 @@
-// dashboard\components\user-dashboard\expenseManager\debtCard\DebtSummaryCardV2.tsx
-
 "use client";
+import Link from "next/link";
+import { useMemo } from "react";
+import { CheckCircle2 } from "lucide-react";
+import { IExpenseEntry, IParty } from "@/types/expenseManagerTy";
+import { debtBalances, debtKey, debtTotals, pkr } from "@/lib/utils/debt";
+import { PARTY_BASE, partyHref } from "@/lib/utils/party";
+import BalanceText from "../party/BalanceText";
 
-import { useState } from "react";
-import {
-    CircleDollarSign,
-    TrendingDown,
-    CheckCircle2,
-    ArrowUpRight,
-} from "lucide-react";
-import { IExpenseEntry } from "@/types/expenseManagerTy";
-import DebtRow from "./DebtRow";
-import AllDebtsDialog from "./AllDebtsDialog";
-
-interface DebtSummaryCardProps {
-    debtEntries: IExpenseEntry[];
-    onMakePayment: (id: string, amount: number) => void;
-}
-
-export default function DebtSummaryCardV2({
-    debtEntries,
-    onMakePayment,
-}: DebtSummaryCardProps) {
-
-    const [showAll, setShowAll] = useState(false);
-
-    const unsettled = debtEntries.filter((d) => !d.isSettled);
-    const latestUnsettled = [...unsettled]
-        .sort((a, b) => Date.parse(b.date) - Date.parse(a.date))
-        .slice(0, 2);
-    const settled = debtEntries.filter((d) => d.isSettled);
-
-    const totalDebt = unsettled.reduce((sum, d) => sum + d.amount, 0);
-
-    const totalOriginal = debtEntries.reduce(
-        (sum, d) => sum + (d.originalAmount ?? d.amount),
-        0
-    );
-
-    const paidOffPercent =
-        totalOriginal > 0
-            ? Math.min(
-                100,
-                Math.round(
-                    ((totalOriginal - totalDebt) / totalOriginal) * 100
-                )
-            )
-            : 0;
-
-    const largest = [...unsettled].sort(
-        (a, b) => b.amount - a.amount
-    )[0];
+export default function DebtSummaryCardV2({ debtEntries, parties }: { debtEntries: IExpenseEntry[]; parties: IParty[] }) {
+    const { rows, youWillGet, youWillGive } = useMemo(() => {
+        const balances = debtBalances(debtEntries);
+        const rows = [...balances]
+            .filter(([, b]) => b !== 0)
+            .map(([key, bal]) => {
+                const party = parties.find((p) => p.id === key);
+                const name = party?.name ?? debtEntries.find((e) => debtKey(e) === key)?.subject ?? key;
+                return { key, bal, name, party };
+            })
+            .sort((a, b) => Math.abs(b.bal) - Math.abs(a.bal));
+        return { rows, ...debtTotals(balances) };
+    }, [debtEntries, parties]);
 
     return (
         <div className="flex h-full min-h-0 flex-col rounded-brand-16 border border-border-clr bg-white p-brand-12">
-
-            {/* Header */}
-            <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2.5">
-                    <div>
-                        <h3 className="para-small font-semibold text-text-dark">
-                            Outstanding Debt
-                        </h3>
-
-                        <p className="mt-0.5 para-tiny text-text-secondary-muter">
-                            PKR {totalDebt.toLocaleString("en-PK")}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-1 rounded-full bg-success-bg px-2 py-1">
-                    <TrendingDown
-                        size={11}
-                        className="text-success"
-                    />
-                    <span className="para-tiny font-medium text-success">
-                        {paidOffPercent}% cleared
-                    </span>
-                </div>
+            <h3 className="para-small font-semibold text-text-dark">Udhaar Balances</h3>
+            <div className="mt-2 grid grid-cols-2 gap-2">
+                <div><p className="para-small font-semibold text-danger">{pkr(youWillGet)}</p><p className="para-tiny text-text-secondary-muted">You will get</p></div>
+                <div><p className="para-small font-semibold text-green-600">{pkr(youWillGive)}</p><p className="para-tiny text-text-secondary-muted">You will give</p></div>
             </div>
 
-            {/* Progress */}
-            <div className="mt-3">
-                <div className="flex items-center justify-between para-tiny text-text-secondary-muter">
-                    <span>
-                        {unsettled.length} active
-                    </span>
-
-                    <span>
-                        {settled.length} settled
-                    </span>
-                </div>
-
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-page-bg">
-                    <div
-                        className="h-full rounded-full bg-success transition-all duration-300"
-                        style={{
-                            width: `${paidOffPercent}%`,
-                        }}
-                    />
-                </div>
-            </div>
-
-            {/* Debt List */}
-            <div className="mt-3 flex min-h-0 flex-1 flex-col gap-1.5">
-                {unsettled.length === 0 ? (
+            <div className="mt-3 flex flex-1 flex-col gap-1.5">
+                {rows.length === 0 ? (
                     <div className="flex items-center justify-center gap-1.5 rounded-brand-8 bg-success-bg px-2 py-2.5">
-                        <CheckCircle2
-                            size={14}
-                            className="text-success"
-                        />
-
-                        <span className="para-tiny font-semibold text-success">
-                            Debt free — nice work.
-                        </span>
+                        <CheckCircle2 size={14} className="text-success" />
+                        <span className="para-tiny font-semibold text-success">Sab hisaab barabar hai</span>
                     </div>
-                ) : (
-                    latestUnsettled.map((entry) => (
-                        <DebtRow
-                            key={entry.id}
-                            entry={entry}
-                            onMakePayment={onMakePayment}
-                        />
-                    ))
-                )}
+                ) : rows.slice(0, 4).map(({ key, bal, name, party }) => {
+                    const inner = (<><span className="truncate para-tiny font-semibold">{name}</span><BalanceText value={bal} /></>);
+                    const cls = "flex items-center justify-between gap-2 rounded-brand-8 border border-border-clr px-2.5 py-2";
+                    return party
+                        ? <Link key={key} href={partyHref(party)} className={`${cls} hover:bg-page-bg`}>{inner}</Link>
+                        : <div key={key} className={cls}>{inner}</div>;
+                })}
             </div>
 
-            {/* see all entries dialog */}
-            {unsettled.length > 2 && (
-                <button onClick={() => setShowAll(true)} className="mt-1.5 self-center para-tiny font-semibold text-primary hover:underline cursor-pointer">
-                    See all {unsettled.length} entries
-                </button>
-            )}
-
-            {/* Footer */}
-            {largest && (
-                <div className="flex items-center justify-between border-t border-border-clr/75 mt-2.5 pt-2.5">
-                    <div className="flex items-center gap-1.5">
-                        <ArrowUpRight
-                            size={14}
-                            className="text-danger"
-                        />
-
-                        <div>
-                            <p className="para-tiny text-[11px] leading-none text-text-secondary-muter mb-1">
-                                Largest liability
-                            </p>
-
-                            <p className="mt-0.5 max-w-[150px] truncate para-tiny font-semibold text-text-dark">
-                                {largest.subject}
-                            </p>
-                        </div>
-                    </div>
-
-                    <span className="para-small font-bold text-danger">
-                        PKR {largest.amount.toLocaleString("en-PK")}
-                    </span>
-                </div>
-            )}
-
-            {/* All Debts Entries Dialogs */}
-            <AllDebtsDialog open={showAll} onOpenChange={setShowAll} unsettled={unsettled} onMakePayment={onMakePayment} />
+            <Link href={PARTY_BASE} className="mt-2 self-center para-tiny font-semibold text-primary hover:underline">
+                Sab parties dekhein
+            </Link>
         </div>
     );
 }

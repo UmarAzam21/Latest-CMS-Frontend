@@ -1,4 +1,4 @@
-// dashboard\components\dashboard\Sidebar.tsx
+// dashboard\components\dashboard\sidebar\Sidebar.tsx
 
 "use client";
 import { useState, useEffect } from "react";
@@ -122,7 +122,6 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
   return (
     <>
       {/* Placeholder — reserves space so page content never shifts */}
-      {/* <div className="h-screen w-[76px] shrink-0" /> */}
       <div className="hidden lg:block h-screen w-[76px] shrink-0" />
 
       {mobileOpen && (
@@ -147,8 +146,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
             </div>
 
             <span
-              className={`text-sm font-semibold tracking-wide text-3 whitespace-nowrap transition-opacity duration-200 ${collapsed ? "opacity-0" : "opacity-100 delay-100"
-                }`}
+              className={`text-sm font-semibold tracking-wide text-3 whitespace-nowrap transition-opacity duration-200 ${!isExpanded ? "opacity-0" : "opacity-100 delay-100"}`}
             >
               {isUser ? "User Dashboard" : "Admin CMS"}
             </span>
@@ -169,7 +167,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                 <div key={item.href} className="relative">
                   <Link
                     href={item.href}
-                    title={collapsed ? item.label : undefined}
+                    title={!isExpanded ? item.label : undefined}
                     onClick={() => {
                       if (isUser && item.href === "/user-dashboard/enroll-service") {
                         setEnrollServicesOpen(true);
@@ -177,7 +175,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                     }}
                     className={`relative flex w-full items-center gap-3 rounded-md py-2.5 px-3 text-sm transition-all whitespace-nowrap ${isActive
                       ? "hover:bg-danger-bg text-primary"
-                      : "text-[#4B5563]x text-text-secondary"
+                      : "text-text-secondary-muted"
                       }`}
                   >
                     {isActive && (
@@ -185,14 +183,14 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                     )}
                     <Icon size={19} strokeWidth={1.8} className="shrink-0" />
                     <span
-                      className={`transition-opacity duration-200 ${collapsed ? "opacity-0" : "opacity-100 delay-100"
+                      className={`transition-opacity duration-200 ${!isExpanded ? "opacity-0" : "opacity-100 delay-100"
                         }`}
                     >
                       {item.label}
                     </span>
                   </Link>
 
-                  {hasChildren && !collapsed && (
+                  {hasChildren && isExpanded && (
                     <button
                       type="button"
                       aria-label={submenuOpen ? "Collapse" : "Expand"}
@@ -210,7 +208,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                   )}
 
                   {/* digital-khata sub-menus */}
-                  {hasChildren && !collapsed && submenuOpen && (
+                  {hasChildren && isExpanded && submenuOpen && (
                     <div className="ml-7 mt-1 flex flex-col gap-0.5">
                       {item.children!.map((child) => {
                         const ChildIcon = child.icon;
@@ -233,8 +231,8 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                     </div>
                   )}
 
-
-                  {isUser && item.href === "/user-dashboard/enroll-service" && !collapsed && services.length > 0 && (
+                  {/* // enroll-service chevron + list */}
+                  {isUser && item.href === "/user-dashboard/enroll-service" && isExpanded && services.length > 0 && (
                     <button
                       type="button"
                       aria-label={enrollServicesOpen ? "Collapse enroll services" : "Expand enroll services"}
@@ -249,7 +247,7 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
                     </button>
                   )}
 
-                  {isUser && item.href === "/user-dashboard/enroll-service" && enrollServicesOpen && !collapsed && services.length > 0 && (
+                  {isUser && item.href === "/user-dashboard/enroll-service" && enrollServicesOpen && isExpanded && services.length > 0 && (
                     <div className="ml-7 mt-1 min-w-0 space-y-0.5">
                       {SERVICE_CATEGORIES.map((category) => {
                         const categoryServices = services.filter((service) => category.values.includes(service.value as never));
@@ -341,13 +339,12 @@ export default function Sidebar({ variant = "admin" }: SidebarProps) {
           <div className="border-t border-slate-200 px-3 h-[54px] flex items-center">
             <button
               onClick={handleLogout}
-              title={collapsed ? "Log out" : undefined}
+              title={!isExpanded ? "Log out" : undefined}
               className="flex w-full items-center gap-3 rounded-md px-3 text-sm text-[#4B5563] hover:text-primary transition-colors whitespace-nowrap"
             >
               <LogOut size={19} strokeWidth={1.8} className="text-primary shrink-0" />
               <span
-                className={`transition-opacity duration-200 ${collapsed ? "opacity-0" : "opacity-100 delay-100"
-                  }`}
+                className={`transition-opacity duration-200 ${!isExpanded ? "opacity-0" : "opacity-100 delay-100"}`}
               >
                 Log out
               </span>

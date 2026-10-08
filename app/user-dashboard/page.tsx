@@ -1,3 +1,5 @@
+// dashboard\app\user-dashboard\page.tsx
+
 "use client";
 
 import { Suspense } from 'react';

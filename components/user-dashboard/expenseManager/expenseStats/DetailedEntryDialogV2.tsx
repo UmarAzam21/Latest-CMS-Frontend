@@ -1,5 +1,3 @@
-// dashboard\components\user-dashboard\expenseManager\expenseStats\DetailedEntryDialog.tsx
-
 "use client";
 import { useEffect, useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
