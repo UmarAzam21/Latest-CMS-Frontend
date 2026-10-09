@@ -114,7 +114,7 @@ function DashboardOverviewContent() {
             type="button"
             onClick={() => setIsFilterOpen((open) => !open)}
             aria-expanded={isFilterOpen}
-            className="mb-1 flex shrink-0 items-center gap-2 rounded-brand-8 bg-primary px-4 py-2 text-xs font-bold uppercase text-white shadow-primary-btn default-transition hover:bg-primary-light">
+            className="mb-1 flex shrink-0 items-center gap-2 rounded-brand-8 bg-[#FAFAFA] border border-slate-300 px-4 py-2 text-xs font-bold uppercase text-black shadow-primary-btn default-transition hover:bg-primary-light">
             <Filter size={15} />
             Filters
           </button>
@@ -134,7 +134,7 @@ function DashboardOverviewContent() {
 
 export default function DashboardOverviewPage() {
   return (
-    <Suspense fallback={<div className="min-h-40" />}>
+    <Suspense fallback={<div className="min-h-40 bg-white" />}>
       <DashboardOverviewContent />
     </Suspense>
   );

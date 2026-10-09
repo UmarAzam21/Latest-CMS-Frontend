@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import {
     MoveLeft,
     X,
@@ -271,56 +272,29 @@ function PromoBanner() {
                             </span>
                         </div>
 
-                        {/* Modules */}
-                        <div className="grid grid-cols-2 gap-1.5">
-                            {MODULES.map(({ key, title, icon: Icon }) => (
-                                <button
-                                    key={key}
-                                    type="button"
-                                    aria-label={`Add ${title}`}
-                                    onClick={() => setActive(key)}
-                                    className="
-                      group relative flex h-[46px] min-w-0 items-center gap-1 overflow-hidden
-                      border border-slate-200
-                      rounded-xl border border-slate-100 bg-white/95 pr-1.5 text-left
-                      
-                      transition-all duration-200
-                      hover:-translate-y-0.5 hover:border-[var(--brand-primary)]/20
-                      hover:shadow-[0_8px_18px_rgba(200,16,46,0.14)]
-                      active:translate-y-0 active:scale-[0.98]
-                      focus-visible:outline-none focus-visible:ring-2
-                      focus-visible:ring-[var(--brand-primary)]/40
-                    "
+                        <div className="grid grid-cols-3 border-y border-primary/15 bg-white">
+                            {[
+                                { label: "Income", icon: Wallet, href: "/user-dashboard/digital-khata/daily" },
+                                { label: "Expenses", icon: ChartNoAxesCombined, href: "/user-dashboard/digital-khata/daily" },
+                                { label: "Udhaar", icon: Users, href: "/user-dashboard/digital-khata/udhaar" },
+                            ].map(({ label, icon: Icon, href }) => (
+                                <Link
+                                    key={label}
+                                    href={href}
+                                    aria-label={`Open ${label} in Digital Khata`}
+                                    className="group relative flex min-w-0 flex-col items-center gap-1.5 px-1 py-2 text-center transition-colors duration-200 hover:bg-primary/5 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 [&:not(:last-child)]:border-r [&:not(:last-child)]:border-primary/15"
                                 >
-                                    {/* Icon tile */}
-                                    <span
-                                        className="
-                        flex h-full w-[38px] shrink-0 items-center justify-center
-                        rounded-l-xl rounded-r-[20px] bg-primary
-                        text-white
-                      "
-                                    >
-                                        <Icon className="h-4 w-4" strokeWidth={2} />
+                                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-lighter text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                                        <Icon aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
                                     </span>
-
-                                    <span className="min-w-0 flex-1 truncate text-[11px] font-bold text-[var(--text-dark)]">
-                                        {title}
+                                    <span className="flex max-w-full items-center gap-0.5 text-[9px] font-semibold text-[var(--text-dark)]">
+                                        <span className="truncate">{label}</span>
+                                        <ArrowRight aria-hidden="true" className="h-3 w-3 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
                                     </span>
-
-                                    {/* Arrow indicator */}
-                                    <span
-                                        className="
-                        flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full
-                        bg-rose-50 text-[var(--brand-primary)]
-                        transition-colors duration-200
-                        group-hover:bg-[var(--brand-primary)] group-hover:text-white
-                      "
-                                    >
-                                        <ArrowRight className="h-3 w-3" strokeWidth={2} />
-                                    </span>
-                                </button>
+                                </Link>
                             ))}
                         </div>
+                   
                     </div>
 
                     {/* ------------------------------------------------------------ */}
@@ -373,8 +347,8 @@ function PromoBanner() {
                             </h2>
 
                             {/* CTA */}
-                            <button
-                                type="button"
+                            <Link
+                                href="/user-dashboard/digital-khata/daily"
                                 dir="rtl"
                                 className="
       group
@@ -419,7 +393,7 @@ function PromoBanner() {
                                 >
                                     <MoveLeft className="h-3.5 w-3.5" strokeWidth={2.5} />
                                 </span>
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

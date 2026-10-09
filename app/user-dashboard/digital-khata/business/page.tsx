@@ -1,7 +1,7 @@
 // dashboard\app\user-dashboard\digital-khata\business\page.tsx
 
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useBusinessKhataStore } from "@/hooks/useBusinessKhataStore";
 import AddItemDialog from "@/components/user-dashboard/expenseManager/businessKhata/stockbook/AddItemDialog";
 import StockTable from "@/components/user-dashboard/expenseManager/businessKhata/stockbook/StockTable";
@@ -17,6 +17,13 @@ export default function BusinessKhataPage() {
     const store = useBusinessKhataStore();
     const [tab, setTab] = useState<Tab>("stock");
     const [cashDialog, setCashDialog] = useState<"in" | "out" | null>(null);
+
+    useEffect(() => {
+        const requestedTab = new URLSearchParams(window.location.search).get("tab");
+        if (requestedTab === "stock" || requestedTab === "bill" || requestedTab === "cash") {
+            setTab(requestedTab);
+        }
+    }, []);
 
     const tabIcons = {
         stock: Package,

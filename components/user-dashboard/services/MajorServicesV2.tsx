@@ -1,9 +1,14 @@
-const MajorServicesV2 = () => {
-  return (
-    <div className="h-full w-full flex flex-col gap-brand-12x rounded-brand-12 border border-border-clr bg-white p-brand-12 default-transition">
+import React from "react";
+import KhataServices from "@/components/user-dashboard/services/khata-services/page";
+import AdvancedServices from "@/components/user-dashboard/services/advance-services/page";
 
+function MajorServicesV2() {
+  return (
+    <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-2">
+      <KhataServices />
+      <AdvancedServices />
     </div>
   );
-};
+}
 
 export default MajorServicesV2;
