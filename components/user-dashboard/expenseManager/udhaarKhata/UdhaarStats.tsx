@@ -8,8 +8,8 @@ import { IExpenseEntry, ICategory, IExpenseStatItem, KHATA_LABELS } from "@/type
 
 const pk = (n: number) => `PKR ${n.toLocaleString("en-PK")}`;
 
-export default function UdhaarStats({ debtEntries, categories, onCtaClick }: {
-    debtEntries: IExpenseEntry[]; categories: ICategory[]; onCtaClick: () => void;
+export default function UdhaarStats({ debtEntries, categories, onCtaClick, onView }: {
+    debtEntries: IExpenseEntry[]; categories: ICategory[]; onCtaClick: () => void; onView: () => void;
 }) {
     const { get, give, settled } = useMemo(() => {
         const b = debtBalances(debtEntries);
@@ -41,7 +41,7 @@ export default function UdhaarStats({ debtEntries, categories, onCtaClick }: {
     return (
         <div className="grid grid-cols-1 gap-brand-8 sm:grid-cols-2 lg:grid-cols-4">
             {items.map((item) => (
-                <ExpenseStatCard key={item.id} item={item} onView={() => { }}
+                <ExpenseStatCard key={item.id} item={item} onView={onView}
                     onExport={() => exportEntriesToCsv(debtEntries, categories, `${item.id}-udhaar-export.csv`)}
                     ctaLabel={item.ctaLabel} onCtaClick={item.ctaLabel ? onCtaClick : undefined} />
             ))}

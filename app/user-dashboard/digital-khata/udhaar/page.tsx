@@ -13,12 +13,14 @@ import CardsBalanceChart from "@/components/user-dashboard/expenseManager/cardsM
 import CategoryManagerDialog from "@/components/user-dashboard/expenseManager/expenseCategory/CategoryManagerDialog";
 import { IExpenseEntry } from "@/types/expenseManagerTy";
 import DataModeToggler from "@/components/user-dashboard/expenseManager/modeToggler/DataModeToggler";
+import StatDetailDialog from "@/components/user-dashboard/expenseManager/expenseStats/StatDetailDialog";
 
 export default function UdhaarKhataPage() {
     const store = useExpenseManagerStore();
     const [editingEntry, setEditingEntry] = useState<IExpenseEntry | null>(null);
     const [addOpen, setAddOpen] = useState(false);
     const debtEntries = store.entries.filter((e) => e.kind === "debt");
+    const [statOpen, setStatOpen] = useState(false);
 
     return (
         <div className="flex flex-col gap-brand-12">
@@ -60,6 +62,14 @@ export default function UdhaarKhataPage() {
                 debtEntries={debtEntries}
                 categories={store.categories}
                 onCtaClick={() => setAddOpen(true)}
+                onView={() => setStatOpen(true)}
+            />
+
+            <StatDetailDialog
+                kind={statOpen ? "debt" : null}
+                entries={store.entries}
+                categories={store.categories}
+                onClose={() => setStatOpen(false)}
             />
 
             {/* <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">

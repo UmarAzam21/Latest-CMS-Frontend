@@ -7,15 +7,16 @@ import { exportEntriesToCsv } from "@/lib/utils/exportCsv";
 import ExpenseStatCard from "./ExpensesStatCard";
 import { useState } from "react";
 import CardFormDialog from "../cardsManager/CardFormDialog";
-import DetailedEntryDialog from "./DetailedEntryDialog";
-import { DetailedEntryValues } from "@/lib/schemas/detailedEntrySchema";
+import DetailedEntryDialog, { EntrySavePayload } from "./DetailedEntryDialog";
+import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
+import { debtBalances, debtTotals } from "@/lib/utils/debt";
 
 interface ExpensesStatsProps {
     entries: IExpenseEntry[];
     categories: ICategory[];
     cards: ICard[];
     onViewKind: (kind: EntryKind | "all") => void;
-    onSaved: (v: DetailedEntryValues & { kind: EntryKind }) => void;
+    onSaved: (v: EntrySavePayload) => void;
     onAddCard: (card: Omit<ICard, "id">) => void;
 }
 
@@ -56,6 +57,7 @@ function monthlyDelta(entries: IExpenseEntry[] = [], kind: EntryKind | "net") {
 
 
 export default function ExpensesStats({ entries = [], categories = [], cards = [], onViewKind, onSaved, onAddCard }: ExpensesStatsProps) {
+    const store = useExpenseManagerStore();
     const [dialogKind, setDialogKind] = useState<EntryKind | null>(null);
     const [cardDialogOpen, setCardDialogOpen] = useState(false);
 
@@ -68,9 +70,12 @@ export default function ExpensesStats({ entries = [], categories = [], cards = [
         .filter((e) => e.kind === "expense")
         .reduce((s, e) => s + e.amount, 0);
 
-    const totalDebt = entries
-        .filter((e) => e.kind === "debt" && !e.isSettled)
-        .reduce((s, e) => s + e.amount, 0);
+    // const totalDebt = entries
+    //     .filter((e) => e.kind === "debt" && !e.isSettled)
+    //     .reduce((s, e) => s + e.amount, 0);
+
+    const { youWillGet, youWillGive } = debtTotals(debtBalances(entries));
+    const totalDebt = Math.abs(youWillGet - youWillGive); // net udhaar
 
     // const balance = totalIncome - totalExpenses;
 
@@ -189,6 +194,8 @@ export default function ExpensesStats({ entries = [], categories = [], cards = [
                 cards={cards}
                 onClose={() => setDialogKind(null)}
                 onSaved={onSaved}
+                parties={store.parties}
+                onAddParty={store.addParty}
             />
         </>
     );
