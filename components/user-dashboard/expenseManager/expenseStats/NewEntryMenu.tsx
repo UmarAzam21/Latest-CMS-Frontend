@@ -4,8 +4,7 @@
 import { useState } from "react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { Plus, ChevronDown } from "lucide-react";
-import DetailedEntryDialog from "./DetailedEntryDialog";
-import { DetailedEntryValues } from "@/lib/schemas/detailedEntrySchema";
+import DetailedEntryDialog, { EntrySavePayload } from "./DetailedEntryDialog";
 import { EntryKind, ICategory, ICard, IExpenseEntry, KHATA_LABELS, IParty } from "@/types/expenseManagerTy";
 import { PartyFormValues } from "@/lib/schemas/partySchema";
 
@@ -14,7 +13,7 @@ type NewEntryMenuProps = {
     cards: ICard[];
     editingEntry?: IExpenseEntry | null;
     onCloseEdit: () => void;
-    onSaved: (v: DetailedEntryValues & { kind: EntryKind }) => void;
+    onSaved: (v: EntrySavePayload) => void;
     parties: IParty[];
     onAddParty: (p: PartyFormValues) => IParty
 }

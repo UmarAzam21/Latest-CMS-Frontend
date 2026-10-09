@@ -9,6 +9,7 @@ import { IExpenseEntry, ICategory, SortField, SortDirection, EntryKind, KHATA_LA
 import { cn } from "@/lib/cn";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { exportToCsv, exportToPdf, exportToXlsx } from "@/lib/utils/exportTransactionsData";
+import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 
 type FilterTab = "all" | EntryKind;
 
@@ -38,6 +39,7 @@ function formatCurrency(v: number) {
 export default function ExpensesTable({
   entries, categories, sortField, sortDirection, onSort, onDelete, onEdit, activeFilter, onFilterChange, showTypeFilters = true
 }: ExpensesTableProps) {
+  const { parties } = useExpenseManagerStore();
   const PAGE_SIZE = 8;
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<IExpenseEntry | null>(null);
@@ -91,9 +93,15 @@ export default function ExpensesTable({
             </DropdownMenu.Trigger>
             <DropdownMenu.Portal>
               <DropdownMenu.Content align="end" className="z-dropdown w-40 rounded-brand-8 border border-border-clr bg-white p-1 shadow-card-hover">
-                <DropdownMenu.Item onClick={() => exportToCsv(filteredEntries, categories, "transactions.csv")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">CSV</DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => exportToXlsx(filteredEntries, categories, "transactions.xlsx")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">Excel (.xlsx)</DropdownMenu.Item>
-                <DropdownMenu.Item onClick={() => exportToPdf(filteredEntries, categories, "transactions.pdf")} className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">PDF</DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onClick={() => exportToCsv(filteredEntries, categories, "transactions.csv", parties)}
+                  className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">CSV</DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onClick={() => exportToXlsx(filteredEntries, categories, "transactions.xlsx", parties)}
+                  className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">Excel (.xlsx)</DropdownMenu.Item>
+                <DropdownMenu.Item
+                  onClick={() => exportToPdf(filteredEntries, categories, "transactions.pdf", parties)}
+                  className="cursor-pointer rounded-brand-8 px-2.5 py-2 para-tiny text-text-secondary hover:bg-page-bg outline-none">PDF</DropdownMenu.Item>
               </DropdownMenu.Content>
             </DropdownMenu.Portal>
           </DropdownMenu.Root>

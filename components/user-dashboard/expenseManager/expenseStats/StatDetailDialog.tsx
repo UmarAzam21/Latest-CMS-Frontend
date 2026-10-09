@@ -5,7 +5,8 @@ import { useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 import { X } from "lucide-react";
-import { buildTrend, weekKey } from "@/lib/utils/trend";
+import { buildTrend, buildDebtTrend, weekKey } from "@/lib/utils/trend";
+import { debtSign } from "@/lib/utils/debt";
 import { IExpenseEntry, ICategory, EntryKind } from "@/types/expenseManagerTy";
 import { KHATA_LABELS } from "@/types/expenseManagerTy";
 
@@ -46,9 +47,14 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
 
     const filtered = useMemo(() => (kind === "all" || !kind ? entries : entries.filter((e) => e.kind === kind)), [entries, kind]);
 
-    const trend = useMemo(() => {
+    // const trend = useMemo(() => {
+    const trend = useMemo<{ label: string; amount: number }[]>(() => {
         const { keyFn, limit } = GRAIN_CONFIG[granularity];
 
+        if (kind === "debt") {
+            // net change: positive = they owe you more, negative = you owe more
+            return buildDebtTrend(filtered, keyFn, limit).map((r) => ({ ...r, amount: r.gave - r.got }));
+        }
         return buildTrend(filtered, keyFn, limit).map((row) =>
             kind === "all"
                 ? { ...row, amount: row.income - row.expense }
@@ -56,8 +62,10 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
         );
     }, [filtered, granularity, kind]);
 
+    const total = kind === "debt"
+        ? filtered.reduce((s, e) => s + debtSign(e) * e.amount, 0)
+        : filtered.reduce((s, e) => s + e.amount, 0);
 
-    const total = filtered.reduce((s, e) => s + e.amount, 0);
     const catLabel = (id: string) => categories.find((c) => c.id === id)?.label ?? "Uncategorized";
 
     return (
@@ -85,8 +93,8 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
                                     key={g}
                                     onClick={() => setGranularity(g)}
                                     className={`rounded-brand-8 px-3 py-1.25 para-tiny font-medium cursor-pointer ${granularity === g
-                                            ? "bg-primary text-white"
-                                            : "bg-page-bg border border-border-clr/35 text-text-secondary"
+                                        ? "bg-primary text-white"
+                                        : "bg-page-bg border border-border-clr/35 text-text-secondary"
                                         }`}
                                 >
                                     {g[0].toUpperCase() + g.slice(1)}
@@ -133,8 +141,11 @@ export default function StatDetailDialog({ kind, entries, categories, onClose }:
                                         {catLabel(e.categoryId)} · {new Date(e.date).toLocaleDateString("en-GB")}
                                     </p>
                                 </div>
-                                <span className={`para-tiny font-semibold ${e.kind === "income" ? "text-success" : "text-text-dark"}`}>
+                                {/* <span className={`para-tiny font-semibold ${e.kind === "income" ? "text-success" : "text-text-dark"}`}>
                                     {e.kind === "income" ? "+" : "-"}PKR {e.amount.toLocaleString("en-PK")}
+                                </span> */}
+                                <span className={`para-tiny font-semibold ${(e.kind === "income" || debtSign(e) < 0) ? "text-success" : "text-text-dark"}`}>
+                                    {(e.kind === "income" || debtSign(e) < 0) ? "+" : "-"}PKR {e.amount.toLocaleString("en-PK")}
                                 </span>
                             </div>
                         ))}

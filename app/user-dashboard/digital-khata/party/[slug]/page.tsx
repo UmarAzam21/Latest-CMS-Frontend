@@ -3,26 +3,31 @@
 "use client";
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
 import { toast } from "sonner";
-import { ArrowLeft, FileText, MessageCircle, MessageSquare } from "lucide-react";
+import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, FileText, MessageCircle, MessageSquare, Pencil, Trash2 } from "lucide-react";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 import DetailedEntryDialog from "@/components/user-dashboard/expenseManager/expenseStats/DetailedEntryDialog";
 import PartyLedger from "@/components/user-dashboard/expenseManager/party/PartyLedger";
 import BalanceText from "@/components/user-dashboard/expenseManager/party/BalanceText";
 import ReminderDateDialog from "@/components/user-dashboard/expenseManager/party/ReminderDateDialog";
+import AddPartyDialog from "@/components/user-dashboard/expenseManager/party/AddPartyDialog";
 import { buildLedger } from "@/lib/utils/debt";
 import { PARTY_BASE, partyHref } from "@/lib/utils/party";
 import { DEBT_TYPE_META, IExpenseEntry } from "@/types/expenseManagerTy";
 
 const idsBySign = (s: 1 | -1) => Object.values(DEBT_TYPE_META).filter((m) => m.sign === s).map((m) => m.categoryId);
-const actionCls = "flex flex-1 cursor-pointer flex-col items-center gap-1 rounded-brand-12 border border-border-clr bg-white py-2 para-tiny";
+const actionCls = "flex flex-1 flex-col items-center gap-1 rounded-brand-12 border border-border-clr bg-white py-2 para-tiny";
 
 export default function PartyDetailPage() {
     const { slug } = useParams<{ slug: string }>();
     const store = useExpenseManagerStore();
     const [txn, setTxn] = useState<1 | -1 | null>(null); // 1 = You Gave, -1 = You Got
     const [editing, setEditing] = useState<IExpenseEntry | null>(null);
+
+    const router = useRouter();
+    const [editOpen, setEditOpen] = useState(false);
+    const [confirmDelete, setConfirmDelete] = useState(false);
 
     const party = store.parties.find((p) => p.slug === slug || p.id === slug); // id fallback = old links
     const partyId = party?.id ?? "";
@@ -31,6 +36,11 @@ export default function PartyDetailPage() {
 
     if (!store.hasLoaded) return null;
     if (!party) return <p className="p-6 para-small">Party nahi mili.</p>;
+
+    const handleDelete = () => {
+        if (store.deleteParty(party.id)) router.push(PARTY_BASE);
+        else setConfirmDelete(false);
+    };
 
     const digits = party.phone?.replace(/\D/g, "").replace(/^0/, "92");
     const amount = Math.abs(balance).toLocaleString("en-PK");
@@ -54,10 +64,32 @@ export default function PartyDetailPage() {
 
     return (
         <div className="flex flex-col gap-brand-12 pb-24">
+
             <div className="flex items-center gap-2">
                 <Link href={PARTY_BASE} aria-label="Back"><ArrowLeft size={18} /></Link>
                 <h1 className="heading-h6">{party.name}</h1>
                 <span className="rounded-full bg-page-bg px-2 py-0.5 para-tiny capitalize text-primary">{party.type}</span>
+
+                <div className="ml-auto flex items-center gap-1.5">
+                    <button type="button" title="Edit party" aria-label="Edit party" onClick={() => setEditOpen(true)}
+                        className="cursor-pointer rounded-brand-8 border border-border-clr p-1.5 text-text-secondary hover:bg-page-bg">
+                        <Pencil size={14} />
+                    </button>
+                    {confirmDelete ? (
+                        <div className="flex items-center gap-1.5">
+                            <span className="para-tiny text-text-secondary-muter">Delete?</span>
+                            <button type="button" onClick={handleDelete}
+                                className="cursor-pointer rounded-brand-8 bg-danger px-2 py-1 para-tiny font-semibold text-white">Confirm</button>
+                            <button type="button" onClick={() => setConfirmDelete(false)}
+                                className="cursor-pointer rounded-brand-8 border border-border-clr px-2 py-1 para-tiny font-semibold text-text-secondary">Cancel</button>
+                        </div>
+                    ) : (
+                        <button type="button" title="Delete party" aria-label="Delete party" onClick={() => setConfirmDelete(true)}
+                            className="cursor-pointer rounded-brand-8 border border-border-clr p-1.5 text-text-secondary-muter hover:text-danger">
+                            <Trash2 size={14} />
+                        </button>
+                    )}
+                </div>
             </div>
 
             <div className="rounded-brand-12 border border-border-clr bg-white p-brand-12"><BalanceText value={balance} /></div>
@@ -69,12 +101,15 @@ export default function PartyDetailPage() {
                     current={party.reminderDate}
                     onSave={(d) => { store.updateParty(party.id, { reminderDate: d }); toast.success(`Reminder date set: ${d}`); }}
                 />
-                <button type="button" aria-disabled={Boolean(blocked)} onClick={() => contact(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`)}
-                    className={`${actionCls} ${blocked ? "opacity-40" : ""}`}>
+
+                <button type="button" aria-disabled={Boolean(blocked)} title={blocked ?? "WhatsApp reminder bhejein"}
+                    onClick={() => contact(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`)}
+                    className={`${actionCls} ${blocked ? "cursor-not-allowed opacity-40" : "cursor-pointer"}`}>
                     <MessageCircle size={18} className="text-warning" /> Reminder
                 </button>
-                <button type="button" aria-disabled={Boolean(blocked)} onClick={() => contact(`sms:${party.phone}?body=${encodeURIComponent(msg)}`, true)}
-                    className={`${actionCls} ${blocked ? "opacity-40" : ""}`}>
+                <button type="button" aria-disabled={Boolean(blocked)} title={blocked ?? "SMS bhejein"}
+                    onClick={() => contact(`sms:${party.phone}?body=${encodeURIComponent(msg)}`, true)}
+                    className={`${actionCls} ${blocked ? "cursor-not-allowed opacity-40" : "cursor-pointer"}`}>
                     <MessageSquare size={18} className="text-warning" /> SMS
                 </button>
             </div>
@@ -98,6 +133,13 @@ export default function PartyDetailPage() {
                 defaultCategoryId={defaultCategoryId}
                 onClose={() => { setTxn(null); setEditing(null); }}
                 onSaved={(v) => (editing ? store.updateEntry(editing.id, v) : store.addEntry(v))}
+            />
+
+            <AddPartyDialog
+                party={party}
+                open={editOpen}
+                onOpenChange={setEditOpen}
+                onSaved={(v) => { store.updateParty(party.id, v); toast.success("Party update ho gayi"); }}
             />
         </div>
     );

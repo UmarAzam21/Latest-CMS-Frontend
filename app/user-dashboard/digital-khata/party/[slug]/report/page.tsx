@@ -4,7 +4,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { ArrowLeft, Printer, MessageCircle } from "lucide-react";
+import { ArrowLeft, MessageCircle } from "lucide-react";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 import PartyLedger from "@/components/user-dashboard/expenseManager/party/PartyLedger";
 import { buildLedger, pkr } from "@/lib/utils/debt";
