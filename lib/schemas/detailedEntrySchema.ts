@@ -19,6 +19,7 @@ const base = z.object({
     categoryId: z.string().min(1, "Category chunein"),
     amount: z.number({ message: "Sahi amount likhein" }).positive("Sahi amount likhein"),
     date: z.string().min(1),
+    time: z.string().optional(),
     description: z.string().optional(),
     cardId: z.string().optional(),
 });

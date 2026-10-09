@@ -16,7 +16,8 @@ import ExpensesStats from "@/components/user-dashboard/expenseManager/expenseSta
 import DebtSummaryCardV2 from "@/components/user-dashboard/expenseManager/debtCard/DebtSummaryCardV2";
 import NewEntryMenu from "@/components/user-dashboard/expenseManager/expenseStats/NewEntryMenu";
 import AdvancedExpenseWorkspaceV2 from "@/components/user-dashboard/expenseManager/overview/AdvanceExpenseWorkspaceV2";
-import DataModeToggler from "@/components/user-dashboard/expenseManager/modeToggler/DataModeToggler";
+import KhataPageHeader from "@/components/user-dashboard/expenseManager/header/KhataPageHeader";
+import { DIGITAL_KHATA_ROUTES } from "@/data/user-dashboard/digitalKhata";
 
 export default function ExpenseManagerPage() {
     const store = useExpenseManagerStore();
@@ -28,19 +29,13 @@ export default function ExpenseManagerPage() {
 
     return (
         <div className="flex flex-col gap-brand-12">
-            <div className="flex items-center justify-between border-b border-border-clr pb-brand-8">
-                <h1 className="heading-h6">Digital Khatta</h1>
-
-                <div className="flex gap-2">
-                    <DataModeToggler store={store} />
-
-                    <div className="flex items-center gap-brand-8">
-                        <CategoryManagerDialog
-                            categories={store.categories}
-                            onAdd={store.addCategory}
-                            onDelete={store.deleteCategory}
-                        />
-
+            
+            <KhataPageHeader
+                title={DIGITAL_KHATA_ROUTES.daily.label}
+                subtitle="Roz ki aamdani, kharcha aur udhaar ka hisaab"
+                actions={
+                    <>
+                        <CategoryManagerDialog categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
                         <NewEntryMenu
                             categories={store.categories}
                             cards={store.cards}
@@ -50,11 +45,12 @@ export default function ExpenseManagerPage() {
                                 if (editingEntry) store.updateEntry(editingEntry.id, values);
                                 else store.addEntry(values);
                             }}
-                            parties={store.parties} onAddParty={store.addParty}
+                            parties={store.parties}
+                            onAddParty={store.addParty}
                         />
-                    </div>
-                </div>
-            </div>
+                    </>
+                }
+            />
 
             <ExpensesStats
                 entries={store.entries}

@@ -1,19 +1,43 @@
 // dashboard\components\user-dashboard\expenseManager\modeToggler\DataModeToggler.tsx
 
-type Props = {
-    store: any;
-}
+"use client";
+import { useState } from "react";
+import { RotateCcw, Sparkles } from "lucide-react";
+import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 
-const DataModeToggler = ({store}: Props) => {
+export default function DataModeToggler() {
+    const store = useExpenseManagerStore();
+    const [confirm, setConfirm] = useState(false);
+    const isDemo = store.dataMode === "demo";
+    const hasData = store.entries.length + store.cards.length + store.parties.length > 0;
+    const Icon = isDemo ? RotateCcw : Sparkles;
+
+    const apply = () => {
+        (isDemo ? store.resetToBlank : store.loadDemoData)();
+        setConfirm(false);
+    };
+
     return (
-        <div className="flex items-center gap-2 para-tiny text-text-secondary-muter">
-            <span>Mode: {store.dataMode === "demo" ? "Demo" : "Blank"}</span>
-            <button onClick={store.dataMode === "demo" ? store.resetToBlank : store.loadDemoData}
-                className="rounded-brand-8 border border-border-clr px-2.5 py-2 para-tiny font-semibold hover:bg-page-bg">
-                {store.dataMode === "demo" ? "Start Fresh" : "Load Demo Data"}
-            </button>
-        </div>
-    )
-}
+        <div className="flex items-center gap-2">
+            <span className="flex items-center gap-1.5 rounded-full border border-border-clr bg-white px-2.5 py-1.5 para-tiny text-text-secondary">
+                <span className={`h-1.5 w-1.5 rounded-full ${isDemo ? "bg-warning" : "bg-success"}`} />
+                Mode: {isDemo ? "Demo" : "Blank"}
+            </span>
 
-export default DataModeToggler
+            {confirm ? (
+                <div className="flex items-center gap-1.5">
+                    <span className="para-tiny text-text-secondary-muted">Maujooda data replace hoga. Pakka?</span>
+                    <button type="button" onClick={apply}
+                        className="cursor-pointer rounded-brand-8 bg-danger px-2 py-1.5 para-tiny font-semibold text-white">Haan</button>
+                    <button type="button" onClick={() => setConfirm(false)}
+                        className="cursor-pointer rounded-brand-8 border border-border-clr px-2 py-1.5 para-tiny font-semibold text-text-secondary">Nahi</button>
+                </div>
+            ) : (
+                <button type="button" onClick={() => (hasData ? setConfirm(true) : apply())}
+                    className="flex cursor-pointer items-center gap-1.5 rounded-brand-8 border border-border-clr bg-white px-2.5 py-2 para-tiny font-semibold text-text-secondary default-transition hover:bg-page-bg">
+                    <Icon size={13} /> {isDemo ? "Start Fresh" : "Load Demo Data"}
+                </button>
+            )}
+        </div>
+    );
+}

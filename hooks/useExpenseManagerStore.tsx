@@ -4,7 +4,7 @@
 import { useState, useMemo, useCallback, useEffect, useContext, createContext, ReactNode } from "react";
 import { IExpenseEntry, ICategory, SortField, SortDirection, ICard, IParty, PARTY_TYPES } from "@/types/expenseManagerTy";
 import { defaultCategories } from "@/data/user-dashboard/defaultCategoriesData";
-import { dummyExpenseEntries } from "@/data/user-dashboard/dummyExpenseEntries";
+import { dummyExpenseEntries, dummyParties } from "@/data/user-dashboard/dummyExpenseEntries";
 import { dummyCards } from "@/data/user-dashboard/dummyCards";
 import { buildTrend, weekKey } from "@/lib/utils/trend";
 import { toast } from "sonner";
@@ -18,10 +18,10 @@ import { makeSlug } from "@/lib/utils/party";
 // Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
 // RENAMED or REMOVED. Adding a new OPTIONAL field does NOT require a bump —
 // old stored JSON simply parses with that field undefined, which is valid.
-const SCHEMA_VERSION = "v3";
+const SCHEMA_VERSION = "v2";
 const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
-const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
+// const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CARDS = `filernow_expense_cards_${SCHEMA_VERSION}`;
 const STORAGE_KEY_MODE = `filernow_khata_mode_${SCHEMA_VERSION}`; // "demo" | "blank"
 const STORAGE_KEY_PARTIES = `filernow_expense_parties_${SCHEMA_VERSION}`;
@@ -57,7 +57,7 @@ function useExpenseManagerState() {
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [hasLoaded, setHasLoaded] = useState(false);
   const [cards, setCards] = useState<ICard[]>([]);
-  const [dataMode, setDataMode] = useState<"demo" | "blank">("demo");
+  const [dataMode, setDataMode] = useState<"demo" | "blank">("blank");
   // parties state
   const [parties, setParties] = useState<IParty[]>([]);
 
@@ -65,20 +65,12 @@ function useExpenseManagerState() {
     // "Seeded" is tracked independently of entries' emptiness, so that a
     // user who deletes every entry themselves stays at a real empty state
     // instead of getting re-seeded with dummy data on next load.
-    const alreadySeeded = window.localStorage.getItem(STORAGE_KEY_SEEDED) === "true";
-
-    if (alreadySeeded) {
-      const raw = readLocalT<IExpenseEntry[]>(STORAGE_KEY_ENTRIES, []);
-      const isHealthy = Array.isArray(raw) && (raw.length === 0 || raw.every(isValidEntry));
-      setEntries(isHealthy ? raw : dummyExpenseEntries); // auto-heal on shape mismatch
-    } else {
-      setEntries(dummyExpenseEntries);
-      window.localStorage.setItem(STORAGE_KEY_SEEDED, "true");
-    }
+    const rawEntries = readLocalT<IExpenseEntry[]>(STORAGE_KEY_ENTRIES, []);
+    setEntries(Array.isArray(rawEntries) && rawEntries.every(isValidEntry) ? rawEntries : []);
 
     // Cards seed unconditionally, not gated behind entries' seeded flag,
     // since it's an independent dataset with its own storage key.
-    setCards(readLocalT(STORAGE_KEY_CARDS, dummyCards));
+    setCards(readLocalT<ICard[]>(STORAGE_KEY_CARDS, []));
     setParties(
       readLocalT<IParty[]>(STORAGE_KEY_PARTIES, []).map((p) => ({
         ...p,
@@ -86,17 +78,12 @@ function useExpenseManagerState() {
         type: (PARTY_TYPES as readonly string[]).includes(p.type) ? p.type : "customer",
       }))
     );
-    // setCategories(readLocalT(STORAGE_KEY_CATEGORIES, defaultCategories));
     const rawCats = readLocalT<ICategory[]>(STORAGE_KEY_CATEGORIES, defaultCategories);
-
     setCategories(
-      Array.isArray(rawCats) && rawCats.every((c) => typeof c.kind === "string")
-        ? rawCats
-        : defaultCategories
+      Array.isArray(rawCats) && rawCats.every((c) => typeof c.kind === "string") ? rawCats : defaultCategories
     );
-
+    setDataMode(readLocalT(STORAGE_KEY_MODE, "blank") as "demo" | "blank");
     setHasLoaded(true);
-    setDataMode(readLocalT(STORAGE_KEY_MODE, "demo") as "demo" | "blank");
   }, []);
 
   // Guarded: never persist before the load-effect has actually run, so we
@@ -121,17 +108,20 @@ function useExpenseManagerState() {
   const loadDemoData = useCallback(() => {
     setEntries(dummyExpenseEntries);
     setCards(dummyCards);
+    setParties(dummyParties);
     window.localStorage.setItem(STORAGE_KEY_MODE, "demo");
     setDataMode("demo");
+    toast.success("Demo data load ho gaya");
   }, []);
 
   // reset to blank
   const resetToBlank = useCallback(() => {
     setEntries([]);
     setCards([]);
+    setParties([]);
     window.localStorage.setItem(STORAGE_KEY_MODE, "blank");
     setDataMode("blank");
-    setParties([]);
+    toast.success("Khata saaf ho gaya. Naye sire se shuru karein");
   }, []);
 
   // ONE place that changes card balances + shows the separate balance toast.
@@ -152,19 +142,6 @@ function useExpenseManagerState() {
       }
     });
   }, [cards]);
-
-  // const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
-  //   const withBaseline = entry.kind === "debt"
-  //     ? { ...entry, originalAmount: entry.originalAmount ?? entry.amount }
-  //     : entry;
-
-  //   setEntries((prev) => [{ ...withBaseline, id: crypto.randomUUID() }, ...prev]);
-  //   toast.success(`${entry.subject} save ho gaya`);
-
-  //   if (entry.cardId) {
-  //     applyCardDeltas({ [entry.cardId]: cardDelta(entry) });
-  //   }
-  // }, [applyCardDeltas]);
 
   const addEntry = useCallback((entry: Omit<IExpenseEntry, "id">) => {
     const clean = entry.kind === "debt"

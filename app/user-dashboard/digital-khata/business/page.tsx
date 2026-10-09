@@ -10,6 +10,8 @@ import BillTable from "@/components/user-dashboard/expenseManager/businessKhata/
 import CashEntryDialog from "@/components/user-dashboard/expenseManager/businessKhata/cashbook/CashEntryDialog";
 import CashTable from "@/components/user-dashboard/expenseManager/businessKhata/cashbook/CashTable";
 import { Package, Receipt, Wallet } from "lucide-react";
+import KhataPageHeader from "@/components/user-dashboard/expenseManager/header/KhataPageHeader";
+import { DIGITAL_KHATA_ROUTES } from "@/data/user-dashboard/digitalKhata";
 
 type Tab = "stock" | "bill" | "cash";
 
@@ -33,27 +35,17 @@ export default function BusinessKhataPage() {
 
     return (
         <div className="flex flex-col gap-brand-12">
-            <h1 className="heading-h6">Business Khata</h1>
 
-            <div className="flex gap-1 border-b border-border-clr">
-                {(["stock", "bill", "cash"] as const).map((t) => {
-                    const Icon = tabIcons[t]; // Get the matching icon
-
-                    return (
-                        <button
-                            key={t}
-                            onClick={() => setTab(t)}
-                            className={`flex items-center gap-1.5 px-3 py-2 para-small font-medium capitalize border-b-2 cursor-pointer ${tab === t
-                                    ? "border-primary text-primary"
-                                    : "border-transparent text-text-secondary"
-                                }`}
-                        >
-                            <Icon size={14} className="shrink-0" />
-                            <span>{t}book</span>
-                        </button>
-                    );
-                })}
-            </div>
+            <KhataPageHeader
+                title={DIGITAL_KHATA_ROUTES.business.label}
+                tabs={[
+                    { key: "stockbook", label: "Stockbook", icon: Package },
+                    { key: "billbook", label: "Billbook", icon: Receipt },
+                    { key: "cashbook", label: "Cashbook", icon: Wallet },
+                ]}
+                activeTab={tab}
+                onTabChange={(k) => setTab(k as typeof tab)}
+            />
 
             {tab === "stock" && (
                 <>

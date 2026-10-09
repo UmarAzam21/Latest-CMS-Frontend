@@ -94,3 +94,49 @@ export function partySummaryText(party: IParty, rows: LedgerRow[], net: number) 
         `— FilerNow Digital Khata`,
     ].join("\n");
 }
+
+export type PartyListRow = { party: IParty; balance: number };
+const LIST_HEAD = ["Party", "Type", "Phone", "Status", "Amount"];
+const statusOf = (b: number) => (b > 0 ? "You will get" : b < 0 ? "You will give" : "Settled");
+const listBody = (rows: PartyListRow[]) =>
+    rows.map(({ party: p, balance: b }) => [p.name, PARTY_TYPE_LABELS[p.type], p.phone ?? "", statusOf(b), Math.abs(b)]);
+const listTotals = (rows: PartyListRow[]) => ({
+    get: rows.filter((r) => r.balance > 0).reduce((s, r) => s + r.balance, 0),
+    give: rows.filter((r) => r.balance < 0).reduce((s, r) => s - r.balance, 0),
+});
+
+export function exportPartyListCsv(rows: PartyListRow[], filename: string) {
+    const lines = [LIST_HEAD, ...listBody(rows)].map((r) => r.map(q).join(","));
+    downloadBlob(new Blob(["\uFEFF" + lines.join("\n")], { type: "text/csv;charset=utf-8;" }), filename);
+}
+
+export function exportPartyListXlsx(rows: PartyListRow[], filename: string) {
+    const ws = XLSX.utils.aoa_to_sheet([LIST_HEAD, ...listBody(rows)]);
+    ws["!cols"] = [{ wch: 26 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 14 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Parties");
+    XLSX.writeFile(wb, filename);
+}
+
+export function exportPartyListPdf(rows: PartyListRow[], filename: string) {
+    const { get, give } = listTotals(rows);
+    const doc = startPdf("Party List", `${rows.length} parties`);
+    const y = summaryBoxes(doc, 90, [
+        { label: "YOU WILL GET", value: pkr(get), color: BRAND },
+        { label: "YOU WILL GIVE", value: pkr(give), color: GREEN },
+        { label: "NET", value: pkr(Math.abs(get - give)) },
+    ]);
+    autoTable(doc, {
+        startY: y + 16,
+        head: [LIST_HEAD],
+        body: listBody(rows).map((r) => r.map((v, i) => (i === 4 ? pkr(Number(v)) : String(v)))),
+        theme: "striped",
+        margin: { left: 40, right: 40, bottom: 50 },
+        styles: { fontSize: 9, cellPadding: 6, textColor: INK },
+        headStyles: { fillColor: INK, textColor: 255, fontStyle: "bold" },
+        alternateRowStyles: { fillColor: [249, 250, 251] },
+        columnStyles: { 4: { halign: "right", fontStyle: "bold" } },
+        didParseCell: (d) => { if (d.column.index === 4 && d.section === "head") d.cell.styles.halign = "right"; },
+    });
+    addFooters(doc).save(filename);
+}

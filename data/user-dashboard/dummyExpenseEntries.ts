@@ -1,5 +1,5 @@
 // /data/user-dashboard/dummyExpenseEntries.ts
-import { IExpenseEntry } from "@/types/expenseManagerTy";
+import { IExpenseEntry, IParty } from "@/types/expenseManagerTy";
 
 // Dummy seed data, gives a first-time user a fully populated dashboard to
 // explore before they add real entries. Fully deletable via existing CRUD
@@ -25,15 +25,16 @@ export const dummyExpenseEntries: IExpenseEntry[] = [
     { id: "i2", kind: "income", subject: "Monthly Salary", categoryId: "cat-salary", amount: 120000, date: "2026-08-01" },
     { id: "i3", kind: "income", subject: "Consulting Fee", categoryId: "cat-business-income", amount: 45000, date: "2026-07-10" },
 
-    // Debt
-    // { id: "d1", kind: "debt", subject: "Car Loan Installment", categoryId: "cat-udhaar-liya", debtDirection: "liya", amount: 25000, date: "2026-09-01", isSettled: false },
-    // { id: "d2", kind: "debt", subject: "Credit Card Balance", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 18000, date: "2026-08-20", isSettled: false },
-    // { id: "d3", kind: "debt", subject: "Test Loan", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 15000, date: "2026-08-20", isSettled: false },
-    // { id: "d4", kind: "debt", subject: "Personal Loan (Friend)", categoryId: "cat-udhaar-diya", debtDirection: "diya", amount: 10000, date: "2026-07-05", isSettled: true },
+    // Debt (linked to dummyParties below)
+    { id: "d1", kind: "debt", subject: "Hassan Traders", partyId: "demo-p2", categoryId: "cat-udhaar-liya", amount: 25000, date: "2026-09-01", time: "10:30" },
+    { id: "d2", kind: "debt", subject: "Ali Ashraf", partyId: "demo-p1", categoryId: "cat-udhaar-diya", amount: 18000, date: "2026-08-20", time: "14:05" },
+    { id: "d3", kind: "debt", subject: "Bilal Ahmed", partyId: "demo-p3", categoryId: "cat-udhaar-diya", amount: 15000, date: "2026-08-20", time: "16:40" },
+    { id: "d4", kind: "debt", subject: "Ali Ashraf", partyId: "demo-p1", categoryId: "cat-udhaar-diya", amount: 10000, date: "2026-07-05", time: "11:15" },
+    { id: "d5", kind: "debt", subject: "Ali Ashraf", partyId: "demo-p1", categoryId: "cat-udhaar-diya-wapis-liya", amount: 10000, date: "2026-07-20", time: "19:45" },
+];
 
-    { id: "d1", kind: "debt", subject: "Car Loan Installment", categoryId: "cat-udhaar-liya", amount: 25000, date: "2026-09-01" },
-    { id: "d2", kind: "debt", subject: "Credit Card Balance", categoryId: "cat-udhaar-diya", amount: 18000, date: "2026-08-20" },
-    { id: "d3", kind: "debt", subject: "Test Loan", categoryId: "cat-udhaar-diya", amount: 15000, date: "2026-08-20" },
-    { id: "d4", kind: "debt", subject: "Personal Loan (Friend)", categoryId: "cat-udhaar-diya", amount: 10000, date: "2026-07-05" },
-    { id: "d5", kind: "debt", subject: "Personal Loan (Friend)", categoryId: "cat-udhaar-diya-wapis-liya", amount: 10000, date: "2026-07-20" },
+export const dummyParties: IParty[] = [
+    { id: "demo-p1", slug: "ali-ashraf-d1a2b", name: "Ali Ashraf", phone: "03001234567", type: "customer", createdAt: "2026-07-01T09:00:00.000Z" },
+    { id: "demo-p2", slug: "hassan-traders-d3c4e", name: "Hassan Traders", phone: "03211234567", type: "supplier", createdAt: "2026-07-01T09:05:00.000Z" },
+    { id: "demo-p3", slug: "bilal-ahmed-d5f6a", name: "Bilal Ahmed", type: "customer", createdAt: "2026-07-01T09:10:00.000Z" },
 ];

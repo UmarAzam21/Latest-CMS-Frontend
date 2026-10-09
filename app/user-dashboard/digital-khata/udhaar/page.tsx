@@ -14,6 +14,8 @@ import CategoryManagerDialog from "@/components/user-dashboard/expenseManager/ex
 import { IExpenseEntry } from "@/types/expenseManagerTy";
 import DataModeToggler from "@/components/user-dashboard/expenseManager/modeToggler/DataModeToggler";
 import StatDetailDialog from "@/components/user-dashboard/expenseManager/expenseStats/StatDetailDialog";
+import KhataPageHeader from "@/components/user-dashboard/expenseManager/header/KhataPageHeader";
+import { DIGITAL_KHATA_ROUTES } from "@/data/user-dashboard/digitalKhata";
 
 export default function UdhaarKhataPage() {
     const store = useExpenseManagerStore();
@@ -24,19 +26,12 @@ export default function UdhaarKhataPage() {
 
     return (
         <div className="flex flex-col gap-brand-12">
-            <div className="flex items-center justify-between border-b border-border-clr pb-brand-8">
-                <h1 className="heading-h6">Udhaar Khatta</h1>
-                <div className="flex gap-2">
-
-                    <DataModeToggler store={store} />
-
-                    <div className="flex items-center gap-brand-8">
-                        <CategoryManagerDialog
-                            kinds={["debt"]}
-                            categories={store.categories}
-                            onAdd={store.addCategory}
-                            onDelete={store.deleteCategory}
-                        />
+            <KhataPageHeader
+                title={DIGITAL_KHATA_ROUTES.udhaar.label}
+                subtitle="Party ke saath udhaar ka len-den"
+                actions={
+                    <>
+                        <CategoryManagerDialog kinds={["debt"]} categories={store.categories} onAdd={store.addCategory} onDelete={store.deleteCategory} />
                         <AddUdhaarButton
                             categories={store.categories}
                             cards={store.cards}
@@ -45,18 +40,16 @@ export default function UdhaarKhataPage() {
                             onOpenChange={setAddOpen}
                             onCloseEdit={() => setEditingEntry(null)}
                             onSaved={(v) => {
-                                if (editingEntry) {
-                                    store.updateEntry(editingEntry.id, v);
-                                } else {
-                                    store.addEntry(v);
-                                }
+                                if (editingEntry) store.updateEntry(editingEntry.id, v);
+                                else store.addEntry(v);
                                 setAddOpen(false);
                             }}
-                            parties={store.parties} onAddParty={store.addParty}
+                            parties={store.parties}
+                            onAddParty={store.addParty}
                         />
-                    </div>
-                </div>
-            </div>
+                    </>
+                }
+            />
 
             <UdhaarStats
                 debtEntries={debtEntries}
