@@ -9,6 +9,9 @@ import DetailedEntryDialog from "../expenseStats/DetailedEntryDialog";
 import { DetailedEntryValues } from "@/lib/schemas/detailedEntrySchema";
 import { IExpenseEntry, ICategory, ICard, EntryKind } from "@/types/expenseManagerTy";
 import { buildTrend } from "@/lib/utils/trend";
+import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
+import { debtBalances, debtTotals } from "@/lib/utils/debt";
+import { EntrySavePayload } from "../expenseStats/DetailedEntryDialog";
 
 function fmt(v: number) { return `PKR ${v.toLocaleString("en-PK")}`; }
 
@@ -16,11 +19,15 @@ export default function DigitalKhataDashboardCard({ entries, categories, cards, 
     entries: IExpenseEntry[]; categories: ICategory[]; cards: ICard[];
     onSaved: (v: DetailedEntryValues & { kind: EntryKind }) => void;
 }) {
+    const { parties, addParty } = useExpenseManagerStore();
+
     const [dialogKind, setDialogKind] = useState<EntryKind | null>(null);
 
     const income = entries.filter((e) => e.kind === "income").reduce((s, e) => s + e.amount, 0);
     const expense = entries.filter((e) => e.kind === "expense").reduce((s, e) => s + e.amount, 0);
-    const debt = entries.filter((e) => e.kind === "debt" && !e.isSettled).reduce((s, e) => s + e.amount, 0);
+    // const debt = entries.filter((e) => e.kind === "debt" && !e.isSettled).reduce((s, e) => s + e.amount, 0);
+    const { youWillGet, youWillGive } = debtTotals(debtBalances(entries));
+    const debt = Math.abs(youWillGet - youWillGive);
     const cardBalance = cards.reduce((s, c) => s + c.balance, 0);
 
     const trend = useMemo(() => buildTrend(entries, (d) => d.slice(0, 10), 7), [entries]);
@@ -157,6 +164,8 @@ export default function DigitalKhataDashboardCard({ entries, categories, cards, 
                 cards={cards}
                 onClose={() => setDialogKind(null)}
                 onSaved={onSaved}
+                parties={parties}
+                onAddParty={addParty}
             />
         </div>
     );

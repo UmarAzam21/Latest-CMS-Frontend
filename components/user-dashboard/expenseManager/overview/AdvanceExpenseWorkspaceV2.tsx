@@ -1,23 +1,25 @@
 "use client";
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
 import NewEntryMenu from "../expenseStats/NewEntryMenu";
 import CardsSnapshot from "./CardsSnapshot";
 import TransactionPreview from "./TransactionPreview";
 import CategoryRail from "./CategoryRail";
-import { IExpenseEntry, ICategory, ICard, EntryKind } from "@/types/expenseManagerTy";
-import { DetailedEntryValues } from "@/lib/schemas/detailedEntrySchema";
+import { IExpenseEntry, ICategory, ICard } from "@/types/expenseManagerTy";
 import { RangeFilter, filterByRange, computeCategoryTotals, buildNetWorthSeriesMonth, buildNetWorthSeriesAllTime } from "@/lib/utils/overviewMetrics";
 import NetworthCard from "./NetworthCard";
+import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
+import { EntrySavePayload } from "../expenseStats/DetailedEntryDialog";
 
 interface AdvancedExpenseWorkspaceProps {
     entries: IExpenseEntry[];
     categories: ICategory[];
     cards: ICard[];
-    onSaved: (values: DetailedEntryValues & { kind: EntryKind }) => void;
+    onSaved: (values: EntrySavePayload) => void;
 }
 
 export default function AdvancedExpenseWorkspaceV2({ entries, categories, cards, onSaved }: AdvancedExpenseWorkspaceProps) {
+    const { parties, addParty } = useExpenseManagerStore();
+
     const [range, setRange] = useState<RangeFilter>("month");
     const currentMonth = new Date().toISOString().slice(0, 7);
     const monthLabel = new Date(`${currentMonth}-01`).toLocaleDateString("en-GB", { month: "long", year: "numeric" });
@@ -47,8 +49,10 @@ export default function AdvancedExpenseWorkspaceV2({ entries, categories, cards,
                     categories={categories}
                     cards={cards}
                     editingEntry={null}
-                    onCloseEdit={() => {}}
+                    onCloseEdit={() => { }}
                     onSaved={onSaved}
+                    parties={parties}
+                    onAddParty={addParty}
                 />
             </div>
 
