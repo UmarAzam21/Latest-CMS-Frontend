@@ -3,12 +3,15 @@
 import { pkr } from "@/lib/utils/debt";
 
 export default function BalanceText({ value, hidden }: { value: number; hidden?: boolean }) {
-    const cls = value > 0 ? "text-danger" : value < 0 ? "text-green-600" : "text-text-secondary";
-    const label = value > 0 ? "You will get" : value < 0 ? "You will give" : "Settled up";
+    const t = value > 0
+        ? { amt: "text-danger", chip: "bg-danger-bg text-danger", label: "You will get" }
+        : value < 0
+            ? { amt: "text-success", chip: "bg-success-bg text-success", label: "You will give" }
+            : { amt: "text-text-secondary", chip: "bg-page-bg text-text-secondary", label: "Settled up" };
     return (
-        <div className="text-right">
-            <p className={`para-small font-semibold ${cls}`}>{hidden ? "Rs ••••" : pkr(Math.abs(value))}</p>
-            <p className="para-tiny text-text-secondary-muted">{label}</p>
+        <div className="flex flex-col items-end gap-0.5">
+            <p className={`para-small font-bold ${t.amt}`}>{hidden ? "Rs ••••" : pkr(Math.abs(value))}</p>
+            <span className={`rounded-full px-2 py-0.5 para-tiny font-medium ${t.chip}`}>{t.label}</span>
         </div>
     );
 }

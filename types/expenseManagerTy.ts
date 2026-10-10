@@ -39,6 +39,7 @@ export interface IExpenseEntry {
   categoryId: string;      // references ICategory.id — not a hardcoded string
   amount: number;
   date: string;             // ISO string
+  time?: string;
   description?: string;
   receiptImage?: string;    // object URL / base64 for now — see note below
   // debt-specific, optional so expense/income entries ignore it
@@ -202,3 +203,12 @@ export interface IParty {
   createdAt: string;
   reminderDate?: string; // YYYY-MM-DD
 }
+
+export const DEBT_TYPE_HINTS: Record<DebtType, string> = {
+  liya: "Aap ne udhaar liya, paise aap ko mile. (You Got)",
+  diya: "Aap ne udhaar diya, paise aap ne diye. (You Gave)",
+  liya_wapis_diya: "Aap ne liya hua udhaar wapis kiya. (You Gave)",
+  diya_wapis_liya: "Aap ka diya hua udhaar wapis mila. (You Got)",
+  liya_maaf: "Samne wale ne aap ka liya hua udhaar maaf kar diya. Cash nahi hilta.",
+  diya_maaf: "Aap ne diya hua udhaar maaf kar diya. Cash nahi hilta.",
+};

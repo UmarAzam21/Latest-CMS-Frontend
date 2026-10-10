@@ -26,7 +26,7 @@ const SWATCH: Record<ICategory["color"], string> = {
 };
 
 export default function CategoryManagerDialog({ categories, onAdd, onDelete, kinds = KINDS }: CategoryManagerDialogProps) {
-    const [tab, setTab] = useState<EntryKind>("expense");
+    const [tab, setTab] = useState<EntryKind>(kinds.includes("expense") ? "expense" : kinds[0]);
     const [label, setLabel] = useState("");
     const [color, setColor] = useState<ICategory["color"]>("neutral");
     const [confirmId, setConfirmId] = useState<string | null>(null);
