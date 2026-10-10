@@ -111,6 +111,7 @@ export default function PartyDetailPage() {
                     name={party.name}
                     current={party.reminderDate}
                     onSave={(d) => { store.updateParty(party.id, { reminderDate: d }); toast.success(`Reminder date set: ${d}`); }}
+                    onClear={() => { store.updateParty(party.id, { reminderDate: undefined }); toast.success("Reminder date hata di gayi"); }}
                 />
                 <button type="button" aria-disabled={Boolean(blocked)} title={blocked ?? "WhatsApp reminder bhejein"}
                     onClick={() => contact(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`)}

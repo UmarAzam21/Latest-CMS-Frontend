@@ -230,6 +230,14 @@ function useExpenseManagerState() {
     return party; // lets the entry dialog select it immediately
   }, []);
 
+  const addParties = useCallback((list: PartyFormValues[]): number => {
+    const now = new Date().toISOString();
+    const created: IParty[] = list.map((p) => ({ ...p, id: crypto.randomUUID(), slug: makeSlug(p.name), createdAt: now }));
+    setParties((prev) => [...created, ...prev]);
+    toast.success(`${created.length} parties add ho gayin`);
+    return created.length;
+  }, []);
+
   const updateParty = useCallback((id: string, patch: Partial<IParty>) => {
     setParties((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   }, []);
@@ -433,7 +441,7 @@ function useExpenseManagerState() {
     updateEntry,
     deleteEntry,
     // makeDebtPayment,
-    hasLoaded, parties, addParty, updateParty, deleteParty,
+    hasLoaded, parties, addParty, addParties, updateParty, deleteParty,
     addCategory,
     updateCategory,
     deleteCategory,

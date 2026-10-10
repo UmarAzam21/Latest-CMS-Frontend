@@ -16,6 +16,7 @@ import { exportPartyListCsv, exportPartyListPdf, exportPartyListXlsx, PartyListR
 import { partyHref } from "@/lib/utils/party";
 import { DIGITAL_KHATA_ROUTES } from "@/data/user-dashboard/digitalKhata";
 import { IExpenseEntry, PARTY_TYPES, PARTY_TYPE_LABELS, PartyType } from "@/types/expenseManagerTy";
+import BulkPartyDialog from "@/components/user-dashboard/expenseManager/party/BulkPartyDialog";
 
 type BalanceFilter = "all" | "get" | "give" | "settled";
 type SortBy = "recent" | "name" | "balance";
@@ -129,15 +130,22 @@ export default function PartyListPage() {
                 activeTab={tab}
                 onTabChange={(k) => setTab(k as "all" | PartyType)}
                 actions={
-                    <AddPartyDialog
-                        defaultType={tab === "all" ? "customer" : tab}
-                        onSaved={store.addParty}
-                        trigger={
-                            <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-brand-8 bg-primary px-3 py-2 para-tiny font-semibold text-white hover:opacity-90">
-                                <UserPlus size={14} /> Add Party
-                            </button>
-                        }
-                    />
+                    <>
+                        <BulkPartyDialog
+                            existing={store.parties}
+                            defaultType={tab === "all" ? "customer" : tab}
+                            onImport={store.addParties}
+                        />
+                        <AddPartyDialog
+                            defaultType={tab === "all" ? "customer" : tab}
+                            onSaved={store.addParty}
+                            trigger={
+                                <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-brand-8 bg-primary px-3 py-2 para-tiny font-semibold text-white hover:opacity-90">
+                                    <UserPlus size={14} /> Add Party
+                                </button>
+                            }
+                        />
+                    </>
                 }
             />
 
