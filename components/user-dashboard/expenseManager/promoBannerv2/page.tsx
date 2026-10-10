@@ -4,20 +4,23 @@ import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
+    ArrowLeft,
+    ArrowRight,
+    ChartNoAxesCombined,
     MoveLeft,
     X,
     Users,
     Wallet,
     Package,
-    ChartNoAxesCombined,
     ArrowUpRight,
-    ArrowRight,
+    Sparkles,
+    CalendarDays,
+    BriefcaseBusiness,
 } from "lucide-react";
 
 /* -------------------------------------------------------------------------- */
 /*                                  TYPES                                     */
 /* -------------------------------------------------------------------------- */
-
 
 type ModuleKey =
     | "party"
@@ -32,27 +35,62 @@ type ModuleKey =
 /* -------------------------------------------------------------------------- */
 
 const MODULES = [
-    {
-        key: "party" as ModuleKey,
-        title: "Party",
-        icon: Users,
-    },
-    {
-        key: "cash" as ModuleKey,
-        title: "Cash",
-        icon: Wallet,
-    },
-    {
-        key: "stock" as ModuleKey,
-        title: "Stock",
-        icon: Package,
-    },
-    {
-        key: "expense" as ModuleKey,
-        title: "Expense",
-        icon: ChartNoAxesCombined,
-    },
+    { key: "party" as ModuleKey, title: "Party", icon: Users },
+    { key: "cash" as ModuleKey, title: "Cash", icon: Wallet },
+    { key: "stock" as ModuleKey, title: "Stock", icon: Package },
+    { key: "expense" as ModuleKey, title: "Expense", icon: ChartNoAxesCombined },
 ];
+
+/* -------------------------------------------------------------------------- */
+/*                              BANNER SLIDES                                 */
+/*  Every slide uses the SAME promo structure:                                */
+/*  badge → headline (with highlighted name) → subline → CTA                  */
+/* -------------------------------------------------------------------------- */
+
+const BANNER_SLIDES = [
+    {
+        id: "digital-khata",
+        label: "Digital Khata",
+        badge: "کاروبار کا حساب، اب اور بھی آسان",
+        badgeIcon: Sparkles,
+        titleBefore: "اپنا",
+        highlight: "Digital Khata",
+        titleAfter: "آسانی سے مینج کریں",
+        subtitle: "خرچ اور آمدنی کا ریکارڈ رکھیں اور حساب کتاب کی جھنجھٹ سے جان چھڑائیں۔",
+        cta: "آج ہی شروع کریں",
+        image: "/FilernowBanner2-12.png",
+        imageAlt: "Digital Khata overview on a phone",
+        href: "/user-dashboard/digital-khata/daily",
+    },
+    {
+        id: "daily-khata",
+        label: "Daily Khata",
+        badge: "روزانہ کا حساب، ایک نظر میں",
+        badgeIcon: CalendarDays,
+        titleBefore: "ہر دن کا حساب",
+        highlight: "Daily Khata",
+        titleAfter: "کے ساتھ",
+        subtitle: "روزانہ کی آمدنی اور خرچ درج کریں اور اپنے اخراجات پر نظر رکھیں۔",
+        cta: "روزانہ کھاتہ کھولیں",
+        image: "/FilernowBanner-11.png",
+        imageAlt: "Daily Khata tracking on a phone",
+        href: "/user-dashboard/digital-khata/daily",
+    },
+    {
+        id: "business-khata",
+        label: "Business Khata",
+        badge: "کیش، اسٹاک اور بل — سب ایک جگہ",
+        badgeIcon: BriefcaseBusiness,
+        titleBefore: "پورا کاروبار",
+        highlight: "Business Khata",
+        titleAfter: "میں",
+        subtitle: "کیش، اسٹاک اور بلوں کا ریکارڈ منظم رکھیں اور جب چاہیں دیکھیں۔",
+        cta: "بزنس کھاتہ کھولیں",
+        image: "/FilernowBanner1-10.png",
+        imageAlt: "Business Khata tools on a phone",
+        href: "/user-dashboard/digital-khata/business",
+    },
+] as const;
 
 /* -------------------------------------------------------------------------- */
 /*                              KHATA ACTIONS                                 */
@@ -62,9 +100,7 @@ function useKhataActions() {
     const add = (key: ModuleKey, amount: number, note: string) => {
         /*
           Connect your real stores here.
-    
-          Example:
-    
+
           party   -> addParty(...)
           cash    -> addCashEntry(...)
           stock   -> addStockEntry(...)
@@ -72,12 +108,7 @@ function useKhataActions() {
           staff   -> addStaffExpense(...)
           expense -> addExpense(...)
         */
-
-        console.log("Digital Khata entry:", {
-            module: key,
-            amount,
-            note,
-        });
+        console.log("Digital Khata entry:", { module: key, amount, note });
     };
 
     return { add };
@@ -111,11 +142,8 @@ function AddAmountModal({
 
     useEffect(() => {
         setMounted(true);
-
         const previousOverflow = document.body.style.overflow;
-
         document.body.style.overflow = "hidden";
-
         return () => {
             document.body.style.overflow = previousOverflow;
         };
@@ -138,7 +166,6 @@ function AddAmountModal({
                         <p className="text-[10px] font-semibold uppercase tracking-[1.5px] text-[var(--brand-primary)]">
                             Digital Khata
                         </p>
-
                         <h3 className="mt-0.5 text-base font-bold text-[var(--text-dark)]">
                             Add {title}
                         </h3>
@@ -164,7 +191,6 @@ function AddAmountModal({
                         <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-gray-400">
                             Rs
                         </span>
-
                         <input
                             autoFocus
                             type="number"
@@ -179,9 +205,7 @@ function AddAmountModal({
 
                     <label className="mb-1.5 mt-4 block text-[11px] font-semibold text-gray-600">
                         Note
-                        <span className="ml-1 font-normal text-gray-400">
-                            (optional)
-                        </span>
+                        <span className="ml-1 font-normal text-gray-400">(optional)</span>
                     </label>
 
                     <input
@@ -192,7 +216,6 @@ function AddAmountModal({
                         className="w-full rounded-xl border border-gray-200 px-3 py-2.5 text-sm outline-none transition focus:border-[var(--brand-primary)] focus:ring-2 focus:ring-[var(--brand-primary)]/10"
                     />
 
-                    {/* Save */}
                     <button
                         type="button"
                         disabled={!valid}
@@ -213,6 +236,66 @@ function AddAmountModal({
 }
 
 /* -------------------------------------------------------------------------- */
+/*                            BANNER BACKDROP                                 */
+/*  Brand red only, kept minimal: soft base tint → two blurred blobs →        */
+/*  one faint dot patch → two layered waves (the front wave is solid red under the phone and    */
+/*  fades out before it reaches the text).                                    */
+/* -------------------------------------------------------------------------- */
+
+const DOT_GRID =
+    "[background-image:radial-gradient(rgba(200,16,46,0.28)_1.2px,transparent_1.4px)]";
+
+function BannerBackdrop() {
+    return (
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+            {/* Base: warm brand tint on the left, clean white under the text */}
+            <div className="absolute inset-0 bg-[linear-gradient(110deg,#fde9ec_0%,#fff5f6_38%,#ffffff_62%,#fff7f8_100%)]" />
+
+            {/* Gradient blobs */}
+            <div className="absolute -left-24 -top-28 h-72 w-72 rounded-full bg-[rgba(200,16,46,0.14)] blur-3xl" />
+            <div className="absolute -right-20 -top-24 h-60 w-60 rounded-full bg-[rgba(200,16,46,0.07)] blur-3xl" />
+
+            {/* Dot grids — faded at their edges so they feel like texture */}
+            <div
+                className={`absolute left-0 top-0 h-full w-[40%] opacity-60 ${DOT_GRID} [background-size:16px_16px] [mask-image:radial-gradient(ellipse_at_22%_30%,#000_0%,transparent_50%)] [-webkit-mask-image:radial-gradient(ellipse_at_22%_30%,#000_0%,transparent_50%)]`}
+            />
+
+            {/* Layered waves */}
+            <svg
+                className="absolute inset-x-0 bottom-0 h-[46%] w-full"
+                viewBox="0 0 1440 220"
+                preserveAspectRatio="none"
+            >
+                <defs>
+                    <linearGradient id="promo-wave-front" x1="0" x2="1" y1="0" y2="0">
+                        <stop offset="0" style={{ stopColor: "var(--brand-primary)", stopOpacity: 0.78 }} />
+                        <stop offset="0.3" style={{ stopColor: "var(--brand-primary)", stopOpacity: 0.42 }} />
+                        <stop offset="0.52" style={{ stopColor: "var(--brand-primary)", stopOpacity: 0.1 }} />
+                        <stop offset="0.75" style={{ stopColor: "var(--brand-primary)", stopOpacity: 0 }} />
+                    </linearGradient>
+                    <linearGradient id="promo-wave-mid" x1="0" x2="1" y1="0" y2="0">
+                        <stop offset="0" style={{ stopColor: "var(--brand-primary)", stopOpacity: 0.1 }} />
+                        <stop offset="0.6" style={{ stopColor: "var(--brand-primary)", stopOpacity: 0.04 }} />
+                        <stop offset="1" style={{ stopColor: "var(--brand-primary)", stopOpacity: 0.06 }} />
+                    </linearGradient>
+                </defs>
+
+                {/* Middle wave */}
+                <path
+                    d="M0,120 C250,60 520,175 810,125 C1090,78 1270,150 1440,112 L1440,220 L0,220 Z"
+                    fill="url(#promo-wave-mid)"
+                />
+                {/* Front wave — the red base under the phone */}
+                <path
+                    d="M0,150 C190,104 410,190 690,162 C960,136 1190,192 1440,168 L1440,220 L0,220 Z"
+                    fill="url(#promo-wave-front)"
+                />
+            </svg>
+        </div>
+    );
+}
+
+/* -------------------------------------------------------------------------- */
 /*                              PROMO BANNER                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -220,192 +303,143 @@ function PromoBanner() {
     const { add } = useKhataActions();
 
     const [active, setActive] = useState<ModuleKey | null>(null);
+    const [activeSlide, setActiveSlide] = useState(0);
+    const [isPaused, setIsPaused] = useState(false);
 
     const activeModule = useMemo(
         () => MODULES.find((module) => module.key === active),
         [active]
     );
 
+    const hasMultipleSlides = BANNER_SLIDES.length > 1;
+
+    useEffect(() => {
+        if (isPaused || !hasMultipleSlides) return;
+
+        const timer = window.setInterval(() => {
+            setActiveSlide((current) => (current + 1) % BANNER_SLIDES.length);
+        }, 2000);
+
+        return () => window.clearInterval(timer);
+    }, [isPaused, hasMultipleSlides]);
+
+    const showSlide = (index: number) => {
+        setActiveSlide((index + BANNER_SLIDES.length) % BANNER_SLIDES.length);
+    };
+
     return (
         <section className="relative w-full">
-            {/* ------------------------------------------------------------------ */}
-            {/* MAIN BANNER                                                         */}
-            {/* ------------------------------------------------------------------ */}
-
             <div
-                className="relative h-[180px] w-full overflow-hidden rounded-2xl border border-slate-200"
+                className="relative h-[250px] w-full overflow-hidden rounded-3xl border border-primary/10 bg-white sm:h-[235px] lg:h-[225px]"
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+                onFocusCapture={() => setIsPaused(true)}
+                onBlurCapture={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                        setIsPaused(false);
+                    }
+                }}
+                aria-roledescription="carousel"
+                aria-label="Digital Khata highlights"
             >
-                {/* ---------------------------------------------------------------- */}
-                {/* BACKGROUND                                                        */}
-                {/* ---------------------------------------------------------------- */}
+                <BannerBackdrop />
 
-                <div
-                    className="pointer-events-none absolute inset-0 z-0"
-                    style={{
-                        backgroundImage: 'url("/FilernowBanner 3-03.png")',
-                        backgroundPosition: "center",
-                        backgroundRepeat: "no-repeat",
-                        backgroundSize: "cover",
-                    }}
-                />
+                <div className="absolute inset-0 z-10">
+                    {BANNER_SLIDES.map((slide, index) => (
+                        <article
+                            key={slide.id}
+                            className={`absolute inset-0 transition-opacity duration-500 ${
+                                index === activeSlide
+                                    ? "z-10 opacity-100"
+                                    : "pointer-events-none z-0 opacity-0"
+                            }`}
+                            aria-hidden={index !== activeSlide}
+                            inert={index !== activeSlide}
+                        >
+                            <div
+                                dir="ltr"
+                                className="relative grid h-full grid-cols-[38%_62%] items-center"
+                            >
+                                {/* IMAGE — let the banner graphic occupy the left visual area naturally */}
+                                <div className="relative flex h-full w-full items-center justify-start overflow-hidden">
+                                    <img
+                                        src={slide.image}
+                                        alt={slide.imageAlt}
+                                        className="relative z-10 -ml-4 h-[100%] w-auto max-w-none object-contain object-left drop-shadow-[0_16px_20px_rgba(80,0,15,0.22)] sm:-ml-6 lg:-ml-8"
+                                    />
+                                </div>
 
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 z-0 h-[85px] opacity-60" />
-
-                {/* Soft light */}
-                <div className="pointer-events-none absolute -left-20 -top-28 h-64 w-64 rounded-full bg-white/50 blur-3xl" />
-
-                <div className="pointer-events-none absolute right-[28%] top-1/2 h-56 w-56 -translate-y-1/2 rounded-full bg-white/30 blur-3xl" />
-
-                <div className="pointer-events-none absolute -bottom-28 -right-20 h-64 w-64 rounded-full bg-[var(--brand-primary)]/10 blur-3xl" />
-
-                <div className="absolute inset-0">
-                    {/* ------------------------------------------------------------ */}
-                    {/* LEFT — DIGITAL KHATA MODULES                                  */}
-                    {/* ------------------------------------------------------------ */}
-
-                    <div className="absolute inset-y-0 left-0 z-20 flex w-[29%] flex-col justify-center px-4 lg:px-5">
-                        {/* Heading */}
-                        <div className="mb-2.5 flex items-center gap-2">
-                            <span className="h-[2px] w-5 rounded-full bg-[var(--brand-primary)]" />
-                            <span className="text-[10px] font-extrabold uppercase tracking-[2px] text-[var(--brand-primary)]">
-                                Digital Khata
-                            </span>
-                        </div>
-
-                        <div className="grid grid-cols-3 border-y border-primary/15 bg-white">
-                            {[
-                                { label: "Income", icon: Wallet, href: "/user-dashboard/digital-khata/daily" },
-                                { label: "Expenses", icon: ChartNoAxesCombined, href: "/user-dashboard/digital-khata/daily" },
-                                { label: "Udhaar", icon: Users, href: "/user-dashboard/digital-khata/udhaar" },
-                            ].map(({ label, icon: Icon, href }) => (
-                                <Link
-                                    key={label}
-                                    href={href}
-                                    aria-label={`Open ${label} in Digital Khata`}
-                                    className="group relative flex min-w-0 flex-col items-center gap-1.5 px-1 py-2 text-center transition-colors duration-200 hover:bg-primary/5 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 [&:not(:last-child)]:border-r [&:not(:last-child)]:border-primary/15"
+                                {/* COPY — same promo layout on every slide */}
+                                <div
+                                    dir="rtl"
+                                    className="flex h-full min-w-0 items-center  py-4 pb-7 pe-2 ps-6 sm:pe-3 sm:ps-10"
+                                    style={{ fontFamily: "var(--font-noto-nastaliq-urdu), serif" }}
                                 >
-                                    <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary-lighter text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-                                        <Icon aria-hidden="true" className="h-3.5 w-3.5" strokeWidth={2} />
-                                    </span>
-                                    <span className="flex max-w-full items-center gap-0.5 text-[9px] font-semibold text-[var(--text-dark)]">
-                                        <span className="truncate">{label}</span>
-                                        <ArrowRight aria-hidden="true" className="h-3 w-3 shrink-0 text-primary transition-transform group-hover:translate-x-0.5" />
-                                    </span>
-                                </Link>
+                                    <div className="flex w-full max-w-[520px] flex-col items-start gap-2 text-right">
+                                        {/* Badge */}
+                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/15 bg-white/80 px-2.5 py-0.5 text-[10px] font-bold leading-[1.9] text-primary shadow-sm sm:text-[11px]">
+                                            <slide.badgeIcon aria-hidden="true" className="h-3 w-3 shrink-0" />
+                                            {slide.badge}
+                                        </span>
+
+                                        {/* Headline */}
+                                        <h2 className="text-[17px] font-extrabold leading-[1.75] text-text-dark sm:text-[20px] lg:text-[23px]">
+                                            {slide.titleBefore}{" "}
+                                            <span
+                                                dir="ltr"
+                                                className="inline-block whitespace-nowrap font-sans font-extrabold text-primary"
+                                            >
+                                                {slide.highlight}
+                                            </span>{" "}
+                                            {slide.titleAfter}
+                                        </h2>
+
+                                        {/* Subline */}
+                                        <p className="line-clamp-2 text-[11px] leading-[1.9] text-text-secondary sm:text-[12px]">
+                                            {slide.subtitle}
+                                        </p>
+
+                                        {/* CTA */}
+                                        <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2">
+                                            <Link
+                                                href={slide.href}
+                                                className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-primary py-1 ps-3.5 pe-1 text-[11px] font-bold leading-[1.9] text-white shadow-[0_6px_16px_rgba(200,16,46,0.22)] transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_22px_rgba(200,16,46,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2"
+                                            >
+                                                <span>{slide.cta}</span>
+                                                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white text-primary transition-transform group-hover:-translate-x-0.5">
+                                                    <MoveLeft className="h-3.5 w-3.5" />
+                                                </span>
+                                            </Link>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </article>
+                    ))}
+
+                    {hasMultipleSlides && (
+                        <div className="absolute bottom-2 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/85 px-2 py-1 shadow-sm sm:bottom-2.5">
+                            {BANNER_SLIDES.map((slide, index) => (
+                                <button
+                                    key={slide.id}
+                                    type="button"
+                                    aria-label={`Show ${slide.label} banner`}
+                                    aria-current={index === activeSlide}
+                                    onClick={() => showSlide(index)}
+                                    className={`h-1.5 rounded-full transition-all ${
+                                        index === activeSlide
+                                            ? "w-5 bg-primary"
+                                            : "w-1.5 bg-primary/30 hover:bg-primary/60"
+                                    }`}
+                                />
                             ))}
                         </div>
-                   
-                    </div>
-
-                    {/* ------------------------------------------------------------ */}
-                    {/* CENTER — PHONE MOCKUP                                         */}
-                    {/* ------------------------------------------------------------ */}
-
-                    <div className="absolute inset-y-0 left-[28%] right-[28%] z-10 flex items-center justify-center">
-                        {/* Glow behind mockup */}
-                        <div className="pointer-events-none absolute h-[125px] w-[180px] rounded-full bg-[var(--brand-primary)]/10 blur-2xl" />
-
-                        <img
-                            src="/MobileOverViewMockup.png"
-                            alt="Filernow Digital Khata"
-                            className="
-                  relative
-                  z-10
-                  max-h-[230px]
-                  max-w-[230px]
-                  object-contain
-                "
-                        />
-                    </div>
-
-                    {/* ------------------------------------------------------------ */}
-                    {/* RIGHT — URDU CONTENT                                          */}
-                    {/* ------------------------------------------------------------ */}
-
-                    <div className="absolute inset-y-0 right-0 z-20 flex w-[32%] items-center justify-center px-5 lg:px-7">
-                        <div
-                            dir="rtl"
-                            className="flex w-full max-w-[315px] flex-col items-start text-right"
-                            style={{
-                                fontFamily: "var(--font-noto-nastaliq-urdu), serif",
-                            }}
-                        >
-                            {/* Eyebrow */}
-                            <div className="mb-1 text-[13px] font-bold tracking-wide text-[var(--brand-primary)]">
-                                کاروبار کا حساب، اب اور بھی آسان
-                            </div>
-
-                            {/* Main copy */}
-                            <h2 className="text-[15px] font-bold leading-[1.65] tracking-[-0.2px] text-[var(--text-dark)]">
-                                اب کاروبار کے حساب کتاب کی جھنجھٹ سے جان چھڑائیں،
-                                <br />
-                                خرچ اور آمدنی کا ریکارڈ رکھیں اور اپنا{" "}
-                                <span className="text-primary font-semibold">
-                                    Digital Khata{" "}
-                                </span>{" "}
-                                آسانی سے مینج کریں۔
-                            </h2>
-
-                            {/* CTA */}
-                            <Link
-                                href="/user-dashboard/digital-khata/daily"
-                                dir="rtl"
-                                className="
-      group
-      mt-2.5
-      flex
-      items-center
-      gap-2
-      rounded-full
-      bg-[var(--brand-primary)]
-      py-1.5
-      ps-4
-      pe-1.5
-      text-[11px]
-      font-bold
-      text-white
-      transition-all
-      duration-200
-      hover:-translate-y-0.5
-      hover:shadow-[0_10px_24px_rgba(200,16,46,0.28)]
-      active:translate-y-0
-    "
-                            >
-                                <span className="text-[12px] leading-none">
-                                    آج ہی شروع کریں
-                                </span>
-
-                                <span
-                                    className="
-        flex
-        h-6
-        w-6
-        shrink-0
-        items-center
-        justify-center
-        rounded-full
-        bg-white
-        text-[var(--brand-primary)]
-        transition-transform
-        duration-200
-        group-hover:-translate-x-1
-      "
-                                >
-                                    <MoveLeft className="h-3.5 w-3.5" strokeWidth={2.5} />
-                                </span>
-                            </Link>
-                        </div>
-                    </div>
+                    )}
                 </div>
-
-                {/* Subtle top highlight */}
-                <div className="pointer-events-none absolute inset-x-0 top-0 z-30 h-px bg-white/70" />
             </div>
 
-            {/* ------------------------------------------------------------------ */}
-            {/* ADD AMOUNT MODAL                                                    */}
-            {/* ------------------------------------------------------------------ */}
-
+            {/* ADD AMOUNT MODAL */}
             {active && activeModule && (
                 <AddAmountModal
                     title={activeModule.title}

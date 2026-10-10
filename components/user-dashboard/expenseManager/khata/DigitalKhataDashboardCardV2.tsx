@@ -50,26 +50,27 @@ function DigitalKhataDashboardCardV2() {
         <Link
           key={title}
           href={href}
-          className={`
+          className="
             group relative flex min-h-0 flex-col justify-between overflow-hidden
-            rounded-2xl border border-primary/20 bg-primary-lighter p-4 text-text-dark
-            shadow-[0_2px_8px_rgba(17,17,17,0.05)] transition-all duration-200
-            hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_8px_20px_rgba(200,16,46,0.10)]
-            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50
-          `}
+            rounded-2xl border border-border-clr bg-white/80 p-4 text-text-dark
+            shadow-sm transition-all duration-200 ease-out
+            hover:-translate-y-0.5 hover:border-primary/30 hover:bg-[#fff7f8] 
+          "
         >
           <div className="relative flex items-center justify-between">
-            <div className="flex h-6 w-6 items-center justify-center rounded-xl bg-white/80 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
-              <Icon className="h-[16px] w-[16px]" strokeWidth={2} />
+            <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-[#fff1f4] text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-white">
+              <Icon className="h-[15px] w-[15px]" strokeWidth={2} />
             </div>
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/70 text-text-secondary transition-all group-hover:bg-white group-hover:text-primary">
-              <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" strokeWidth={2.5} />
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-text-secondary shadow-sm transition-all duration-200 group-hover:bg-primary group-hover:text-white">
+              <ChevronRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2.5} />
             </span>
           </div>
 
           <div className="relative mt-2">
-            <h3 className="para-small font-semibold leading-tight">{title}</h3>
-            <p className="mt-1.5 para-tiny leading-snug text-text-secondary-muted">
+            <h3 className="para-small font-semibold leading-tight transition-colors group-hover:text-primary">
+              {title}
+            </h3>
+            <p className="mt-1.5 para-tiny leading-snug text-text-secondary-muted transition-colors group-hover:text-text-secondary">
               {description}
             </p>
           </div>
