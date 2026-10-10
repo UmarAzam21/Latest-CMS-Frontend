@@ -12,8 +12,9 @@ import PartyBalanceCard from "@/components/user-dashboard/expenseManager/party/P
 import { Field, IconBox, inputCls } from "@/components/user-dashboard/expenseManager/ui/FormKit";
 import { buildLedger, debtLabel } from "@/lib/utils/debt";
 import { partyHref } from "@/lib/utils/party";
-import { PARTY_TYPE_LABELS } from "@/types/expenseManagerTy";
+import { IExpenseEntry, PARTY_TYPE_LABELS } from "@/types/expenseManagerTy";
 import { exportPartyCsv, exportPartyPdf, exportPartyXlsx, buildPartyPdf, partySummaryText } from "@/lib/utils/exportParty";
+import DetailedEntryDialog from "@/components/user-dashboard/expenseManager/expenseStats/DetailedEntryDialog";
 
 type Side = "all" | "gave" | "got";
 const BTN = "flex cursor-pointer items-center gap-1.5 rounded-brand-8 border border-primary px-4 py-2 para-tiny font-semibold text-primary default-transition hover:bg-primary hover:text-white";
@@ -25,6 +26,8 @@ export default function PartyReportPage() {
     const [side, setSide] = useState<Side>("all");
     const [from, setFrom] = useState("");
     const [to, setTo] = useState("");
+
+    const [editing, setEditing] = useState<IExpenseEntry | null>(null);
 
     const party = store.parties.find((p) => p.slug === slug || p.id === slug);
     const pid = party?.id ?? "";
@@ -109,7 +112,8 @@ export default function PartyReportPage() {
 
             <PartyBalanceCard balance={net} gave={gave} got={got} count={rows.length} />
 
-            <PartyLedger rows={rows} />
+            {/* <PartyLedger rows={rows} /> */}
+            <PartyLedger rows={rows} onEdit={setEditing} onDelete={store.deleteEntry} />
 
             <div className="flex flex-wrap items-center gap-2 print:hidden">
                 <span className="flex items-center gap-1.5 para-tiny font-semibold text-text-secondary-muted"><Download size={14} /> Report:</span>
@@ -118,6 +122,18 @@ export default function PartyReportPage() {
                 <button onClick={guard(() => exportPartyCsv(party, rows, net, `${party.slug}-khata.csv`))} className={BTN}><FileText size={14} /> CSV</button>
                 <button onClick={shareWhatsApp} className={BTN}><MessageCircle size={14} /> WhatsApp</button>
             </div>
+
+            <DetailedEntryDialog
+                kind={editing ? "debt" : null}
+                categories={store.categories}
+                cards={store.cards}
+                parties={store.parties}
+                onAddParty={store.addParty}
+                editingEntry={editing}
+                presetPartyId={party.id}
+                onClose={() => setEditing(null)}
+                onSaved={(v) => { if (editing) store.updateEntry(editing.id, v); }}
+            />
         </div>
     );
 }

@@ -5,7 +5,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
-import { ArrowDownLeft, ArrowUpRight, Check, Download, Eye, EyeOff, Scale, Search, SlidersHorizontal, Truck, UserPlus, UserRound, Users, type LucideIcon } from "lucide-react";
+import { ArrowDownLeft, ArrowRight, ArrowUpRight, Check, Download, Eye, EyeOff, Pencil, Scale, Search, SlidersHorizontal, Trash2, Truck, UserPlus, UserRound, Users, type LucideIcon } from "lucide-react";
 import { useExpenseManagerStore } from "@/hooks/useExpenseManagerStore";
 import KhataPageHeader from "@/components/user-dashboard/expenseManager/header/KhataPageHeader";
 import AddPartyDialog from "@/components/user-dashboard/expenseManager/party/AddPartyDialog";
@@ -15,7 +15,7 @@ import { entryDateTime, entrySortKey, localDate } from "@/lib/utils/dateFmt";
 import { exportPartyListCsv, exportPartyListPdf, exportPartyListXlsx, PartyListRow } from "@/lib/utils/exportParty";
 import { partyHref } from "@/lib/utils/party";
 import { DIGITAL_KHATA_ROUTES } from "@/data/user-dashboard/digitalKhata";
-import { IExpenseEntry, PARTY_TYPES, PARTY_TYPE_LABELS, PartyType } from "@/types/expenseManagerTy";
+import { IExpenseEntry, IParty, PARTY_TYPES, PARTY_TYPE_LABELS, PartyType } from "@/types/expenseManagerTy";
 import BulkPartyDialog from "@/components/user-dashboard/expenseManager/party/BulkPartyDialog";
 
 type BalanceFilter = "all" | "get" | "give" | "settled";
@@ -68,16 +68,25 @@ export default function PartyListPage() {
     const [hidden, setHidden] = useState(false);
     const [balanceFilter, setBalanceFilter] = useState<BalanceFilter>("all");
     const [sortBy, setSortBy] = useState<SortBy>("recent");
+    const [editing, setEditing] = useState<IParty | null>(null);
+    const [confirmId, setConfirmId] = useState<string | null>(null);
 
     // balance + latest entry per party
     const rows = useMemo(() => {
         const last = new Map<string, IExpenseEntry>();
+        const counts = new Map<string, number>();
         for (const e of store.entries) {
             if (!e.partyId) continue;
+            counts.set(e.partyId, (counts.get(e.partyId) ?? 0) + 1);
             const cur = last.get(e.partyId);
             if (!cur || entrySortKey(e) > entrySortKey(cur)) last.set(e.partyId, e);
         }
-        return store.parties.map((party) => ({ party, balance: store.stats.debtNet.get(party.id) ?? 0, last: last.get(party.id) }));
+        return store.parties.map((party) => ({
+            party,
+            balance: store.stats.debtNet.get(party.id) ?? 0,
+            last: last.get(party.id),
+            count: counts.get(party.id) ?? 0,
+        }));
     }, [store.parties, store.entries, store.stats.debtNet]);
 
     const inTab = useMemo(() => rows.filter((r) => tab === "all" || r.party.type === tab), [rows, tab]);
@@ -232,22 +241,53 @@ export default function PartyListPage() {
                         {store.parties.length === 0 ? "Abhi koi party nahi hai. \"Add Party\" se shuru karein." : "Is filter mein koi party nahi mili."}
                     </p>
                 )}
-                {visible.map(({ party: p, balance, last }) => (
-                    <Link key={p.id} href={partyHref(p)}
-                        className="flex items-center gap-3 border-b border-border-clr px-3 py-3 last:border-b-0 hover:bg-page-bg">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-brand-8 bg-page-bg font-semibold text-primary">
-                            {p.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                            <p className="truncate para-small font-semibold text-text-dark">{p.name}</p>
-                            <p className="truncate para-tiny text-text-secondary-muter">
-                                {p.phone ?? "No number"} <span className="mx-1 text-border-clr">|</span> {last ? entryDateTime(last) : "Koi entry nahi"}
-                            </p>
+                {visible.map(({ party: p, balance, last, count }) => (
+                    <div key={p.id} className="flex flex-wrap items-center gap-2 border-b border-border-clr px-3 py-3 last:border-b-0 hover:bg-page-bg">
+                        <Link href={partyHref(p)} title="Details dekhne ke liye click karein" className="flex min-w-0 flex-1 items-center gap-3">
+                            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-brand-8 bg-page-bg font-semibold text-primary">
+                                {p.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
+                            </span>
+                            <div className="min-w-0 flex-1">
+                                <p className="truncate para-small font-semibold text-text-dark">{p.name}</p>
+                                <p className="truncate para-tiny text-text-secondary-muter">
+                                    {p.phone ?? "No number"} <span className="mx-1 text-border-clr">|</span> {last ? entryDateTime(last) : "Koi entry nahi"}
+                                </p>
+                            </div>
+                            <BalanceText value={balance} hidden={hidden} />
+                        </Link>
+
+                        <div className="flex items-center gap-1.5">
+                            {confirmId === p.id ? (
+                                <>
+                                    <span className="para-tiny text-text-secondary-muted">{count > 0 ? `Party + ${count} entries delete?` : "Party delete?"}</span>
+                                    <button type="button" onClick={() => { if (store.deleteParty(p.id, true)) setConfirmId(null); }}
+                                        className="cursor-pointer rounded-brand-8 bg-danger px-2 py-1.5 para-tiny font-semibold text-white">Haan</button>
+                                    <button type="button" onClick={() => setConfirmId(null)}
+                                        className="cursor-pointer rounded-brand-8 border border-border-clr px-2 py-1.5 para-tiny font-semibold text-text-secondary">Nahi</button>
+                                </>
+                            ) : (
+                                <>
+                                    <Link href={partyHref(p)}
+                                        className="flex items-center gap-1 rounded-brand-8 border border-primary px-2.5 py-1.5 para-tiny font-semibold text-primary default-transition hover:bg-primary hover:text-white">
+                                        View details <ArrowRight size={12} />
+                                    </Link>
+                                    <button type="button" title="Party edit karein" aria-label="Party edit karein" onClick={() => setEditing(p)}
+                                        className="cursor-pointer rounded-brand-8 border border-border-clr p-1.5 text-text-secondary hover:bg-page-bg"><Pencil size={13} /></button>
+                                    <button type="button" title="Party delete karein" aria-label="Party delete karein" onClick={() => setConfirmId(p.id)}
+                                        className="cursor-pointer rounded-brand-8 border border-border-clr p-1.5 text-text-secondary-muter hover:text-danger"><Trash2 size={13} /></button>
+                                </>
+                            )}
                         </div>
-                        <BalanceText value={balance} hidden={hidden} />
-                    </Link>
+                    </div>
                 ))}
             </div>
+
+            <AddPartyDialog
+                party={editing ?? undefined}
+                open={editing !== null}
+                onOpenChange={(o) => !o && setEditing(null)}
+                onSaved={(v) => { if (editing) { store.updateParty(editing.id, v); toast.success("Party update ho gayi"); } }}
+            />
         </div>
     );
 }

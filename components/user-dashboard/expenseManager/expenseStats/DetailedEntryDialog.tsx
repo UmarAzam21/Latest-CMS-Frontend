@@ -145,7 +145,7 @@ export default function DetailedEntryDialog({
         <Dialog.Root open onOpenChange={(o) => !o && onClose()}>
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
-                <Dialog.Content className="fixed left-1/2 top-1/2 z-modal flex max-h-[90dvh] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-brand-12 bg-white shadow-card-hover">
+                <Dialog.Content className="fixed left-1/2 top-1/2 z-modal flex max-h-[90dvh] w-[calc(100%-2rem)] max-w-mdx max-w-lg -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-brand-12 bg-white shadow-card-hover">
                     <div className={`flex items-center justify-between gap-3 px-brand py-3 ${headerCls}`}>
                         <div className="flex min-w-0 items-center gap-2.5">
                             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-brand-8 bg-black/10"><HeaderIcon size={18} /></span>
@@ -196,25 +196,27 @@ export default function DetailedEntryDialog({
                             </Field>
                         )}
 
-                        <Field
-                            label={isDebt ? "Udhaar ki qism" : "Category"}
-                            required
-                            hint={isDebt && debtType ? DEBT_TYPE_HINTS[debtType] : undefined}
-                            error={errors.categoryId?.message}
-                        >
-                            <IconBox icon={Tags}>
-                                <select {...register("categoryId")} className={inputCls}>
-                                    {categoryOptions.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
-                                </select>
-                            </IconBox>
-                        </Field>
+                        <div className="grid grid-cols-2 gap-brand-8">
+                            <Field
+                                label={isDebt ? "Udhaar ki qism" : "Category"}
+                                required
+                                hint={isDebt && debtType ? DEBT_TYPE_HINTS[debtType] : undefined}
+                                error={errors.categoryId?.message}
+                            >
+                                <IconBox icon={Tags}>
+                                    <select {...register("categoryId")} className={inputCls}>
+                                        {categoryOptions.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+                                    </select>
+                                </IconBox>
+                            </Field>
 
-                        <Field label="Raqam" required error={errors.amount?.message}>
-                            <IconBox prefix="Rs">
-                                <input type="number" step="0.01" inputMode="decimal" placeholder="jaise: 5000"
-                                    {...register("amount", { valueAsNumber: true })} className={`${inputCls} text-base font-semibold`} />
-                            </IconBox>
-                        </Field>
+                            <Field label="Raqam" required error={errors.amount?.message}>
+                                <IconBox prefix="Rs">
+                                    <input type="number" step="0.01" inputMode="decimal" placeholder="jaise: 5000"
+                                        {...register("amount", { valueAsNumber: true })} className={`${inputCls} text-base font-semibold`} />
+                                </IconBox>
+                            </Field>
+                        </div>
 
                         <div className="grid grid-cols-2 gap-brand-8">
                             <Field label="Tareekh" required error={errors.date?.message}>

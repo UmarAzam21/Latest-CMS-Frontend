@@ -18,7 +18,7 @@ import { makeSlug } from "@/lib/utils/party";
 // Bump ONLY this one line when IExpenseEntry/ICategory/ICard fields are
 // RENAMED or REMOVED. Adding a new OPTIONAL field does NOT require a bump —
 // old stored JSON simply parses with that field undefined, which is valid.
-const SCHEMA_VERSION = "v2";
+const SCHEMA_VERSION = "v3";
 const STORAGE_KEY_ENTRIES = `filernow_expense_entries_${SCHEMA_VERSION}`;
 const STORAGE_KEY_CATEGORIES = `filernow_expense_categories_${SCHEMA_VERSION}`;
 // const STORAGE_KEY_SEEDED = `filernow_expense_seeded_${SCHEMA_VERSION}`;
@@ -242,15 +242,25 @@ function useExpenseManagerState() {
     setParties((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   }, []);
 
-  const deleteParty = useCallback((id: string): boolean => {
-    if (entries.some((e) => e.partyId === id)) {
+  const deleteParty = useCallback((id: string, withEntries = false): boolean => {
+    const linked = entries.filter((e) => e.partyId === id);
+    if (linked.length && !withEntries) {
       toast.error("Is party ki entries maujood hain, pehle woh delete karein");
       return false;
     }
+    if (linked.length) {
+      // undo card balance effects of linked income/expense entries (debt never touches cards)
+      const deltas: Record<string, number> = {};
+      linked.forEach((e) => {
+        if (e.kind !== "debt" && e.cardId) deltas[e.cardId] = (deltas[e.cardId] ?? 0) - cardDelta(e);
+      });
+      applyCardDeltas(deltas);
+      setEntries((prev) => prev.filter((e) => e.partyId !== id));
+    }
     setParties((prev) => prev.filter((p) => p.id !== id));
-    toast.success("Party delete ho gayi");
+    toast.success(linked.length ? `Party aur ${linked.length} entries delete ho gayin` : "Party delete ho gayi");
     return true;
-  }, [entries]);
+  }, [entries, applyCardDeltas]);
 
   const addCategory = useCallback((label: string, color: ICategory["color"], kind: EntryKind) => {
     const clean = label.trim();
@@ -416,7 +426,6 @@ function useExpenseManagerState() {
     return {
       totalIncome,
       totalExpenses,
-      // totalDebt,
       debtNet,
       youWillGet,
       youWillGive,
@@ -440,7 +449,6 @@ function useExpenseManagerState() {
     addEntry,
     updateEntry,
     deleteEntry,
-    // makeDebtPayment,
     hasLoaded, parties, addParty, addParties, updateParty, deleteParty,
     addCategory,
     updateCategory,

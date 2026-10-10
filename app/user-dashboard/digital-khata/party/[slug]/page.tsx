@@ -49,7 +49,7 @@ export default function PartyDetailPage() {
     if (!party) return <p className="p-6 para-small">Party nahi mili.</p>;
 
     const handleDelete = () => {
-        if (store.deleteParty(party.id)) router.push(PARTY_BASE);
+        if (store.deleteParty(party.id, true)) router.push(PARTY_BASE);
         else setConfirmDelete(false);
     };
 
@@ -89,7 +89,10 @@ export default function PartyDetailPage() {
                         </button>
                         {confirmDelete ? (
                             <div className="flex items-center gap-1.5">
-                                <span className="para-tiny text-text-secondary-muted">Party delete karein?</span>
+                                {/* <span className="para-tiny text-text-secondary-muted">Party delete karein?</span> */}
+                                <span className="para-tiny text-text-secondary-muted">
+                                    {rows.length > 0 ? `Party + ${rows.length} entries delete karein?` : "Party delete karein?"}
+                                </span>
                                 <button type="button" onClick={handleDelete} className="cursor-pointer rounded-brand-8 bg-danger px-2 py-1.5 para-tiny font-semibold text-white">Haan</button>
                                 <button type="button" onClick={() => setConfirmDelete(false)} className="cursor-pointer rounded-brand-8 border border-border-clr px-2 py-1.5 para-tiny font-semibold text-text-secondary">Nahi</button>
                             </div>
@@ -131,7 +134,8 @@ export default function PartyDetailPage() {
                     className="w-full rounded-brand-8 border border-border-clr bg-white py-2 pl-9 pr-3 para-small outline-none focus:border-primary" />
             </div>
 
-            <PartyLedger rows={shown} onRowClick={setEditing} />
+            {/* <PartyLedger rows={shown} onRowClick={setEditing} /> */}
+            <PartyLedger rows={shown} onEdit={setEditing} onDelete={store.deleteEntry} />
 
             <div className="sticky bottom-0 z-10 flex gap-3 border-t border-border-clr bg-white p-3">
                 <button onClick={() => setTxn(1)} className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-danger py-3 para-small font-bold uppercase text-white hover:opacity-90">
