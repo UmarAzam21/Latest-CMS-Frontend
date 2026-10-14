@@ -120,16 +120,6 @@ export const KHATA_LABELS: Record<EntryKind, {
 
 export const MAX_CARDS = 3;
 
-// export type DebtDirection = "liya" | "diya";
-// export const DEBT_CATEGORY_DIRECTION: Record<string, DebtDirection> = {
-//   "cat-udhaar-liya": "liya",
-//   "cat-udhaar-diya": "diya",
-// };
-// export const DEBT_CARD_LABELS: Record<DebtDirection, string> = {
-//   liya: "Udhaar kis card me aaya? (card me jama hoga, optional)",
-//   diya: "Udhaar kis card se diya? (card se kam hoga, optional)",
-// };
-
 export type DebtType = "liya" | "diya" | "liya_wapis_diya" | "diya_wapis_liya" | "liya_maaf" | "diya_maaf";
 
 // SINGLE source of truth for debt categories. sign: +1 = party owes me more, -1 = I owe more.
@@ -187,12 +177,17 @@ export const DEBT_CATEGORY_TYPE: Record<string, DebtType> = Object.fromEntries(
       DebtType,
       (typeof DEBT_TYPE_META)[DebtType]
     ][]
-  ).map(([t, m]) => [m.categoryId, t])
+  )
+    // Loop over the key-value entry matrices and flip them upside down so categoryId becomes the index key.
+    .map(([t, m]) => [m.categoryId, t])
 );
 
 // export type PartyType = "customer" | "supplier" | "bank";
 export const PARTY_TYPES = ["customer", "supplier"] as const;
+
+// Generates a strict TypeScript union type by extracting the literal value elements directly from the read-only array index items.
 export type PartyType = (typeof PARTY_TYPES)[number];
+
 export const PARTY_TYPE_LABELS: Record<PartyType, string> = { customer: "Customer", supplier: "Supplier" };
 export interface IParty {
   id: string;

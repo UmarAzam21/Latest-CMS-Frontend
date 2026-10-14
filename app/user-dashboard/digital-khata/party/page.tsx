@@ -146,8 +146,8 @@ export default function PartyListPage() {
                             onImport={store.addParties}
                         />
                         <AddPartyDialog
-                            defaultType={tab === "all" ? "customer" : tab}
                             onSaved={store.addParty}
+                            defaultType={tab === "all" ? "customer" : tab}
                             trigger={
                                 <button type="button" className="flex cursor-pointer items-center gap-1.5 rounded-brand-8 bg-primary px-3 py-2 para-tiny font-semibold text-white hover:opacity-90">
                                     <UserPlus size={14} /> Add Party

@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 
-const base = "w-full rounded-brand-8 border border-border-clr bg-white py-2.5 para-small text-text-dark placeholder:text-text-secondary-muter outline-none default-transition focus:border-primary focus:ring-2 focus:ring-primary/10";
+const base = "w-full rounded-brand-8 border border-border-clr bg-page-bg py-2.5 para-small text-text-dark placeholder:text-text-secondary-muter outline-none default-transition focus:border-primary focus:ring-2 focus:ring-primary/10";
 export const inputCls = `${base} pl-9 pr-2.5`;   // with icon
 export const inputPlainCls = `${base} px-2.5`;   // no icon (textarea)
 

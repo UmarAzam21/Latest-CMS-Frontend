@@ -89,7 +89,6 @@ export default function PartyDetailPage() {
                         </button>
                         {confirmDelete ? (
                             <div className="flex items-center gap-1.5">
-                                {/* <span className="para-tiny text-text-secondary-muted">Party delete karein?</span> */}
                                 <span className="para-tiny text-text-secondary-muted">
                                     {rows.length > 0 ? `Party + ${rows.length} entries delete karein?` : "Party delete karein?"}
                                 </span>
@@ -119,7 +118,7 @@ export default function PartyDetailPage() {
                 <button type="button" aria-disabled={Boolean(blocked)} title={blocked ?? "WhatsApp reminder bhejein"}
                     onClick={() => contact(`https://wa.me/${digits}?text=${encodeURIComponent(msg)}`)}
                     className={`${actionCls} ${disabledCls}`}>
-                    <MessageCircle size={18} className="text-warning" /> Reminder
+                    <MessageCircle size={18} className="text-warning" />Whatsapp Reminder
                 </button>
                 <button type="button" aria-disabled={Boolean(blocked)} title={blocked ?? "SMS bhejein"}
                     onClick={() => contact(`sms:${party.phone}?body=${encodeURIComponent(msg)}`, true)}
@@ -134,15 +133,14 @@ export default function PartyDetailPage() {
                     className="w-full rounded-brand-8 border border-border-clr bg-white py-2 pl-9 pr-3 para-small outline-none focus:border-primary" />
             </div>
 
-            {/* <PartyLedger rows={shown} onRowClick={setEditing} /> */}
             <PartyLedger rows={shown} onEdit={setEditing} onDelete={store.deleteEntry} />
 
             <div className="sticky bottom-0 z-10 flex gap-3 border-t border-border-clr bg-white p-3">
                 <button onClick={() => setTxn(1)} className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-danger py-3 para-small font-bold uppercase text-white hover:opacity-90">
-                    <ArrowUpRight size={16} /> You Gave Rs
+                    <ArrowUpRight size={16} /> Apne Diye (Gave) Rs
                 </button>
                 <button onClick={() => setTxn(-1)} className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-full bg-green-600 py-3 para-small font-bold uppercase text-white hover:opacity-90">
-                    <ArrowDownLeft size={16} /> You Got Rs
+                    <ArrowDownLeft size={16} /> Apne Liye (Got) Rs
                 </button>
             </div>
 
