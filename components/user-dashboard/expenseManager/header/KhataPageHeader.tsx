@@ -22,8 +22,8 @@ interface Props {
 
 export default function KhataPageHeader({ title, subtitle, backHref, actions, tabs, activeTab, onTabChange, hideDataMode }: Props) {
     return (
-        <header className="border-b border-border-clr">
-            <div className="flex flex-wrap items-center justify-between gap-brand-8 pb-brand-8">
+        <header className="border border-border-clr rounded-brand-12 bg-white px-brand-12 pt-brand-8 pb-brand-8 print:hidden">
+            <div className="flex flex-wrap items-center justify-between gap-brand-8 pb-brand-8x">
                 <div className="flex min-w-0 items-center gap-2">
                     {backHref && (
                         <Link href={backHref} aria-label="Wapis jayein"
@@ -50,7 +50,7 @@ export default function KhataPageHeader({ title, subtitle, backHref, actions, ta
                         return (
                             <button key={t.key} type="button" role="tab" aria-selected={active} onClick={() => onTabChange?.(t.key)}
                                 className={cn(
-                                    "flex shrink-0 cursor-pointer items-center gap-1.5 border-b-2 px-3 py-2 para-small font-medium default-transition",
+                                    "flex shrink-0 cursor-pointer items-center gap-1.5 border-b-2 px-3 pt-2 pb-1 para-small font-medium default-transition",
                                     active ? "border-primary text-primary" : "border-transparent text-text-secondary hover:text-text-dark"
                                 )}>
                                 {Icon && <Icon size={15} />}{t.label}

@@ -18,10 +18,10 @@ const TYPE_HINT: Record<PartyType, string> = {
 
 interface Props {
     onSaved: (v: PartyFormValues) => void;
-    trigger?: ReactNode;
     defaultType?: PartyType;
-    party?: IParty;                      // pass to switch into EDIT mode
-    open?: boolean;                      // pass open + onOpenChange to control it from outside
+    trigger?: ReactNode;
+    party?: IParty;    // pass to switch into EDIT mode
+    open?: boolean;    // pass open + onOpenChange to control it from outside
     onOpenChange?: (o: boolean) => void;
 }
 
@@ -62,7 +62,8 @@ export default function AddPartyDialog({ onSaved, trigger, defaultType = "custom
             <Dialog.Portal>
                 <Dialog.Overlay className="fixed inset-0 z-modal bg-black/40" />
                 <Dialog.Content className="fixed left-1/2 top-1/2 z-modal w-[calc(100%-2rem)] max-w-sm -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-brand-12 bg-white shadow-card-hover">
-                    <div className="flex items-start justify-between gap-3 border-b border-border-clr px-brand py-3">
+                    {/* header */}
+                    <div className="flex items-start justify-between gap-3 border-b border-border-clr bg-page-bg px-brand py-3">
                         <div className="flex items-center gap-2.5">
                             <span className="flex h-9 w-9 items-center justify-center rounded-brand-8 bg-danger-bg text-primary"><UserPlus size={18} /></span>
                             <div>
@@ -94,7 +95,7 @@ export default function AddPartyDialog({ onSaved, trigger, defaultType = "custom
                                     return (
                                         <label key={t} className="cursor-pointer">
                                             <input type="radio" value={t} {...register("type")} className="peer sr-only" />
-                                            <span className="flex flex-col gap-0.5 rounded-brand-8 border border-border-clr p-2.5 default-transition peer-checked:border-primary peer-checked:bg-danger-bg peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30">
+                                            <span className="flex flex-col gap-0.5 rounded-brand-8 border border-border-clr p-2.5 bg-page-bg default-transition peer-checked:border-primary peer-checked:bg-danger-bg peer-focus-visible:ring-2 peer-focus-visible:ring-primary/30">
                                                 <span className="flex items-center gap-1.5 para-small font-semibold text-text-dark"><Icon size={15} />{PARTY_TYPE_LABELS[t]}</span>
                                                 <span className="para-tiny text-text-secondary-muter">{TYPE_HINT[t]}</span>
                                             </span>

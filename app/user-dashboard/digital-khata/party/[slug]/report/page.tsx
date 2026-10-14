@@ -77,6 +77,7 @@ export default function PartyReportPage() {
                 />
             </div>
 
+            {/* filters */}
             <div className="grid grid-cols-1 gap-brand-8 rounded-brand-12 border border-border-clr bg-white p-brand-12 sm:grid-cols-2 lg:grid-cols-4 print:hidden">
                 <Field label="Entry dhoondein">
                     <IconBox icon={Search}>
