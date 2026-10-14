@@ -54,9 +54,8 @@ function DigitalKhataDashboardCardV2() {
             group relative flex min-h-0 flex-col justify-between overflow-hidden
             rounded-2xl border border-border-clr bg-white/80 p-4 text-text-dark
             shadow-sm transition-all duration-200 ease-out
-            hover:-translate-y-0.5 hover:border-primary/30 hover:bg-[#fff7f8] 
-          "
-        >
+            hover:-translate-y-0.5 hover:border-primary/30 hover:bg-[#fff7f8]"
+         >
           <div className="relative flex items-center justify-between">
             <div className="flex h-7 w-7 items-center justify-center rounded-xl bg-[#fff1f4] text-primary transition-colors duration-200 group-hover:bg-primary group-hover:text-white">
               <Icon className="h-[15px] w-[15px]" strokeWidth={2} />
